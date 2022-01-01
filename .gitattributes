@@ -1,0 +1,22 @@
+.github export-ignore
+tests export-ignore
+phpunit.xml.dist export-ignore
+phpcs.xml.dist export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.coveralls.yml export-ignore
+phpunit.xml.dist export-ignore
+.php-cs-fixer.php export-ignore
+CHANGELOG.md export-ignore
+README.md export-ignore
+
+app export-ignore
+bin export-ignore
+config export-ignore
+database export-ignore
+docker export-ignore
+refactor export-ignore;
+logs export-ignore
+public export-ignore
+tests export-ignore
+tmp export-ignore

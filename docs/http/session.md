@@ -1,0 +1,3 @@
+# Session
+
+PSR friendly session.

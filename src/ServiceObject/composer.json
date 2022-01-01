@@ -1,0 +1,17 @@
+{
+    "name": "jamielsharief/service-object",
+    "description": "Service object",
+    "type": "library",
+    "keywords": [
+        "library"
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Lightning\\ServiceObject\\": "."
+        }
+    },
+    "require": {
+        "php": ">=7.4.0"
+    }
+}

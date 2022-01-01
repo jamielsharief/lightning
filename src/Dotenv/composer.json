@@ -1,0 +1,20 @@
+{
+    "name": "lightning/dotenv",
+    "description": "DOT Env",
+    "type": "library",
+    "keywords": [
+        "library"
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Lightning\\Dotenv\\": "."
+        },
+        "files": [
+            "functions.php"
+          ]
+    },
+    "require": {
+        "php": ">=7.4.0"
+    }
+}

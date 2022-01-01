@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Demo 1.0.0\n"
+"Report-Msgid-Bugs-To: user@example.com \n"
+"Last-Translator:  <user@example.com>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "This is a translation test."
+msgstr "Esta es una prueba de traducción."
+
+msgid "Welcome to our application %s."
+msgstr "Bienvenido a nuestra aplicación %s"
+
+msgid "Welcome back %1$s, your last vist was on %2$s."
+msgstr "Bienvenido de nuevo %1$s, tu última visita fue en %2$s."
+
+msgid "%d apple"
+msgid_plural "%d apples"
+msgstr[0] "Solo hay una manzana"
+msgstr[1] "%d manzanas"

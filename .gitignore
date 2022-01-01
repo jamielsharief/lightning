@@ -1,0 +1,16 @@
+node_modules/
+/composer.lock
+/phpunit.xml
+/vendor
+.env
+.vscode
+.php_cs.cache
+.phpunit.result.cache
+.idea/
+coverage/
+public/debugbar
+
+# Temporary
+app/
+bin/
+refactor/

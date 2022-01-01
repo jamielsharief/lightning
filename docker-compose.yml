@@ -1,0 +1,38 @@
+version: "3"
+services:
+  app:
+    build: .
+    ports:
+      - "3000:80"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+      - pgsql
+    links:
+      - mysql
+      - pgsql
+  mysql:
+    image: jamielsharief/mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+  pgsql:
+    image: postgres:12.5
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+volumes:
+  mysql-data:
+  pg-data:

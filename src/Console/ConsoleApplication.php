@@ -166,7 +166,7 @@ class ConsoleApplication implements CommandInterface
             return self::ERROR;
         }
 
-        array_unshift($args, $file, $subCommand);
+        array_unshift($args, $file);
 
         return $this->instances[$subCommand]->run($args);
     }

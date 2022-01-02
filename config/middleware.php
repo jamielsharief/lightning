@@ -22,10 +22,10 @@ use Lightning\Http\ExceptionHandler\ExceptionHandlerMiddleware;
  * @exampe $router->addMiddleware(new SessionMiddleware);
  */
 return function (Router $router, ContainerInterface $container) {
-    $router->middleware(new ExceptionHandlerMiddleware(
-        __DIR__ . '/../app/View/error', new ErrorRenderer(), new Psr17Factory(), $container->get(LoggerInterface::class)
-        )
-    );
+    // $router->middleware(new ExceptionHandlerMiddleware(
+    //     __DIR__ . '/../app/View/error', new ErrorRenderer(), new Psr17Factory(), $container->get(LoggerInterface::class)
+    //     )
+    // );
     $router->middleware(new SessionMiddleware(new PhpSession()));
     $router->middleware(new CookieMiddleware(new Cookies()));
     //$router->middleware(new TranslationMiddleware($container->get(TranslatorInterface::class), ['en_GB']));

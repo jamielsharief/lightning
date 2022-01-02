@@ -6,9 +6,10 @@ use Nyholm\Psr7\Response;
 use Lightning\Router\Router;
 use Psr\Log\LoggerInterface;
 use App\View\ApplicationView;
-use Lightning\Log\FileLogger;
+use Lightning\Logger\FileLogger;
 use Lightning\Autowire\Autowire;
 use Lightning\View\ViewCompiler;
+use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Event\EventDispatcher;
 use Lightning\Translator\Translator;
@@ -20,6 +21,7 @@ use Lightning\Translator\TranslatorInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
+
 use Lightning\Translator\MessageLoader\PhpMessageLoader;
 
 /**
@@ -53,7 +55,7 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
      PDO::class => function (ContainerInterface $container) {
          $pdoFactory = new PdoFactory();
 
-         return $pdoFactory->create(getenv('DB_URL'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+         return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
      },
 
      // TODO: I want to share this

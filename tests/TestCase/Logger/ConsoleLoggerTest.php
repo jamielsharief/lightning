@@ -4,7 +4,7 @@ namespace Lightning\Test\Logger;
 
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
-use Lightning\Log\ConsoleLogger;
+use Lightning\Logger\ConsoleLogger;
 
 final class ConsoleLoggerTest extends TestCase
 {

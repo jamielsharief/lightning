@@ -2,8 +2,6 @@
 
 Simple PSR loggers
 
-> PENDING: Channel setting
-
 # Usage
 
 ```php

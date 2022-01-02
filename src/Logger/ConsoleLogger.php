@@ -11,7 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Log;
+namespace Lightning\Logger;
 
 use Psr\Log\LogLevel;
 use InvalidArgumentException;

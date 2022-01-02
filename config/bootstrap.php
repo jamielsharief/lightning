@@ -18,7 +18,7 @@ include dirname(__DIR__) . '/src/Dotenv/functions.php'; // TODO: temp
 // Load .env
 $dotEnv = (new Dotenv(dirname(__DIR__)))->load();
 
-if (filter_var(env('APP_DEBUG', true), FILTER_VALIDATE_BOOLEAN) === 'true') {
+if (filter_var(env('APP_DEBUG', true), FILTER_VALIDATE_BOOLEAN) === true) {
     $whoops = new \Whoops\Run();
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
     $whoops->register();

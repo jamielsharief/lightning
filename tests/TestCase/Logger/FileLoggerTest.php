@@ -2,7 +2,7 @@
 
 namespace Lightning\Test\Logger;
 
-use Lightning\Log\FileLogger;
+use Lightning\Logger\FileLogger;
 use PHPUnit\Framework\TestCase;
 
 final class FileLoggerTest extends TestCase

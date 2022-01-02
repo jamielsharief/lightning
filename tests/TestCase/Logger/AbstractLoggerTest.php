@@ -3,7 +3,7 @@
 namespace Lightning\Test\Logger;
 
 use Psr\Log\LogLevel;
-use Lightning\Log\FileLogger;
+use Lightning\Logger\FileLogger;
 use PHPUnit\Framework\TestCase;
 
 final class AbstractLoggerTest extends TestCase

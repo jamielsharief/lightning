@@ -2,12 +2,14 @@
 
 namespace Lightning\Test\Console;
 
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Console\Arguments;
 use Lightning\Console\ConsoleIo;
 use Lightning\ServiceObject\Result;
 use Lightning\Console\AbstractCommand;
 use Lightning\Console\ConsoleArgumentParser;
+use Lightning\Console\TestSuite\ConsoleIoStub;
 use Lightning\Console\TestSuite\ConsoleIntegrationTestTrait;
 
 class DummyCommand extends AbstractCommand
@@ -55,6 +57,27 @@ class DummyCommand extends AbstractCommand
 final class ConsoleIntegrationTestTraitTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
+
+    public function testGetIoException(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Console IO stub not created');
+        $this->getIo();
+    }
+
+    public function testCreateConsoleIoStub(): void
+    {
+        $this->assertInstanceOf(ConsoleIoStub::class, $this->createConsoleIoStub());
+    }
+
+    /**
+     * @depends testCreateConsoleIoStub
+     */
+    public function testGetConsoleIoStub(): void
+    {
+        $this->createConsoleIoStub();
+        $this->assertInstanceOf(ConsoleIoStub::class, $this->getIo());
+    }
 
     public function testExitSuccesss(): void
     {

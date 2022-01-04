@@ -27,6 +27,6 @@ return function (Router $router, ContainerInterface $container) {
     //     )
     // );
     $router->middleware(new SessionMiddleware(new PhpSession()));
-    $router->middleware(new CookieMiddleware(new Cookies()));
+    $router->middleware(new CookieMiddleware($container->get(Cookies::class)));
     //$router->middleware(new TranslationMiddleware($container->get(TranslatorInterface::class), ['en_GB']));
 };

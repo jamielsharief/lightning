@@ -15,6 +15,7 @@ namespace Lightning\Http\Cookie;
 
 use Stringable;
 use InvalidArgumentException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Cookie
@@ -254,7 +255,7 @@ class Cookie implements Stringable
     {
         $out = [];
 
-        $out[] = sprintf('%s=%s', $this->name, urlencode($this->value));
+        $out[] = sprintf('%s=%s', $this->name, rawurlencode($this->value));
         $out[] = sprintf('max-age=%s', $this->maxAge);
 
         if (! empty($this->path)) {
@@ -288,5 +289,16 @@ class Cookie implements Stringable
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    /**
+     * Adds this Cookie to a response
+     *
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function addToResponse(ResponseInterface $response): ResponseInterface
+    {
+        return $response->withAddedHeader('Set-Cookie', $this->toString());
     }
 }

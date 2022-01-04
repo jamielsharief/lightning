@@ -36,9 +36,21 @@ class ResponseEmitter
             sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase())
         );
 
+        $cookies = [];
         foreach ($response->getHeaders() as $key => $value) {
+            if (strtolower($key) === 'set-cookie') {
+                $cookies = $value;
+
+                continue;
+            }
             $this->sendHeader(
                 sprintf('%s: %s', $key, $response->getHeaderLine($key))
+            );
+        }
+
+        foreach ($cookies as $cookie) {
+            $this->sendHeader(
+                sprintf('Set-Cookie: %s', $cookie, $response->getHeaderLine($key))
             );
         }
 

@@ -50,7 +50,7 @@ class ResponseEmitter
 
         foreach ($cookies as $cookie) {
             $this->sendHeader(
-                sprintf('Set-Cookie: %s', $cookie, $response->getHeaderLine($key))
+                sprintf('Set-Cookie: %s', $cookie)
             );
         }
 

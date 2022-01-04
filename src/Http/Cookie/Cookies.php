@@ -13,26 +13,34 @@
 
 namespace Lightning\Http\Cookie;
 
+use Countable;
+use Traversable;
+use ArrayIterator;
+use IteratorAggregate;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * TODO: move to own repo, Cookies and Cookie object perhaps.
- */
-class Cookies
+class Cookies implements Countable, IteratorAggregate
 {
-    protected ?ServerRequestInterface $request;
+    protected array $cookies = [];
 
-    protected array $requestCookies = [];
-    protected array $responseCookies = [];
+    /**
+     * @var Cookie[]
+     */
+    protected array $cookiesToSet = [];
 
-    public function __construct(?ServerRequestInterface $request = null)
+    /**
+     * Constructor
+     *
+     * @param array $cookies
+     */
+    public function __construct(array $cookies = [])
     {
-        $this->request = $request;
-        $this->requestCookies = $request ? $request->getCookieParams() : [];
+        $this->cookies = $cookies;
     }
 
     /**
-     * Gets a cookie from the request
+     * Gets a value of a cookie
      *
      * @param string $name
      * @param mixed $default
@@ -40,7 +48,7 @@ class Cookies
      */
     public function get(string $name, $default = null)
     {
-        return array_key_exists($name, $this->requestCookies) ? $this->requestCookies[$name] : $default;
+        return array_key_exists($name, $this->cookies) ? $this->cookies[$name] : $default;
     }
 
     /**
@@ -51,94 +59,67 @@ class Cookies
      */
     public function has(string $name): bool
     {
-        return array_key_exists($name, $this->requestCookies);
+        return array_key_exists($name, $this->cookies);
     }
 
     /**
-     * Sets a cookie for deletion
+     * Sets a cookie that will be written to the response
      *
-     * @param string $name
+     * @param Cookie $cookie
      * @return self
      */
-    public function delete(string $name): self
+    public function add(Cookie $cookie): self
     {
-        $this->set($name, '', [
-            'expires' => time() - 3600
-        ]);
+        $this->cookiesToSet[] = $cookie;
 
         return $this;
     }
 
     /**
-     * Creates a new cookie
+     * Adds cookies that were set to the Response object
      *
-     * @param string $name
-     * @param string $value
-     * @param array $options
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function addToResponse(ResponseInterface $response): ResponseInterface
+    {
+        foreach ($this->cookiesToSet as $cookie) {
+            $response = $cookie->addToResponse($response);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sets the ServerRequest to read cookies from
+     *
+     * @param ServerRequestInterface $request
      * @return self
      */
-    public function set(string $name, string $value, array $options = []): self
+    public function setServerRequest(ServerRequestInterface $request): self
     {
-        $options += [
-            'path' => '/', // path on server
-            'domain' => '', // domains cookie will be available on
-            'secure' => false, // only send if through https
-            'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expires' => null,
-            'sameSite' => '' // lax/strict/none
-        ];
-
-        $options['name'] = $name;
-        $options['value'] = $value;
-
-        $this->responseCookies[$name] = $options;
+        $this->cookies = $request->getCookieParams();
 
         return $this;
     }
 
     /**
-     * Convert the cookies  to be set to an array of headers
+     * Gets the cookies from this request
      *
-     * @return array
+     * @return Traversable
      */
-    public function toArray(): array
+    public function getIterator(): Traversable
     {
-        return array_map(function ($cookie) {
-            return $this->cookieToHeaderString($cookie);
-        }, $this->responseCookies);
+        return new ArrayIterator($this->cookies);
     }
 
-    private function cookieToHeaderString(array $cookie): string
+    /**
+     * Gets the cookie count from this request
+     *
+     * @return integer
+     */
+    public function count(): int
     {
-        $out = [];
-
-        $out[] = urlencode($cookie['name']) . '=' . urlencode($cookie['value']);
-
-        if ($cookie['expires'] !== null) {
-            $time = is_string($cookie['expires']) ? strtotime($cookie['expires']) : $cookie['expires'];
-            $out[] = 'expires=' . gmdate('D, d M Y H:i:s T', $time);
-        }
-
-        if (! empty($cookie['path'])) {
-            $out[] = 'path=' . $cookie['path'];
-        }
-
-        if (! empty($cookie['domain'])) {
-            $out[] = 'domain=' . $cookie['domain'];
-        }
-
-        if ($cookie['secure']) {
-            $out[] = 'secure';
-        }
-
-        if ($cookie['httpOnly']) {
-            $out[] = 'httponly';
-        }
-
-        if ($cookie['sameSite']) {
-            $out[] = 'samesite='  . $cookie['sameSite'];
-        }
-
-        return implode('; ', $out);
+        return count($this->cookies);
     }
 }

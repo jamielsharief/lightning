@@ -22,6 +22,11 @@ class CookieMiddleware implements MiddlewareInterface
 {
     protected Cookies $cookies;
 
+    /**
+     * Constructor
+     *
+     * @param Cookies $cookies
+     */
     public function __construct(Cookies $cookies)
     {
         $this->cookies = $cookies;
@@ -35,11 +40,9 @@ class CookieMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = $handler->handle($request);
+        $this->cookies->setServerRequest($request);
 
-        foreach ($this->cookies->toArray() as $header) {
-            $response = $response->withAddedHeader('Set-Cookie', $header);
-        }
+        $response = $this->cookies->addToResponse($handler->handle($request));
 
         return $response;
     }

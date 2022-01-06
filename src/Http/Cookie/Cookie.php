@@ -55,7 +55,7 @@ class Cookie implements Stringable
      * @param string $name
      * @param string $value
      */
-    public function __construct(string $name, string $value)
+    public function __construct(string $name, string $value = '')
     {
         /// space, tab, ( ) < > @ , ; : \ " / [ ] ? = { }
         if ((bool) preg_match('#[\s\t\(\)\[\]<>@,;:?="/\\\]#', $name)) {

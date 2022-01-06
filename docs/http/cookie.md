@@ -8,6 +8,7 @@ A `Cookie` object
 ```php
 $cookie = new Cookie('foo','bar');
 
+$cookie->setMaxAge(3600);
 $cookie->setHttpOnly(true);
 $cookie->setSecure(true);
 $cookie->setPath('/');

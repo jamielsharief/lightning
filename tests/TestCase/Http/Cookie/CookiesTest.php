@@ -26,6 +26,17 @@ final class CookiesTest extends TestCase
         $this->assertFalse($cookies->has('bar'));
     }
 
+    public function testDelete(): void
+    {
+        $response = new Response();
+        $cookies = new Cookies();
+        $cookies->delete(new Cookie('foo'));
+
+        $response = $cookies->addToResponse($response);
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertEquals('foo=; max-age=-1; path=/', $response->getHeaderLine('Set-Cookie'));
+    }
+
     public function testAddToResponse(): void
     {
         $cookies = new Cookies(['abc' => '1234']);
@@ -37,7 +48,7 @@ final class CookiesTest extends TestCase
 
         $response = $cookies->addToResponse($response);
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertEquals('foo=bar; max-age=-1; path=/', $response->getHeaderLine('Set-Cookie'));
+        $this->assertEquals('foo=bar; path=/', $response->getHeaderLine('Set-Cookie'));
     }
 
     public function testGetIterator(): void

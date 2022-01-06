@@ -32,7 +32,7 @@ class Cookie implements Stringable
      *
      * @var integer
      */
-    protected int $maxAge = -1;
+    protected int $maxAge = 0;
 
     /**
      * By default cookies on whole domain (javascript default is page ownly)
@@ -256,7 +256,10 @@ class Cookie implements Stringable
         $out = [];
 
         $out[] = sprintf('%s=%s', $this->name, rawurlencode($this->value));
-        $out[] = sprintf('max-age=%s', $this->maxAge);
+
+        if ($this->maxAge !== 0) {
+            $out[] = sprintf('max-age=%s', $this->maxAge);
+        }
 
         if (! empty($this->path)) {
             $out[] = sprintf('path=%s', $this->path);

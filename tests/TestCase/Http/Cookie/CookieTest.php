@@ -42,7 +42,7 @@ final class CookieTest extends TestCase
     public function testMaxAge(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals(-1, $cookie->getMaxAge());
+        $this->assertEquals(0, $cookie->getMaxAge());
         $this->assertEquals(3600, $cookie->setMaxAge(3600)->getMaxAge());
     }
 
@@ -88,42 +88,42 @@ final class CookieTest extends TestCase
     public function testToString(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo=bar; max-age=-1; path=/', $cookie->toString());
-        $this->assertEquals('foo=bar; max-age=-1; path=/', (string) $cookie);
+        $this->assertEquals('foo=bar; path=/', $cookie->toString());
+        $this->assertEquals('foo=bar; path=/', (string) $cookie);
     }
 
     public function testToStringDomain(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo=bar; max-age=-1; path=/', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/', (string) $cookie); // no domain
 
         $cookie->setDomain('example.com');
-        $this->assertEquals('foo=bar; max-age=-1; path=/; domain=example.com', (string) $cookie);
+        $this->assertEquals('foo=bar; path=/; domain=example.com', (string) $cookie);
     }
 
     public function testToStringHttpOnly(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo=bar; max-age=-1; path=/', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/', (string) $cookie); // no domain
 
         $cookie->setHttpOnly(true);
-        $this->assertEquals('foo=bar; max-age=-1; path=/; httponly', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/; httponly', (string) $cookie); // no domain
     }
     public function testToSecure(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo=bar; max-age=-1; path=/', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/', (string) $cookie); // no domain
 
         $cookie->setSecure(true);
-        $this->assertEquals('foo=bar; max-age=-1; path=/; secure', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/; secure', (string) $cookie); // no domain
     }
 
     public function testToSameSite(): void
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo=bar; max-age=-1; path=/', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/', (string) $cookie); // no domain
 
         $cookie->setSameSite('Lax');
-        $this->assertEquals('foo=bar; max-age=-1; path=/; samesite=Lax', (string) $cookie); // no domain
+        $this->assertEquals('foo=bar; path=/; samesite=Lax', (string) $cookie); // no domain
     }
 }

@@ -63,7 +63,7 @@ class Cookies implements Countable, IteratorAggregate
     }
 
     /**
-     * Sets a cookie that will be written to the response
+     * Adds a cookie to the response
      *
      * @param Cookie $cookie
      * @return self
@@ -71,6 +71,19 @@ class Cookies implements Countable, IteratorAggregate
     public function add(Cookie $cookie): self
     {
         $this->cookiesToSet[] = $cookie;
+
+        return $this;
+    }
+
+    /**
+     * Deletes a cookie for the next request
+     *
+     * @param Cookie $cookie
+     * @return self
+     */
+    public function delete(Cookie $cookie): self
+    {
+        $this->cookiesToSet[] = $cookie->setMaxAge(-1)->setValue('');
 
         return $this;
     }

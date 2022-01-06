@@ -33,6 +33,6 @@ final class CookieMiddlewareTest extends TestCase
 
         $response = $middleware->process(new ServerRequest('GET', '/'), new TestRequestHandler(new Response()));
 
-        $this->assertEquals('foo=bar; max-age=-1; path=/', $response->getHeaderLine('Set-Cookie'));
+        $this->assertEquals('foo=bar; path=/', $response->getHeaderLine('Set-Cookie'));
     }
 }

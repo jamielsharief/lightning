@@ -40,10 +40,10 @@ class CookieMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $this->cookies->setServerRequest($request);
+        $request = $request->withAttribute('cookies', $this->cookies);
 
-        $response = $this->cookies->addToResponse($handler->handle($request));
-
-        return $response;
+        return $this->cookies
+            ->setServerRequest($request)
+            ->addToResponse($handler->handle($request));
     }
 }

@@ -90,3 +90,17 @@ $this->setSession([
     'user_id' => 1234
 ]);
 ```
+
+## Testing Middleware
+
+The `TestRequestHandler` helps making it easy to test middleware in a consistent manner.
+
+```php
+public function testMiddleware(): void
+{
+    $fooMiddleware = new FooMiddleware();
+    $serverRequest = new ServerRequest('GET', '/');
+    $response = $middleware->process($serverRequest, new TestRequestHandler(new Response()));
+    // Do your checks
+}
+```

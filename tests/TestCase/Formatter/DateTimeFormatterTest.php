@@ -79,15 +79,36 @@ final class DateTimeFormatterTest extends TestCase
         $this->assertEquals('1999-07-01', $datetime->date('1999-07-01 22:00:00'));
     }
 
+    public function testDateSetFormat(): void
+    {
+        $datetime = new DateTimeFormatter();
+
+        $this->assertEquals('01.07.99', $datetime->setDateFormat('d.m.y')->date('1999-07-01 22:00:00'));
+    }
+
     public function testDateTime(): void
     {
         $datetime = new DateTimeFormatter();
         $this->assertEquals('1999-07-01 22:00:00', $datetime->datetime('1999-07-01 22:00:00'));
     }
 
+    public function testDateTimeSetFormat(): void
+    {
+        $datetime = new DateTimeFormatter();
+
+        $this->assertEquals('Thursday, 01-Jul-1999 22:00:00 UTC', $datetime->setDateTimeFormat(DateTime::COOKIE)->datetime('1999-07-01 22:00:00'));
+    }
+
     public function testTime(): void
     {
         $datetime = new DateTimeFormatter();
         $this->assertEquals('22:00:00', $datetime->time('1999-07-01 22:00:00'));
+    }
+
+    public function testTimeSetFormat(): void
+    {
+        $datetime = new DateTimeFormatter();
+
+        $this->assertEquals('22:00:00 UTC', $datetime->setTimeformat('H:i:s T')->time('1999-07-01 22:00:00'));
     }
 }

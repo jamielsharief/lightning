@@ -116,9 +116,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
     /**
      * Gets the data to be serialized
      *
-     * @return mixed
+     * @return array
      */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->data;
     }

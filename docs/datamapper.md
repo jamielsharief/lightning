@@ -52,10 +52,45 @@ $count = $article->updateAllBy(
     ['status'=>'pending','owner'=> 1234], 
     ['status'=>'approved']
 );
-$count $aritcle->deleteAllBy([
+$count = $aritcle->deleteAllBy([
     'status'=>'draft',
     'created_date <' => date('Y-m-d H:i:s',strtotime('- 3 months'))
 ]);
+```
+
+## Query Object
+
+Under the hood, the find methods use the `QueryObject`, this object is passed to the `Events` and `Hooks`.
+
+```php
+$query = new QueryObject(['status' => 'pending'],['order' => 'title DESC']);
+$result = $mapper->find($query);
+$result = $mapper->findAll($query);
+$result = $mapper->findCount($query);
+$mapper->deleteAll($query);
+$mapper->updateAll($query, ['status'=> 'approved']);
+```
+
+## ResultSet
+
+During the find query the results from the database query are in the `ResultSet` object, and this is passed around to `Events` and `Hooks` and make it easy
+for modification.
+
+```php
+function addFoo(ResultSet $resultSet) { 
+    foreach($resultSet as $key => $row){
+        $resultSet[$key]['foo'] = 'bar';
+    }
+}
+```
+
+The `ResultSet` object implements `ArrayAccess` and `Countable` and offers some basic methods for working with a result collection.
+
+```php
+$resultSet->isEmpty();
+$row = $resultSet->first();
+$array = $resultSet->toArray();
+$string = $resultSet->toString();
 ```
 
 ## Hooks

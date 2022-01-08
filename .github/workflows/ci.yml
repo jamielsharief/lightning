@@ -73,11 +73,11 @@ jobs:
 
             if [[ ${{ matrix.database }} == 'postgres' ]]; then
              
-              export DB_URL="pgsql:host=postgres;port=5432;dbname=lightning";
+              export DB_URL="pgsql:host=127.0.0.1;port=5432;dbname=lightning";
               export DB_USERNAME=postgres;
-              export DB_PASSWORD=postgres;
+              export DB_PASSWORD=root
 
-              sudo psql -h postgres -U postgres -d lightning -f database/schema/postgres.sql
+              sudo PGPASSWORD=root psql -h 127.0.0.1 -U postgres -d lightning -f database/schema/postgres.sql
             fi;
 
             php vendor/bin/phpunit --coverage-clover build/logs/clover.xml

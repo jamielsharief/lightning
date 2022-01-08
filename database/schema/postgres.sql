@@ -1,113 +1,88 @@
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE posts_seq;
-
 CREATE TABLE posts (
-  id int check (id > 0) NOT NULL DEFAULT NEXTVAL ('posts_seq'),
+  id SERIAL PRIMARY KEY,
   title varchar(50) DEFAULT NULL,
   body text,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
 
-ALTER SEQUENCE posts_seq RESTART WITH 1000;
-
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE articles_seq;
 
 CREATE TABLE articles (
-  id int check (id > 0) NOT NULL DEFAULT NEXTVAL ('articles_seq'),
+  id SERIAL PRIMARY KEY,
   title varchar(50) DEFAULT NULL,
   body text,
   author_id integer NOT NULL,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
 
-ALTER SEQUENCE articles_seq RESTART WITH 1000;
 
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE authors_seq;
 
 CREATE TABLE authors (
-  id int check (id > 0) NOT NULL DEFAULT NEXTVAL ('authors_seq'),
+  id SERIAL PRIMARY KEY,
   name varchar(80) DEFAULT NULL,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
 
-ALTER SEQUENCE authors_seq RESTART WITH 1000;
 
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE users_seq;
 
 CREATE TABLE users (
-  id int check (id > 0) NOT NULL DEFAULT NEXTVAL ('users_seq'),
+  id SERIAL PRIMARY KEY,
   name varchar(80) DEFAULT NULL,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
 
-ALTER SEQUENCE users_seq RESTART WITH 1000;
-
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE profiles_seq;
-
 CREATE TABLE profiles (
-  id int check (id > 0) NOT NULL DEFAULT NEXTVAL ('profiles_seq'),
+  id SERIAL PRIMARY KEY,
   name varchar(80) DEFAULT NULL,
   user_id integer NOT NULL,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
-
-ALTER SEQUENCE profiles_seq RESTART WITH 1000;
-
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE tags_seq;
 
 CREATE TABLE tags (
-  id int NOT NULL DEFAULT NEXTVAL ('tags_seq'),
+  id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
   created_at timestamp(0) NOT NULL,
-  updated_at timestamp(0) NOT NULL,
-  PRIMARY KEY (id)
+  updated_at timestamp(0) NOT NULL
 );
 
-ALTER SEQUENCE tags_seq RESTART WITH 1000;
 
--- SQLINES LICENSE FOR EVALUATION USE ONLY
 CREATE TABLE posts_tags (
   post_id int NOT NULL,
   tag_id int NOT NULL,
   PRIMARY KEY (post_id, tag_id)
 );
 
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE migrations_seq;
 
 CREATE TABLE migrations (
-  id MEDIUMINT NOT NULL DEFAULT NEXTVAL ('migrations_seq'),
+  id SERIAL PRIMARY KEY,
   version BIGINT NOT NULL,
-  created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
+  created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP
 );
 
--- SQLINES LICENSE FOR EVALUATION USE ONLY
-CREATE SEQUENCE queue_seq;
+
 
 CREATE TABLE queue (
-  id MEDIUMINT NOT NULL DEFAULT NEXTVAL ('queue_seq'),
+  id SERIAL PRIMARY KEY,
   body TEXT,
   queue VARCHAR(100) NOT NULL,
   scheduled TIMESTAMP(0) NOT NULL,
-  created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
+  created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER SEQUENCE posts_id_seq RESTART WITH 1000;
+ALTER SEQUENCE articles_id_seq RESTART WITH 1000;
+ALTER SEQUENCE articles_id_seq RESTART WITH 1000;
+ALTER SEQUENCE posts_id_seq RESTART WITH 1000;
+ALTER SEQUENCE authors_id_seq RESTART WITH 1000;
+ALTER SEQUENCE users_id_seq RESTART WITH 1000;
+ALTER SEQUENCE profiles_id_seq RESTART WITH 1000;
+ALTER SEQUENCE tags_id_seq RESTART WITH 1000;
+ALTER SEQUENCE migrations_seq RESTART WITH 1000;
+ALTER SEQUENCE queue_seq RESTART WITH 1000;
 
 /* SQLINES DEMO *** posts for testing: */
 INSERT INTO

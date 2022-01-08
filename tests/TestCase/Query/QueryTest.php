@@ -268,7 +268,7 @@ final class QueryTest extends TestCase
             ]);
 
         $this->assertSame(
-            'INSERT INTO posts (posts.title, posts.body, posts.created_at, posts.updated_at) VALUES (:v0, :v1, :v2, :v3)',
+            'INSERT INTO posts (title, body, created_at, updated_at) VALUES (:v0, :v1, :v2, :v3)',
             (string) $query
         );
 

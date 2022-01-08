@@ -536,10 +536,15 @@ class QueryBuilder implements Stringable
             $params[] = $this->getPlaceholder($value);
         }
 
+        $columns = [];
+        foreach ($this->parts['insert'] as $column) {
+            $columns[] = $this->quote($column);
+        }
+
         return sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quote($this->table),
-            implode(', ', $this->prepareColumns($this->parts['insert'])),
+            implode(', ', $columns),
             implode(', ', $params)
         );
     }

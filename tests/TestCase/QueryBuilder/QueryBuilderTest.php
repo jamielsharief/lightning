@@ -28,7 +28,7 @@ final class QueryBuilderTest extends TestCase
             ->values(array_values($article));
 
         $this->assertEquals(
-            'INSERT INTO `articles` (`articles`.`title`, `articles`.`body`, `articles`.`author_id`, `articles`.`created_at`, `articles`.`updated_at`) VALUES (:v0, :v1, :v2, :v3, :v4)',
+            'INSERT INTO `articles` (`title`, `body`, `author_id`, `created_at`, `updated_at`) VALUES (:v0, :v1, :v2, :v3, :v4)',
             (string) $builder
         );
     }

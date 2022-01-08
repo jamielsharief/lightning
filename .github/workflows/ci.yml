@@ -10,18 +10,6 @@ jobs:
   tests:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-20.04"
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     strategy:
       matrix:
         php-version:
@@ -39,6 +27,11 @@ jobs:
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE lightning;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
+      - name: Setup Postgres
+        if: matrix.database == 'postgres'
+        run: |
+          docker run -d -e POSTGRES_PASSWORD=root -e POSTGRES_DB=lightning -p 5432:5432 postgres
+          sudo apt-get install postgresql-client
       - name: Setup Redis
         run: docker run -p 6379:6379 -d redis
       - name: Checkout source code
@@ -62,11 +55,11 @@ jobs:
       - name: Run PHPUnit
         run: |
             if [[ ${{ matrix.database }} == 'sqlite' ]]; then
-              export DB_URL="sqlite:dbname=database/test.sqlite";
+              export DB_URL="sqlite:dbname=test.sqlite";
               export DB_USERNAME=root;
               export DB_PASSWORD=root;
 
-              cat database/schema/sqlite.sql | sqlite3 database/test.sqlite
+              cat database/schema/sqlite.sql | sqlite3 test.sqlite
             fi;
             
             if [[ ${{ matrix.database }} == 'mysql' ]]; then
@@ -80,11 +73,11 @@ jobs:
 
             if [[ ${{ matrix.database }} == 'postgres' ]]; then
              
-              export DB_URL="pgsql:host=postgres;port=5432;dbname=postgres";
+              export DB_URL="pgsql:host=postgres;port=5432;dbname=lightning";
               export DB_USERNAME=postgres;
               export DB_PASSWORD=postgres;
 
-              sudo psql -h postgres -U postgres -d postgres -f database/schema/postgres.sql
+              sudo psql -h postgres -U postgres -d lightning -f database/schema/postgres.sql
             fi;
 
             php vendor/bin/phpunit --coverage-clover build/logs/clover.xml

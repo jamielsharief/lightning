@@ -34,7 +34,7 @@ class MysqlDialect implements SqlDialectInterface
     public function truncate(string $table): array
     {
         return [
-            sprintf('TRUNCATE TABLE %s', $table)
+            sprintf('TRUNCATE TABLE %s', $this->quoteIdentifier($table))
         ];
     }
 

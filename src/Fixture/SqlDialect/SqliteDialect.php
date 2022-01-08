@@ -35,7 +35,7 @@ class SqliteDialect implements SqlDialectInterface
     {
         return [
             sprintf('DELETE FROM %s', $table),
-            sprintf('DELETE FROM sqlite_sequence WHERE name = %s', $table),
+            sprintf('DELETE FROM sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table)),
         ];
     }
 

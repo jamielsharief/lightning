@@ -34,7 +34,7 @@ class PostgresDialect implements SqlDialectInterface
     public function truncate(string $table): array
     {
         return [
-            sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', $table)
+            sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', $this->quoteIdentifier($table))
         ];
     }
 

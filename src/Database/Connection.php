@@ -27,7 +27,6 @@ class Connection
 {
     private PDO $pdo;
     private ?LoggerInterface $logger;
-    private bool $executed = false;
 
     /**
      * Constructor

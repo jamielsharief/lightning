@@ -6,6 +6,8 @@ use Lightning\Dotenv\Dotenv;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
+use function Lightning\Dotenv\env;
+
 final class DotenvTest extends TestCase
 {
     public function testLoad(): void
@@ -28,5 +30,18 @@ final class DotenvTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('`/nowhere` does not exist');
         new Dotenv('/nowhere');
+    }
+
+    public function testEnv(): void
+    {
+        $_SERVER['FOO'] = 'bar';
+        $_ENV['BAR'] = 'foo';
+        putenv('FOOBAR=true');
+
+        $this->assertEquals('bar', env('FOO'));
+        $this->assertEquals('foo', env('BAR'));
+        $this->assertEquals('true', env('FOOBAR'));
+        $this->assertNull(env('ABC'));
+        $this->assertEquals('default', env('ABC', 'default'));
     }
 }

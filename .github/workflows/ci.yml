@@ -39,17 +39,6 @@ jobs:
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE lightning;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
-          sudo mysql -uroot -proot -h 127.0.0.1 lightning < database/schema/schema.sql
-
-      - name: Setup Postgres
-        if: matrix.database == 'postgres'
-        run: |
-          psql -h 127.0.0.1 -U postgres -d postgres -f database/schema/postgres.sql
-
-      - name: Setup Sqlite
-        if: matrix.database == 'sqlite'
-        run: |
-          cat database/schema/sqlite.sql | sqlite3 database/test.sqlite
       - name: Setup Redis
         run: docker run -p 6379:6379 -d redis
       - name: Checkout source code
@@ -76,18 +65,26 @@ jobs:
               export DB_URL="sqlite:dbname=database/test.sqlite";
               export DB_USERNAME=root;
               export DB_PASSWORD=root;
+
+              cat database/schema/sqlite.sql | sqlite3 database/test.sqlite
             fi;
             
             if [[ ${{ matrix.database }} == 'mysql' ]]; then
               export DB_URL="mysql:host=127.0.0.1;port=3306;dbname=lightning";
               export DB_USERNAME=root;
               export DB_PASSWORD=root;
+
+              sudo mysql -uroot -proot -h 127.0.0.1 lightning < database/schema/schema.sql
+
             fi;
 
             if [[ ${{ matrix.database }} == 'postgres' ]]; then
+             
               export DB_URL="pgsql:host=postgres;port=5432;dbname=postgres";
               export DB_USERNAME=postgres;
               export DB_PASSWORD=postgres;
+
+              sudo psql -h postgres -U postgres -d postgres -f database/schema/postgres.sql
             fi;
 
             php vendor/bin/phpunit --coverage-clover build/logs/clover.xml

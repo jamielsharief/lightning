@@ -212,21 +212,37 @@ class Query implements IteratorAggregate
      */
     public function first()
     {
-        $row = $this->executeSelect()->fetch(PDO::FETCH_ASSOC);
+        $statement = $this->run();
 
-        return $row ? $this->mapRow($row) : null;
+        $row = $statement->fetch(PDO::FETCH_NUM);
+
+        return $row ? $this->mapRow($row, $this->getColumnMeta($statement)) : null;
+    }
+
+    private function getColumnMeta(PDOStatement $statement): array
+    {
+        $result = [];
+        $max = $statement->columnCount();
+        for ($column = 0;$column < $max;$column++) {
+            $meta = $statement->getColumnMeta($column);
+            $result[] = $meta['table'] . '.' . $meta['name'];
+        }
+
+        return $result;
     }
 
     /**
      * Gets all the records that match
      *
-     * @return Row[] $records
      */
     public function all(): array
     {
-        return array_map(function ($row) {
-            return $this->mapRow($row);
-        }, $this->executeSelect()->fetchAll(PDO::FETCH_ASSOC) ?: []);
+        $statement = $this->run();
+        $meta = $this->getColumnMeta($statement);
+
+        return array_map(function ($row) use ($meta) {
+            return $this->mapRow($row, $meta);
+        }, $statement->fetchAll(PDO::FETCH_ASSOC) ?: []);
     }
 
     /**
@@ -320,9 +336,11 @@ class Query implements IteratorAggregate
      * @param array $row
      * @return Row
      */
-    private function mapRow(array $data): Row
+    private function mapRow(array $data, array $meta): Row
     {
         $row = new Row();
+
+        $data = array_combine($meta, $data);
 
         foreach ($data as $field => $value) {
             $table = null;
@@ -381,20 +399,6 @@ class Query implements IteratorAggregate
         $id = $this->pdo->lastInsertId();
 
         return $id === '0' || $id === false ? null : $id;
-    }
-
-    /**
-     * @return PDOStatement
-     */
-    private function executeSelect(): PDOStatement
-    {
-        $this->pdo->setAttribute(PDO::ATTR_FETCH_TABLE_NAMES, true);
-
-        $statement = $this->run();
-
-        $this->pdo->setAttribute(PDO::ATTR_FETCH_TABLE_NAMES, false);
-
-        return $statement;
     }
 
     /**

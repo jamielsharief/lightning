@@ -55,12 +55,10 @@ jobs:
       - name: Run PHPUnit
         run: |
             if [[ ${{ matrix.database }} == 'sqlite' ]]; then
-              export DB_URL="sqlite:dbname=${PWD}/test.sqlite";
+              export DB_URL="sqlite:${PWD}/test.sqlite";
               export DB_USERNAME=root;
               export DB_PASSWORD=root;
-              echo "sqlite:dbname=${PWD}/test.sqlite";
-              echo "database/schema/sqlite.sql | sqlite3 ${PWD}/test.sqlite";
-              
+        
               cat database/schema/sqlite.sql | sqlite3 ${PWD}/test.sqlite
             fi;
             

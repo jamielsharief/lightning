@@ -19,7 +19,7 @@ jobs:
         database:
           - mysql
  #         - postgres
- #         - sqlite
+          - sqlite
     steps:
       - name: Setup MySQL
         if: matrix.database == 'mysql'
@@ -55,11 +55,11 @@ jobs:
       - name: Run PHPUnit
         run: |
             if [[ ${{ matrix.database }} == 'sqlite' ]]; then
-              export DB_URL="sqlite:dbname=test.sqlite";
+              export DB_URL="sqlite:dbname=${PWD}/test.sqlite";
               export DB_USERNAME=root;
               export DB_PASSWORD=root;
 
-              cat database/schema/sqlite.sql | sqlite3 test.sqlite
+              cat database/schema/sqlite.sql | sqlite3 ${PWD}/test.sqlite
             fi;
             
             if [[ ${{ matrix.database }} == 'mysql' ]]; then

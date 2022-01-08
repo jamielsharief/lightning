@@ -24,6 +24,12 @@ class BeforeFindEvent implements StoppableEventInterface
 
     protected bool $stopped = false;
 
+    /**
+     * Constructor
+     *
+     * @param AbstractDataMapper $dataMapper
+     * @param QueryObject $query
+     */
     public function __construct(AbstractDataMapper $dataMapper, QueryObject $query)
     {
         $this->dataMapper = $dataMapper;
@@ -40,11 +46,21 @@ class BeforeFindEvent implements StoppableEventInterface
         return $this->dataMapper;
     }
 
+    /**
+     * Gets the Query Object
+     *
+     * @return QueryObject
+     */
     public function getQuery(): QueryObject
     {
         return $this->query;
     }
 
+    /**
+     * Stops the Event
+     *
+     * @return self
+     */
     public function stop(): self
     {
         $this->stopped = true;
@@ -52,6 +68,11 @@ class BeforeFindEvent implements StoppableEventInterface
         return $this;
     }
 
+    /**
+     * Checks if the Event was stopped
+     *
+     * @return boolean
+     */
     public function isPropagationStopped(): bool
     {
         return $this->stopped;

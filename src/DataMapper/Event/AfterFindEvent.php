@@ -48,13 +48,18 @@ class AfterFindEvent
         return $this->dataMapper;
     }
 
+    /**
+     * Gets the Query Object
+     *
+     * @return QueryObject
+     */
     public function getQuery(): QueryObject
     {
         return $this->query;
     }
 
     /**
-     * Get the colleciton of the results
+     * Get the ResultSet from the find query
      *
      * @return ResultSet
      */

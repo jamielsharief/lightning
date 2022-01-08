@@ -42,4 +42,11 @@ class PostgresDialect implements SqlDialectInterface
     {
         return sprintf('"%s"', $identifier);
     }
+
+    public function resetAutoIncrement(string $table, int $id, string $column = 'id'): array
+    {
+        return [
+            sprintf('ALTER SEQUENCE %s_%s_seq RESTART WITH %d', $table, $column, $id)
+        ];
+    }
 }

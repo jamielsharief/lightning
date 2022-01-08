@@ -34,7 +34,7 @@ class SqliteDialect implements SqlDialectInterface
     public function truncate(string $table): array
     {
         return [
-            sprintf('DELETE FROM %s', $table),
+            sprintf('DELETE FROM %s', $this->quoteIdentifier($table)),
             sprintf('DELETE FROM sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table)),
         ];
     }
@@ -42,5 +42,12 @@ class SqliteDialect implements SqlDialectInterface
     public function quoteIdentifier(string $identifier): string
     {
         return sprintf('"%s"', $identifier);
+    }
+
+    public function resetAutoIncrement(string $table, int $id, string $column = 'id'): array
+    {
+        return [
+            sprintf('SQLITE_SEQUENCE SET SEQ = %d WHERE NAME = %s', $id, $this->quoteIdentifier($table))
+        ];
     }
 }

@@ -42,4 +42,11 @@ class MysqlDialect implements SqlDialectInterface
     {
         return sprintf('`%s`', $identifier);
     }
+
+    public function resetAutoIncrement(string $table, int $id, string $column = 'id'): array
+    {
+        return [
+            sprintf('ALTER TABLE %s AUTO_INCREMENT = %d', $this->quoteIdentifier($table), $id)
+        ];
+    }
 }

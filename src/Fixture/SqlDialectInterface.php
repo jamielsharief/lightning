@@ -22,4 +22,6 @@ interface SqlDialectInterface
     public function truncate(string $table): array;
 
     public function quoteIdentifier(string $identifier): string;
+
+    public function resetAutoIncrement(string $table, int $id, string $column = 'id'): array;
 }

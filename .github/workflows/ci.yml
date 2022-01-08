@@ -8,7 +8,7 @@ env:
   REDIS_PORT: 6379
 jobs:
   tests:
-    name: "PHP ${{ matrix.php-version }}"
+    name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-20.04"
     services:
       postgres:
@@ -44,7 +44,7 @@ jobs:
       - name: Setup Postgres
         if: matrix.database == 'postgres'
         run: |
-          psql -h postgres -U postgres -d postgres -f database/schema/postgres.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -f database/schema/postgres.sql
 
       - name: Setup Sqlite
         if: matrix.database == 'sqlite'

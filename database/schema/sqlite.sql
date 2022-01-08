@@ -10,7 +10,7 @@ BEGIN TRANSACTION;
 
 
 CREATE TABLE "posts" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "title" TEXT DEFAULT NULL,
     "body" text,
     "created_at" datetime NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE "posts" (
 );
 
 CREATE TABLE "articles" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "title" TEXT DEFAULT NULL,
     "body" text,
     "author_id" integer NOT NULL,
@@ -27,21 +27,21 @@ CREATE TABLE "articles" (
 );
 
 CREATE TABLE "authors" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "name" TEXT DEFAULT NULL,
     "created_at" datetime NOT NULL,
     "updated_at" datetime NOT NULL
 );
 
 CREATE TABLE "users" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "name" TEXT DEFAULT NULL,
     "created_at" datetime NOT NULL,
     "updated_at" datetime NOT NULL
 );
 
 CREATE TABLE "profiles" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "name" TEXT DEFAULT NULL,
     "user_id" integer NOT NULL,
     "created_at" datetime NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE "profiles" (
 );
 
 CREATE TABLE "tags" (
-    "id" INTEGER PRIMARY KEY ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "name" TEXT NOT NULL,
     "created_at" datetime NOT NULL,
     "updated_at" datetime NOT NULL
@@ -62,10 +62,9 @@ CREATE TABLE "posts_tags" (
 );
 
 CREATE TABLE migrations (
-    id MEDIUMINT NOT NULL ,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     version BIGINT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE queue (
@@ -79,6 +78,7 @@ CREATE TABLE queue (
 
 INSERT INTO posts (title, body, created_at, updated_at)
 VALUES ('Post #1', 'This is post #1.',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
 INSERT INTO posts (title, body, created_at, updated_at)
 VALUES ('Post #2', 'This is post #2.',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO posts (title, body, created_at, updated_at)

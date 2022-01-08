@@ -59,7 +59,7 @@ final class AfterFindEventTest extends TestCase
         $this->assertInstanceOf(QueryObject::class, $this->createAfterFindEvent()->getQuery());
     }
 
-    public function getResultSet(): void
+    public function testGetResultSet(): void
     {
         $this->assertInstanceOf(ResultSet::class, $this->createAfterFindEvent()->getResultSet());
     }

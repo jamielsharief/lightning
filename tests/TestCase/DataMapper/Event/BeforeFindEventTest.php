@@ -56,4 +56,12 @@ final class BeforeFindEventTest extends TestCase
     {
         $this->assertInstanceOf(QueryObject::class, $this->createBeforeFindEvent()->getQuery());
     }
+
+    public function testIsStopped(): void
+    {
+        $event = $this->createBeforeFindEvent();
+        $this->assertFalse($event->isPropagationStopped());
+        $this->assertInstanceOf(BeforeFindEvent::class, $event->stop());
+        $this->assertTrue($event->isPropagationStopped());
+    }
 }

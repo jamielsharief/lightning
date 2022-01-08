@@ -3,29 +3,52 @@ on:
   push:
   schedule:
     - cron: '0 0 * * *'
-env:
-  DB_URL: "mysql:host=127.0.0.1;port=3306;dbname=lightning"
-  DB_DATABASE: lightning
-  DB_USERNAME: root
-  DB_PASSWORD: root
   REDIS_HOST: '127.0.0.1'
   REDIS_PORT: 6379
 jobs:
   tests:
     name: "PHP ${{ matrix.php-version }}"
     runs-on: "ubuntu-20.04"
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       matrix:
         php-version:
           - "7.4"
           - "8.0"
           - "8.1"
+        database:
+          - mysql
+          - postgres
+          - sqlite
     steps:
-      - name: MySQL Server
+      - name: Setup MySQL
+        if: matrix.database == 'mysql'
         run: |
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE lightning;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
+          sudo mysql -uroot -proot -h 127.0.0.1 lightning < database/schema/schema.sql
+
+      - name: Setup Postgres
+        if: matrix.database == 'postgres'
+        run: |
+          psql -h postgres -U postgres -d postgres -f database/schema/postgres.sql
+
+      - name: Setup Sqlite
+        if: matrix.database == 'sqlite'
+        run: |
+          cat database/schema/sqlite.sql | sqlite3 database/test.sqlite
       - name: Setup Redis
         run: docker run -p 6379:6379 -d redis
       - name: Checkout source code
@@ -43,12 +66,30 @@ jobs:
           composer update --no-progress --prefer-dist
       - name: Setup
         run: |
-          sudo mysql -uroot -proot -h 127.0.0.1 lightning < database/schema/schema.sql
           touch .env
           sudo locale-gen es_ES.UTF-8 nl_NL.UTF-8
           mkdir -p build/logs
       - name: Run PHPUnit
-        run: "php vendor/bin/phpunit --coverage-clover build/logs/clover.xml"
+        run: |
+            if [[ ${{ matrix.database }} == 'sqlite' ]]; then
+              export DB_URL="sqlite:dbname=database/test.sqlite";
+              export DB_USERNAME=root;
+              export DB_PASSWORD=root;
+            fi;
+            
+            if [[ ${{ matrix.database }} == 'mysql' ]]; then
+              export DB_URL="mysql:host=127.0.0.1;port=3306;dbname=lightning";
+              export DB_USERNAME=root;
+              export DB_PASSWORD=root;
+            fi;
+
+            if [[ ${{ matrix.database }} == 'postgres' ]]; then
+              export DB_URL="pgsql:host=postgres;port=5432;dbname=postgres";
+              export DB_USERNAME=postgres;
+              export DB_PASSWORD=postgres;
+            fi;
+
+            php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       - name: Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}

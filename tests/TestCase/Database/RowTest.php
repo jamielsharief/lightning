@@ -75,17 +75,26 @@ final class RowTest extends TestCase
     public function testSet(): void
     {
         $row = new Row();
-        $row->title = 'Foo';
+        $row->set('foo', 'bar');
+        $this->assertEquals('bar', $row->get('foo'));
 
-        $this->assertEquals('Foo', $row->get('title'));
+        $row->set(['bar' => 'foo']);
+        $this->assertEquals('foo', $row->get('bar'));
+    }
 
-        $row = new Row();
-        $row->id = 1234;
-        $this->assertEquals(1234, $row->id);
+    public function testArrayAccess(): void
+    {
+        $row = new Row([]);
 
-        $row = new Row();
-        $row['foo'] = 'bar';
-        $this->assertEquals('bar', $row['foo']);
+        $row['key'] = 'value';
+        $this->assertEquals('value', $row['key']);
+        $this->assertTrue(isset($row['key']));
+        unset($row['key']);
+        $this->assertFalse(isset($row['key']));
+
+        $row = new Row([]);
+        $row[] = 'foo';
+        $this->assertEquals('foo', $row[0]);
     }
 
     public function testWorksWithPDO(): void
@@ -100,27 +109,25 @@ final class RowTest extends TestCase
 
     public function testToString()
     {
-        $row = new Row();
-        $row->title = 'Article';
-
-        $author = new Row();
-        $author->name = 'Jon';
-        $row->author = $author;
-
-        $tag = new Row();
-        $tag->title = 'new';
-        $row->tags = [
-            $tag
-        ];
-
         $this->assertEquals(
             '{"title":"Article","author":{"name":"Jon"},"tags":[{"title":"new"}]}',
-            $row->toString()
+            $this->createRowWithAssociatedData()->toString()
         );
+    }
 
+    public function testStringable()
+    {
         $this->assertEquals(
             '{"title":"Article","author":{"name":"Jon"},"tags":[{"title":"new"}]}',
-            (string) $row
+           (string) $this->createRowWithAssociatedData()
+        );
+    }
+
+    public function testJsonSerializable()
+    {
+        $this->assertEquals(
+            '{"title":"Article","author":{"name":"Jon"},"tags":[{"title":"new"}]}',
+            json_encode($this->createRowWithAssociatedData())
         );
     }
 
@@ -133,6 +140,14 @@ final class RowTest extends TestCase
 
     public function testToArray()
     {
+        $this->assertEquals(
+           json_decode('{"title":"Article","author":{"name":"Jon"},"tags":[{"title":"new"}]}', true),
+            $this->createRowWithAssociatedData()->toArray()
+        );
+    }
+
+    private function createRowWithAssociatedData(): Row
+    {
         $row = new Row();
         $row->title = 'Article';
 
@@ -145,9 +160,7 @@ final class RowTest extends TestCase
         $row->tags = [
             $tag
         ];
-        $this->assertEquals(
-           json_decode('{"title":"Article","author":{"name":"Jon"},"tags":[{"title":"new"}]}', true),
-            $row->toArray()
-        );
+
+        return $row;
     }
 }

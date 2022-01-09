@@ -37,9 +37,7 @@ class FixtureManager
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-
-        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $this->sqlDialect = (new SqlDialectFactory())->create($driver);
+        $this->sqlDialect = (new SqlDialectFactory())->create($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
     }
 
     /**
@@ -108,11 +106,6 @@ class FixtureManager
         $this->executeStatements($this->sqlDialect->truncate($table));
     }
 
-    private function quoteIdentifier(string $identifier): string
-    {
-        return $this->sqlDialect->quoteIdentifier($identifier);
-    }
-
     /**
      * Executes multiple statements
      *
@@ -178,13 +171,13 @@ class FixtureManager
         $questionMarks = array_fill(0, count($fields), '?');
 
         array_walk($fields, function (&$value) {
-            $value = $this->quoteIdentifier($value);
+            $value = $this->sqlDialect->quoteIdentifier($value);
         });
 
         $fields = implode(', ', $fields);
         $values = implode(', ', $questionMarks);
 
-        $statement = $this->pdo->prepare("INSERT INTO {$this->quoteIdentifier($table)} ({$fields}) VALUES ({$values})");
+        $statement = $this->pdo->prepare("INSERT INTO {$this->sqlDialect->quoteIdentifier($table)} ({$fields}) VALUES ({$values})");
 
         if (! $statement->execute(array_values($record))) {
             throw new Exception("Error inserting records into table `{$table}`");

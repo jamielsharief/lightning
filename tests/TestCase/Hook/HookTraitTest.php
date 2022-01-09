@@ -2,6 +2,7 @@
 
 namespace Lightning\Test\Query;
 
+use InvalidArgumentException;
 use Lightning\Hook\HookTrait;
 use PHPUnit\Framework\TestCase;
 use Lightning\Hook\HookInterface;
@@ -30,7 +31,7 @@ class ArticlesController implements HookInterface
     }
 }
 
-final class HookTest extends TestCase
+final class HookTraitTest extends TestCase
 {
     public function testRegister(): void
     {
@@ -41,6 +42,14 @@ final class HookTest extends TestCase
             ['beforeFilter'],
             $controller->getRegisteredHooks('before')
         );
+    }
+
+    public function testRegisterException(): void
+    {
+        $controller = new ArticlesController();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Hook method `foo` does not exist');
+        $controller->registerHook('before', 'foo');
     }
 
     public function testRegisterMany(): void

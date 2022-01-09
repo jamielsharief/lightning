@@ -42,14 +42,14 @@ final class MySqlMigrationTest extends TestCase
             [
                 'version' => 1,
                 'name' => 'Initial Setup',
-                'path' => __DIR__ . '/migrations/v1_initial_setup.sql',
+                'path' => __DIR__ . '/migrations/mysql/v1_initial_setup.sql',
                 'installed_on' => '2021-09-28 16:10:00',
                 'status' => 'Installed'
             ],
             [
                 'version' => 2,
                 'name' => 'Add Index Posts',
-                'path' => __DIR__ . '/migrations/v2_add_index_posts.sql',
+                'path' => __DIR__ . '/migrations/mysql/v2_add_index_posts.sql',
                 'installed_on' => null,
                 'status' => 'Pending',
             ]

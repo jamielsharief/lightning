@@ -30,8 +30,9 @@ class User extends AbstractEntity
     // Gets this object state as an array which is sent to storage
     public function toArray(): array
     {
-        return [
-            'id' => $this->id,
+        $id = $this->id ? ['id' => $this->id] : [];
+
+        return $id + [
             'name' => $this->name
         ];
     }

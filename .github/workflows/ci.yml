@@ -17,9 +17,9 @@ jobs:
           - "8.0"
           - "8.1"
         database:
+          - sqlite
           - mysql
 #         - postgres - still require some work
-#         - sqlite
     steps:
       - name: Setup MySQL
         if: matrix.database == 'mysql'

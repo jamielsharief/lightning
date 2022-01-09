@@ -158,7 +158,7 @@ class DatabaseDataSource implements DataSourceInterface
         }
         $this->applyOptions($builder, $query->getOptions());
 
-        return $this->execute($builder->toString(), $builder->getParameters())->fetchColumn(0);
+        return (int) $this->execute($builder->toString(), $builder->getParameters())->fetchColumn(0);
     }
 
     /**

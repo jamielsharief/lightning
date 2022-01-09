@@ -1,4 +1,4 @@
--- import to SQLite by running: sqlite3.exe db.sqlite3 -init sqlite.sql
+-- cat database/schema/sqlite.sql | sqlite3 database/lightning.db
 
 PRAGMA journal_mode = MEMORY;
 PRAGMA synchronous = OFF;
@@ -68,12 +68,11 @@ CREATE TABLE migrations (
 );
 
 CREATE TABLE queue (
-    id MEDIUMINT NOT NULL ,
-    body TEXT,
-    queue TEXT NOT NULL,
-    scheduled DATETIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
+    "body" TEXT NOT NULL,
+    "queue" TEXT NOT NULL,
+    "scheduled" DATETIME NOT NULL,
+    "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO posts (title, body, created_at, updated_at)

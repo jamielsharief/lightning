@@ -62,6 +62,18 @@ $pdo = new PDO(getenv('DB_URL'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
 $queue = new DatabaseMessageQueue($this->pdo, 'queue');
 ```
 
+For Sqlite.
+
+```sql
+CREATE TABLE queue (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
+    "body" TEXT NOT NULL,
+    "queue" TEXT NOT NULL,
+    "scheduled" DATETIME NOT NULL,
+    "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ## Generic Message object
 
 The `Message` object has the following methods
@@ -72,3 +84,4 @@ $id = $message->getId(); // unique message identifier not associated with storag
 $body = $message->getBody(); // message body
 $created = $message->getTimestamp(); // when the message was created
 ```
+

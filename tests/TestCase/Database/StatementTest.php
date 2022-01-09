@@ -60,7 +60,7 @@ final class StatementTest extends TestCase
 
     public function testRowCount(): void
     {
-        $statement = $this->pdo->prepare('SELECT * FROM articles');
+        $statement = $this->pdo->prepare('DELETE FROM articles');
         $statement = new Statement($statement);
 
         $this->assertEquals(0, $statement->rowCount());
@@ -72,7 +72,7 @@ final class StatementTest extends TestCase
 
     public function testCountable(): void
     {
-        $statement = $this->pdo->prepare('SELECT * FROM articles');
+        $statement = $this->pdo->prepare('DELETE FROM articles');
         $statement = new Statement($statement);
 
         $this->assertCount(0, $statement);

@@ -12,14 +12,15 @@ use Lightning\Database\Statement;
 use function Lightning\Dotenv\env;
 use Lightning\Database\Connection;
 use Lightning\Database\PdoFactory;
-use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
+use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\TestSuite\Stubs\LoggerStub;
 use Lightning\Test\Fixture\ArticlesFixture;
 
 final class ConnectionTest extends TestCase
 {
+    private PDO $pdo;
     public function setUp(): void
     {
         $pdoFactory = new PdoFactory();
@@ -42,6 +43,27 @@ final class ConnectionTest extends TestCase
     public function testGetPDO(): void
     {
         $this->assertInstanceOf(PDO::class, $this->createConnection()->getPdo());
+    }
+
+    public function testGetDriver(): void
+    {
+        $this->assertContains($this->createConnection()->getDriver(), ['mysql','sqlite','pgsql']);
+    }
+
+    public function testGetLastInsertId(): void
+    {
+        $connection = $this->createConnection();
+
+        switch ($connection->getDriver()) {
+            case 'mysql':
+                $this->assertNull($connection->getLastInsertId());
+
+            break;
+            case 'sqlite':
+                $this->assertEquals(2002, $connection->getLastInsertId());
+
+            break;
+        }
     }
 
     public function testPrepare(): void
@@ -133,7 +155,7 @@ final class ConnectionTest extends TestCase
 
         $statement = $connection->execute('SELECT * FROM articles WHERE id = ?', [1000]);
         $this->assertEquals('SELECT * FROM articles WHERE id = ?', $statement->getQueryString());
-        $this->assertEquals(1, $statement->rowCount());
+        $this->assertCount(1, $statement->fetchAll());
 
         $this->assertCount(1, $logger->getLogged());
         $this->assertEquals('debug', $logger->getLogged()[0][0]);
@@ -224,15 +246,7 @@ final class ConnectionTest extends TestCase
     public function testExecuteError(): void
     {
         $this->expectException(PDOException::class);
-        $this->expectExceptionMessage('SQLSTATE[42S02]: Base table or view not found: 1146 Table \'lightning.foo\' doesn\'t exist');
-
         $this->createConnection()->execute('SELECT * FROM foo');
-    }
-
-    public function testGetLastInsertId(): void
-    {
-        $connection = $this->createConnection();
-        $this->assertNull($connection->getLastInsertId());
     }
 
     public function testInsertWithPlaceHolders(): void

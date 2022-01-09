@@ -122,7 +122,7 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
     {
         $article = new static();
 
-        $article->id = $data['id'] ?? null;
+        $article->id = isset($data['id']) ? (int) $data['id'] : null; // work with sqlite
 
         if (! empty($data['title'])) {
             $article->setTitle($data['title']);
@@ -132,7 +132,7 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
             $article->setBody($data['body']);
         }
         if (! empty($data['author_id'])) {
-            $article->setAuthorId($data['author_id']);
+            $article->setAuthorId((int) $data['author_id']);
         }
 
         if (! empty($data['created_at'])) {
@@ -501,16 +501,14 @@ final class AbstractDataMapperTest extends TestCase
         $this->assertTrue($mapper->saveMany($entities));
     }
 
+    /**
+     * @depends testBeforeSaveHookFail
+     */
     public function testSaveManyFail(): void
     {
         $mapper = new Article($this->storage);
-
+        $mapper->registerHook('beforeSave', 'hookFail');;
         $entities = $mapper->findAll();
-        foreach ($entities as $entity) {
-            $entity->setUpdatedAt(date('Y-m-d H:i:s'));
-
-            break;
-        }
         $this->assertFalse($mapper->saveMany($entities));
     }
 

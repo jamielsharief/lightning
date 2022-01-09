@@ -294,4 +294,14 @@ class Connection
 
         return $result;
     }
+
+    /**
+     * Gets the Driver name for this connection
+     *
+     * @return string
+     */
+    public function getDriver(): string
+    {
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
 }

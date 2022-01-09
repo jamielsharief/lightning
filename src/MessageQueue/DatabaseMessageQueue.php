@@ -44,7 +44,7 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
      */
     public function send(string $queue, object $message, int $delay = 0): bool
     {
-        $statement = $this->pdo->prepare("INSERT INTO {$this->table} (body, queue, scheduled) VALUES (:body, :queue, :scheduled)");
+        $statement = $this->pdo->prepare("INSERT INTO {$this->table} (body,queue,scheduled) VALUES (:body,:queue,:scheduled)");
 
         return $statement->execute([
             'body' => $this->serialize($message),

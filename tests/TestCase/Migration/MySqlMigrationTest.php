@@ -11,7 +11,7 @@ use Lightning\Fixture\FixtureManager;
 
 use Lightning\Test\Fixture\MigrationsFixture;
 
-final class MigrationTest extends TestCase
+final class MySqlMigrationTest extends TestCase
 {
     protected PDO $pdo;
     protected string $migrationFolder;
@@ -29,11 +29,15 @@ final class MigrationTest extends TestCase
 
         $this->migrationFolder = sys_get_temp_dir() . '/' . uniqid();
         mkdir($this->migrationFolder);
+
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'mysql') {
+            $this->markTestSkipped('This test is written for MySQL');
+        }
     }
 
     public function testGetMigrations()
     {
-        $migration = new Migration($this->pdo, __DIR__ . '/migrations');
+        $migration = new Migration($this->pdo, __DIR__ . '/migrations/mysql');
         $expected = [
             [
                 'version' => 1,
@@ -62,7 +66,7 @@ final class MigrationTest extends TestCase
         $this->pdo->query('DROP TABLE IF EXISTS posts_m');
         $this->pdo->query('CREATE TABLE posts_m ( title VARCHAR(50) )');
 
-        $migration = new Migration($this->pdo, __DIR__ . '/migrations');
+        $migration = new Migration($this->pdo, __DIR__ . '/migrations/mysql');
 
         $this->assertEquals('Pending', $migration->get()[1]['status']);
 
@@ -76,7 +80,7 @@ final class MigrationTest extends TestCase
         $this->pdo->query('DROP TABLE IF EXISTS posts_m');
         $this->pdo->query('CREATE TABLE posts_m ( title VARCHAR(50) )');
 
-        $migration = new Migration($this->pdo, __DIR__ . '/migrations');
+        $migration = new Migration($this->pdo, __DIR__ . '/migrations/mysql');
         $this->assertTrue($migration->up(function ($payload) {
             $this->assertSame('Add Index Posts', $payload['name']);
             $this->assertSame('CREATE INDEX idx_title ON posts_m (title)', $payload['statements'][0]);
@@ -88,7 +92,7 @@ final class MigrationTest extends TestCase
         $this->pdo->query('DROP TABLE IF EXISTS posts_m');
         $this->pdo->query('CREATE TABLE posts_m ( title VARCHAR(50) )');
 
-        $migration = new Migration($this->pdo, __DIR__ . '/migrations');
+        $migration = new Migration($this->pdo, __DIR__ . '/migrations/mysql');
         $this->assertTrue($migration->up());
 
         $this->assertEquals('Installed', $migration->get()[1]['status']);
@@ -103,7 +107,7 @@ final class MigrationTest extends TestCase
         $this->pdo->query('DROP TABLE IF EXISTS posts_m');
         $this->pdo->query('CREATE TABLE posts_m ( title VARCHAR(50) )');
 
-        $migration = new Migration($this->pdo, __DIR__ . '/migrations');
+        $migration = new Migration($this->pdo, __DIR__ . '/migrations/mysql');
 
         $this->assertTrue($migration->up());
 

@@ -1,6 +1,6 @@
 # Message Queue (MQ)
 
-This component provides a messaging queue, using Redis, database or an in memory version (for testing).
+This component provides a messaging queue, using `Redis`, database (Postgres, MySQL, or Sqlite) or an in memory version (for testing).
 
 ## Usage
 
@@ -28,6 +28,17 @@ Then to receive messages from the `default` queue
 $message = $queue->receive('default'); // This will be in a cron job somewhere
 ```
 
+## Generic Message object
+
+The `Message` object has the following methods
+
+```php
+$message = new Message('hello world!');
+$id = $message->getId(); // unique message identifier not associated with storage
+$body = $message->getBody(); // message body
+$created = $message->getTimestamp(); // when the message was created
+```
+
 ## Redis Message Queue
 
 
@@ -42,7 +53,10 @@ $queue = new RedisMessageQueue($redis);
 
 ## Database Message Queue
 
-Create your table
+Create the database table
+
+
+### MySQL
 
 ```sql
 CREATE TABLE queue (
@@ -55,33 +69,29 @@ CREATE TABLE queue (
 );
 ```
 
-Create the `DatabaseMessageQueue` object
-
-```php
-$pdo = new PDO(getenv('DB_URL'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
-$queue = new DatabaseMessageQueue($this->pdo, 'queue');
-```
-
-For Sqlite.
+### Sqlite
 
 ```sql
 CREATE TABLE queue (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
-    "body" TEXT NOT NULL,
-    "queue" TEXT NOT NULL,
-    "scheduled" DATETIME NOT NULL,
-    "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    body TEXT NOT NULL,
+    queue TEXT NOT NULL,
+    scheduled DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-## Generic Message object
+### Postgres
 
-The `Message` object has the following methods
+With `Postgres` , serialized PHP objects might have null byte characters such as when using private properties, this becomes a problem for `Postgres` as
+the data would have to be `BYTEA` and not a string. Therefore when using `Postgres` as the backend, the serialized string will be encoded/decoded with `base64`.
 
-```php
-$message = new Message('hello world!');
-$id = $message->getId(); // unique message identifier not associated with storage
-$body = $message->getBody(); // message body
-$created = $message->getTimestamp(); // when the message was created
+```sql
+CREATE TABLE queue (
+  id SERIAL PRIMARY KEY,
+  body TEXT,
+  queue VARCHAR(100) NOT NULL,
+  scheduled TIMESTAMP(0) NOT NULL,
+  created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP
+);
 ```
-

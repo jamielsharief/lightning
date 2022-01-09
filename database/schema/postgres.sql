@@ -6,7 +6,6 @@ CREATE TABLE posts (
   updated_at timestamp(0) NOT NULL
 );
 
-
 CREATE TABLE articles (
   id SERIAL PRIMARY KEY,
   title varchar(50) DEFAULT NULL,
@@ -16,16 +15,12 @@ CREATE TABLE articles (
   updated_at timestamp(0) NOT NULL
 );
 
-
-
 CREATE TABLE authors (
   id SERIAL PRIMARY KEY,
   name varchar(80) DEFAULT NULL,
   created_at timestamp(0) NOT NULL,
   updated_at timestamp(0) NOT NULL
 );
-
-
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -49,21 +44,17 @@ CREATE TABLE tags (
   updated_at timestamp(0) NOT NULL
 );
 
-
 CREATE TABLE posts_tags (
   post_id int NOT NULL,
   tag_id int NOT NULL,
   PRIMARY KEY (post_id, tag_id)
 );
 
-
 CREATE TABLE migrations (
   id SERIAL PRIMARY KEY,
   version BIGINT NOT NULL,
   created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP
 );
-
-
 
 CREATE TABLE queue (
   id SERIAL PRIMARY KEY,

@@ -74,7 +74,7 @@ class DatabaseDataSource implements DataSourceInterface
         $result = $this->execute($builder->toString(), $builder->getParameters())->rowCount() === 1;
 
         if ($result) {
-            $id = $this->pdo->lastInsertId($table);
+            $id = $this->pdo->lastInsertId(); // Don't pass table Wrong object type: 7 ERROR:  "articles" is not a sequence
             $this->id = ctype_digit($id) ? (int) $id : $id;
         }
 

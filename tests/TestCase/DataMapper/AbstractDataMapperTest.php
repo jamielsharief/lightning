@@ -148,8 +148,9 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
 
     public function toArray(): array
     {
-        return [
-            'id' => $this->id,
+        $id = $this->id ? ['id' => $this->id] : [];
+
+        return $id + [
             'title' => $this->title,
             'body' => $this->body,
             'author_id' => $this->author_id,
@@ -302,7 +303,6 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
 
         $data = [
-            'id' => null,
             'title' => 'test',
             'body' => 'none',
             'author_id' => 1234,
@@ -409,7 +409,7 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
         $items = $mapper->findAll();
 
-        $this->assertEmpty($mapper->findAllBy(['id' => 'abc']));
+        $this->assertEmpty($mapper->findAllBy(['id' => 123456789]));
     }
 
     public function testCreate(): void
@@ -425,7 +425,10 @@ final class AbstractDataMapperTest extends TestCase
         ]);
 
         $this->assertTrue($mapper->save($article));
-        $this->assertEquals(1003, $article->getId());
+
+        //
+        $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 1003;
+        $this->assertEquals($expected, $article->getId());
 
         $this->assertEquals(['beforeSave','beforeCreate','afterCreate','afterSave'], $article->getCallbacks());
     }
@@ -441,7 +444,8 @@ final class AbstractDataMapperTest extends TestCase
         ]);
 
         $this->assertTrue($mapper->save($tag));
-        $this->assertEquals(2003, $tag->id);
+        $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 2003;
+        $this->assertEquals($expected, $tag->id);
     }
 
     public function testUpdate(): void

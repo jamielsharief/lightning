@@ -35,6 +35,35 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
     }
 
     /**
+     * @internal some objects such as those with private properties will have null byte characters, e.g.  \x00 this causes
+     * for data to be truncated in pgsql, whilst BYTEA would be appropriate its seems messey. There seem to be no problems
+     * in Redis, MySQL or Sqlite or even PHP since these are strings. So data for postgres will be encoded as I do not want
+     * the overhead introduced on all engines just to play nice with postgres.
+     *
+     * @param object $object
+     * @return string
+     */
+    protected function serialize(object $object): string
+    {
+        $string = parent::serialize($object);
+
+        return $this->driver === 'pgsql' ? base64_encode($string) : $string;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $string
+     * @return object
+     */
+    protected function unserialize(string $string): object
+    {
+        $string = $this->driver === 'pgsql' ? base64_decode($string) : $string;
+
+        return parent::unserialize($string);
+    }
+
+    /**
      * Sends a message to the message queue
      *
      * @param string $queue

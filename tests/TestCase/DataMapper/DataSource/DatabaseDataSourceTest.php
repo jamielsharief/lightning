@@ -168,11 +168,13 @@ final class DatabaseDataSourceTest extends TestCase
 
         $options = [
             'fields' => ['COUNT(id) AS count','author_id'],
+            'order' => ['author_id ASC'],
             'group' => [
                 'author_id'
             ]
         ];
         $records = $storage->read('articles', new QueryObject([], $options));
+
         $this->assertEquals(1, $records[0]['count']);
         $this->assertEquals(2, $records[1]['count']); // It worked
         $this->assertEquals(1, $records[2]['count']);
@@ -244,7 +246,7 @@ final class DatabaseDataSourceTest extends TestCase
         $query = new QueryObject(['id' => 1000]);
         $this->assertEquals(1, $storage->update('articles', $query, ['title' => 'foo']));
 
-        $records = $storage->read('articles', new QueryObject());
+        $records = $storage->read('articles', new QueryObject([], ['order' => ['id ASC']]));
 
         $this->assertEquals('foo', $records[0]['title']);
         $this->assertNotEquals('foo', $records[1]['title']);

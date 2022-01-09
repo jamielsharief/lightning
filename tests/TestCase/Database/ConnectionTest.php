@@ -260,7 +260,8 @@ final class ConnectionTest extends TestCase
         ]);
 
         $this->assertEquals(1, $statement->rowCount());
-        $this->assertEquals('2003', $connection->getLastInsertId());
+        $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 2003;
+        $this->assertEquals((string) $expected, $connection->getLastInsertId());
     }
 
     public function testInsertWithNamedPlaceHolders(): void
@@ -274,7 +275,8 @@ final class ConnectionTest extends TestCase
         ]);
 
         $this->assertEquals(1, $statement->rowCount());
-        $this->assertEquals('2003', $connection->getLastInsertId());
+        $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 2003;
+        $this->assertEquals((string) $expected, $connection->getLastInsertId());
     }
 
     public function testInsert(): void

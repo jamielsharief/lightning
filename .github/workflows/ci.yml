@@ -19,7 +19,7 @@ jobs:
         database:
           - sqlite
           - mysql
-#         - postgres - still require some work
+          - postgres
     steps:
       - name: Setup MySQL
         if: matrix.database == 'mysql'

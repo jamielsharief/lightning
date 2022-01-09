@@ -13,6 +13,8 @@
 
 namespace Lightning\Formatter;
 
+use Stringable;
+
 class MessageFormatter
 {
     /**
@@ -45,8 +47,8 @@ class MessageFormatter
     {
         $replace = [];
         foreach ($values as $key => $value) {
-            if (is_scalar($value) || is_null($value)) {
-                $replace['{' . $key . '}'] = $value;
+            if (is_scalar($value) || is_null($value) || $value instanceof Stringable) {
+                $replace['{' . $key . '}'] = (string) $value;
             }
         }
 

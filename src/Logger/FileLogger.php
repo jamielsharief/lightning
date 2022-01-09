@@ -34,10 +34,8 @@ class FileLogger extends AbstractLogger
     {
         $this->checkLevel($level);
 
-        if (! $this->shouldLog($level)) {
-            return;
+        if ($this->shouldLog($level)) {
+            file_put_contents($this->path, $this->format($level, $message, $context) ."\n", FILE_APPEND);
         }
-
-        file_put_contents($this->path, $this->format($level, $message, $context) ."\n", FILE_APPEND);
     }
 }

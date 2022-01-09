@@ -54,12 +54,10 @@ class ConsoleLogger extends AbstractLogger
     {
         $this->checkLevel($level);
 
-        if (! $this->shouldLog($level)) {
-            return;
+        if ($this->shouldLog($level)) {
+            $message = $this->format($level, $message, $context);
+            fwrite($this->stream, $this->colorize($level, $message) . PHP_EOL);
         }
-
-        $message = $this->format($level, $message, $context);
-        fwrite($this->stream, $this->colorize($level, $message) . PHP_EOL) ;
     }
 
     /**

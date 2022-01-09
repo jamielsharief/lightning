@@ -3,8 +3,8 @@
 namespace Lightning\Test\Logger;
 
 use Psr\Log\LogLevel;
-use Lightning\Logger\FileLogger;
 use PHPUnit\Framework\TestCase;
+use Lightning\Logger\FileLogger;
 
 final class AbstractLoggerTest extends TestCase
 {
@@ -38,6 +38,33 @@ final class AbstractLoggerTest extends TestCase
         $logger->$level('This is a test');
 
         $this->assertFileContains(strtoupper($level) .  ': This is a test', $path);
+    }
+
+    public function testWithLogLevel()
+    {
+        $path = $this->generateTempName();
+        $logger = new FileLogger($path);
+
+        $logger = $logger->withLogLevel(LogLevel::ERROR);
+
+        $logger->alert('Error #1');
+        $logger->error('Error #2');
+        $logger->warning('Error #3');
+
+        $this->assertFileContains('ALERT: Error #1', $path);
+        $this->assertFileContains('ERROR: Error #2', $path);
+        $this->assertFileNotContains('WARNING: Error #3', $path);
+    }
+
+    public function testWithChannel(): void
+    {
+        $path = $this->generateTempName();
+        $logger = new FileLogger($path);
+
+        $logger = $logger->withChannel('admin');
+        $logger->info('Message #1');
+
+        $this->assertFileContains(' admin INFO: Message #1', $path);
     }
 
     /**
@@ -81,9 +108,6 @@ final class AbstractLoggerTest extends TestCase
 
     public function assertFileNotContains(string $needle, string $path)
     {
-        var_dump([
-            $path => file_get_contents($path)
-        ]);
         $this->assertStringNotContainsString($needle, file_get_contents($path));
     }
 }

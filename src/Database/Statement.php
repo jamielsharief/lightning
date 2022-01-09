@@ -49,15 +49,13 @@ class Statement implements Countable, Stringable, IteratorAggregate
      */
     public function bind(array $params, array $types = []): void
     {
-        if (empty($params)) {
-            return;
+        if ($params) {
+            $usesQuestionMarks = is_int(key($params));
         }
-
-        $questionMarks = is_int(key($params)); // performance do here
 
         foreach ($params as $index => $value) {
             $type = $types[$index] ?? PDO::PARAM_STR;
-            if ($questionMarks) {
+            if ($usesQuestionMarks) {
                 $index += 1; // Columns/Parameters are 1-based
             }
 

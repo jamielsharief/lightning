@@ -55,7 +55,7 @@ The PHP message files should return an array
 ```php
 return [
     'Hello world!' => '¡Hola Mundo!',
-    'You have %s messages' => 'Tienes %s mensaje(s)'
+    'You have {count} messages' => 'Tienes {count} mensaje(s)'
 ];
 ```
 

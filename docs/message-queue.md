@@ -10,7 +10,7 @@ First create the message queue object
 $queue = new MemoryMessageQueue();
 ```
 
-You can send any object we have also provided a generic `Message` object.
+You can send any object, but we have also provided a generic `Message` object.
 
 ```php
 $message = new Message('hello world!');

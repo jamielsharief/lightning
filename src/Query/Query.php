@@ -15,6 +15,7 @@ namespace Lightning\Query;
 
 use PDO;
 use PDOStatement;
+use ArrayIterator;
 use RuntimeException;
 use IteratorAggregate;
 
@@ -89,16 +90,21 @@ class Query implements IteratorAggregate
     /**
      * The WHERE clause, if you use multiple strings they will be joined together with an AND
      *
-     * @param array|string $conditions
+     * @param array|string $expression
      * @return self
      */
-    public function where($expression)
+    public function where($expression): self
     {
         $this->queryBuilder->where($expression);
 
         return $this;
     }
 
+    /**
+     * @param integer $limit
+     * @param integer|null $offset
+     * @return self
+     */
     public function limit(int $limit, int $offset = null): self
     {
         $this->queryBuilder->limit($limit, $offset);
@@ -118,7 +124,7 @@ class Query implements IteratorAggregate
     }
 
     /**
-     * @param string|array 'id ASC' or ['id','name DESC']
+     * @param string|array $order 'id ASC' or ['id','name DESC']
      * @return self
      */
     public function orderBy($order): self
@@ -293,7 +299,7 @@ class Query implements IteratorAggregate
     /**
      * Creates an Update query
      *
-     * @param string|null $table
+     * @param string $table
      * @return self
      */
     public function update(string $table): self
@@ -333,7 +339,8 @@ class Query implements IteratorAggregate
      *
      * @internal If there is a need in future, the table grouping feature can be enabled/disabled etc.
      *
-     * @param array $row
+     * @param array $data
+     * @param array $meta
      * @return Row
      */
     private function mapRow(array $data, array $meta): Row
@@ -398,7 +405,7 @@ class Query implements IteratorAggregate
     {
         $id = $this->pdo->lastInsertId();
 
-        return $id === '0' || $id === false ? null : $id;
+        return $id === '0' || ! is_string($id) ? null : $id;
     }
 
     /**
@@ -406,7 +413,7 @@ class Query implements IteratorAggregate
      */
     public function getIterator()
     {
-        return $this->all();
+        return new ArrayIterator($this->all());
     }
 
     /**

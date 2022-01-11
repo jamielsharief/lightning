@@ -13,6 +13,8 @@
 
 namespace Lightning\Translator;
 
+use InvalidArgumentException;
+
 interface TranslatorInterface
 {
     /**

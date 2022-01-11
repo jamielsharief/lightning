@@ -18,7 +18,7 @@ use Lightning\View\Exception\ViewException;
 
 class View
 {
-    private ViewCompiler $compiler;
+    private ViewCompilerInterface $compiler;
     private string $viewPath;
     private string $layoutPath;
     private string $viewExtension = '.php';

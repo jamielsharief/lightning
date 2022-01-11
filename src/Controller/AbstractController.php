@@ -171,7 +171,7 @@ abstract class AbstractController implements HookInterface
 
         $response = $this->response
             ->withHeader('Content-Type', mime_content_type($fileObject->getPathname()))
-            ->withHeader('Content-Length', filesize($fileObject->getPathname()));
+            ->withHeader('Content-Length', (string) filesize($fileObject->getPathname()) ?: 0);
 
         if ($options['download']) {
             $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $options['name']));

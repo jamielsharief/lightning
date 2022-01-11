@@ -57,7 +57,7 @@ class Result implements JsonSerializable, Stringable
      * Sets the
      *
      * @param boolean $success
-     * @return self
+     * @return static
      */
     public function setSuccess(bool $success): self
     {
@@ -118,7 +118,7 @@ class Result implements JsonSerializable, Stringable
      * Sets the Data
      *
      * @param array $data
-     * @return self
+     * @return static
      */
     public function setData(array $data): self
     {
@@ -141,7 +141,7 @@ class Result implements JsonSerializable, Stringable
     /**
      * Returns the data to be serialized to JSON
      *
-     * @return void
+     * @return array
      */
     public function jsonSerialize()
     {

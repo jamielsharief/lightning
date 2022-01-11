@@ -13,6 +13,8 @@
 
 namespace Lightning\Cache;
 
+use Lightning\Cache\Exception\InvalidArgumentException;
+
 /**
  * MemoryCache
  *
@@ -39,7 +41,7 @@ class MemoryCache extends AbstractCache
     *
     * @return mixed The value of the item from the cache, or $default in case of cache miss.
     *
-    * @throws \Psr\SimpleCache\InvalidArgumentException
+    * @throws InvalidArgumentException
     *   MUST be thrown if the $key string is not a legal value.
     */
     public function get($key, $default = null)
@@ -60,7 +62,7 @@ class MemoryCache extends AbstractCache
      *
      * @return bool True on success and false on failure.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function set($key, $value, $ttl = null)
@@ -83,7 +85,7 @@ class MemoryCache extends AbstractCache
      *
      * @return bool
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function has($key)
@@ -100,7 +102,7 @@ class MemoryCache extends AbstractCache
      *
      * @return bool True if the item was successfully removed. False if there was an error.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function delete($key)

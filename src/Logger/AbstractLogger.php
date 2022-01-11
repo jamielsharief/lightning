@@ -40,7 +40,7 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Returns a new version of the logger with a different channel
      *
-     * @param string $level e.g. LogLevel::ERROR
+     * @param string $channel e.g. LogLevel::ERROR
      * @return static
      */
     public function withChannel(string $channel): self

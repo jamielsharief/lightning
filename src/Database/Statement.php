@@ -30,7 +30,6 @@ class Statement implements Countable, Stringable, IteratorAggregate
      * Constructor
      *
      * @param PDOStatement $statement
-     * @param string $sql
      */
     public function __construct(PDOStatement $statement)
     {
@@ -69,7 +68,7 @@ class Statement implements Countable, Stringable, IteratorAggregate
      * @param string|integer $param
      * @param mixed $value
      * @param int $type
-     * @return string
+     * @return bool
      */
     public function bindValue($param, $value, int $type = PDO::PARAM_STR): bool
     {

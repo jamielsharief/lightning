@@ -40,7 +40,7 @@ abstract class AbstractAfterWriteEvent
     /**
      * Gets the Entity for this Event
      *
-     * @return Entity
+     * @return EntityInterface
      */
     public function getEntity(): EntityInterface
     {

@@ -40,7 +40,8 @@ class PoMessageLoader implements MessageLoaderInterface
     /**
      * @see http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html
      *
-     * @param string $path
+     * @param string $domain
+     * @param string $locale
      * @return array
      */
     public function load(string $domain, string $locale): array

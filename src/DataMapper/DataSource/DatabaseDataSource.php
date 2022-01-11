@@ -86,7 +86,7 @@ class DatabaseDataSource implements DataSourceInterface
      *
      * @param string $table
      * @param QueryObject $query
-     * @return array
+     * @return ResultSet
      */
     public function read(string $table, QueryObject $query): ResultSet
     {

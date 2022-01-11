@@ -212,9 +212,7 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         try {
-            $code = $this->execute($arguments, $this->io);
-
-            return $code === null ? self::SUCCESS : $code;
+            return $this->execute($arguments, $this->io) ?: self::SUCCESS;
         } catch (StopException $exception) {
             return $exception->getCode();
         }

@@ -13,7 +13,6 @@
 
 namespace Lightning\DataMapper\Event;
 
-use ArrayObject;
 use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\DataMapper\AbstractDataMapper;
@@ -28,8 +27,8 @@ class AfterFindEvent
      * Constructor
      *
      * @param AbstractDataMapper $dataMapper
-     * @param Collection $resultSet
-     * @param ArrayObject $options
+     * @param ResultSet $resultSet
+     * @param QueryObject $query
      */
     public function __construct(AbstractDataMapper $dataMapper, ResultSet $resultSet, QueryObject $query)
     {

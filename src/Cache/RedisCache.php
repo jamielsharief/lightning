@@ -14,6 +14,7 @@
 namespace Lightning\Cache;
 
 use Redis;
+use Lightning\Cache\Exception\InvalidArgumentException;
 
 class RedisCache extends AbstractCache
 {
@@ -41,7 +42,7 @@ class RedisCache extends AbstractCache
     *
     * @return mixed The value of the item from the cache, or $default in case of cache miss.
     *
-    * @throws \Psr\SimpleCache\InvalidArgumentException
+    * @throws InvalidArgumentException
     *   MUST be thrown if the $key string is not a legal value.
     */
     public function get($key, $default = null)
@@ -66,7 +67,7 @@ class RedisCache extends AbstractCache
      *
      * @return bool True on success and false on failure.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function set($key, $value, $ttl = null)
@@ -89,7 +90,7 @@ class RedisCache extends AbstractCache
      *
      * @return bool
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function has($key)
@@ -106,7 +107,7 @@ class RedisCache extends AbstractCache
      *
      * @return bool True if the item was successfully removed. False if there was an error.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function delete($key)

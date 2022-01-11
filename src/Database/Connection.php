@@ -127,7 +127,7 @@ class Connection
         $statement = $this->pdo->prepare($sql);
 
         // @codeCoverageIgnoreStart
-        if (! $statement) {
+        if ($statement === false) {
             throw new DatabaseException(sprintf('Error preparing query `%s`', $sql)); // can't get here
         }
         // @codeCoverageIgnoreEnd
@@ -196,7 +196,7 @@ class Connection
     {
         $id = $this->pdo->lastInsertId($sequence);
 
-        return $id === false || $id === '0' ? null : $id;
+        return ! is_string($id) || $id === '0' ? null : $id;
     }
 
     /**

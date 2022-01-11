@@ -223,13 +223,17 @@ class ConsoleArgumentParser
     {
         $usage = [$command];
 
+        $hasOptionalOptions = false;
+
         foreach ($this->commandOptions as $option) {
             if ($option['required']) {
                 $usage[] = sprintf('--%s', $option['name']);
             }
-        }
-        if ($option['required'] === false) {
-            $usage[] = '[options]';
+
+            if ($option['required'] === false && ! $hasOptionalOptions) {
+                $usage[] = '[options]';
+                $hasOptionalOptions = true;
+            }
         }
 
         // Process Arguments

@@ -127,7 +127,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
      */
     public function __unset(string $property)
     {
-        unset($this->data[$property],$this->dirty[$property]);
+        unset($this->data[$property]);
     }
 
     /**
@@ -144,7 +144,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
     /**
      * JsonSerializable Interface
      *
-     * @return void
+     * @return array
      */
     public function jsonSerialize()
     {

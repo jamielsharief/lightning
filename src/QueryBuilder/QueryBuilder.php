@@ -398,7 +398,6 @@ class QueryBuilder implements Stringable
 
                 return $field . ' = ' . $this->getPlaceholder($value); // ISO Standard
 
-                break;
             case '!=':
             case '<>':
                 if ($valueIsEmpty) {
@@ -408,8 +407,6 @@ class QueryBuilder implements Stringable
                 }
 
                 return $field . ' <> ' . $this->getPlaceholder($value); // ISO Standard
-
-                break;
             case '<':
             case '<=':
             case '>=':
@@ -432,7 +429,7 @@ class QueryBuilder implements Stringable
                     return sprintf('%s %s %s AND %s', $field, $expression, $p1, $p2);
                 }
 
-                // no break
+                break;
             case 'IN':
             case 'NOT IN':
                 if ($isArray) {
@@ -793,7 +790,7 @@ class QueryBuilder implements Stringable
 
     private function prepareColumns(array $columns): array
     {
-        return array_map(function ($column) use ($columns) {
+        return array_map(function ($column) {
             return $this->prepareColumn($column);
         }, $columns);
     }

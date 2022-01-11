@@ -63,7 +63,6 @@ class Container implements ContainerInterface
     /**
      * Automatically configure services, if class exists it will try to resolve it.
      *
-     * @param boolean $status
      * @return self
      */
     public function enableAutoConfigure(): self
@@ -78,7 +77,6 @@ class Container implements ContainerInterface
      *
      * @param string $id e.g ServerRequest::class, Logger::class
      * @param string|closure|object $concrete
-     * @param boolean $share
      * @return self
      */
     public function register(string $id, $concrete = null): self

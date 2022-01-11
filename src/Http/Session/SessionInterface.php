@@ -70,7 +70,6 @@ interface SessionInterface
     /**
      * Get the session Id
      *
-     * @param string|null $sessionId
      * @return string|null
      */
     public function getId(): ?string;

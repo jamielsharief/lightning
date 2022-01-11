@@ -52,9 +52,7 @@ class ConsoleApplication implements CommandInterface
     protected array $commands = [];
 
     /**
-     * Undocumented variable
-     *
-     * @var AbstractCommand[]
+     * @var CommandInterface[]
      */
     protected array $instances = [];
 

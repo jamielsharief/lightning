@@ -59,7 +59,7 @@ class Params
      * Gets a param
      *
      * @param string $name
-     * @throws UnkownParameterException
+     * @throws \Lightning\ServiceObject\Exception\UnknownParameterException
      * @return mixed
      */
     public function get(string $name)
@@ -74,8 +74,8 @@ class Params
     /**
      * Set a value of a param
      *
-     * @param array $data
-     *
+     * @param string $name
+     * @param mixed $value
      * @return self
      */
     public function set(string $name, $value): self

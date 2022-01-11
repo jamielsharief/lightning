@@ -94,7 +94,7 @@ class NumberFormatter
      * Sets the default currency to use
      *
      * @param string $currency
-     * @return void
+     * @return self
      */
     public function setDefaultCurrency(string $currency): self
     {

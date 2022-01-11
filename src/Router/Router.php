@@ -60,7 +60,7 @@ class Router
     *
     * @param string $path e.g. /admin
     * @param callable $callable
-    * @return Routes
+    * @return RouteCollection
         */
     public function group(string $path, callable $callable): RouteCollection
     {

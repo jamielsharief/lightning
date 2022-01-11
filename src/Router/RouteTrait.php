@@ -59,7 +59,7 @@ trait RouteTrait
      * @param string $path
      * @param callable|array $handler
      * @param array $constraints
-     * @return void
+     * @return Route
      */
     public function put(string $path, $handler, array $constraints = []): Route
     {

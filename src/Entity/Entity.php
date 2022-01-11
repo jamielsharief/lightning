@@ -348,7 +348,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
     /**
      * Checks if a field has an error
      *
-     * @param string|null $field
+     * @param string $field
      * @return boolean
      */
     public function hasError(string $field): bool

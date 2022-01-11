@@ -165,7 +165,7 @@ abstract class AbstractRepository
     /**
      * Saves multiple Entities
      *
-     * @param EntityInterface $entity
+     * @param iterable $entities
      * @return boolean
      */
     public function saveMany(iterable $entities): bool

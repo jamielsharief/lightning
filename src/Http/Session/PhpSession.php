@@ -4,6 +4,9 @@ namespace Lightning\Http\Session;
 
 class PhpSession extends AbstractSession
 {
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         // work in CLI e.g. testing or swoole etc

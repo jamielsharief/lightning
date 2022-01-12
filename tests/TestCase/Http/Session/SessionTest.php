@@ -3,12 +3,13 @@
 namespace Lightning\Test\Http\Session;
 
 use Redis;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
+
 use Lightning\Http\Session\PhpSession;
 
 use Lightning\Http\Session\RedisSession;
-
 use Lightning\Http\Session\SessionInterface;
 
 final class SessionTest extends TestCase
@@ -41,6 +42,17 @@ final class SessionTest extends TestCase
         $this->assertTrue($session->start($this->sessionId));
         $this->assertFalse($session->start($this->sessionId));
         $session->close();
+    }
+
+    /**
+    * @dataProvider sessionProvider
+    */
+    public function testMustBeStarted(SessionInterface $session): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Session must be started before it can be used');
+
+        $session->get('foo');
     }
 
     /**

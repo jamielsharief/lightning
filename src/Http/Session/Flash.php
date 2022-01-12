@@ -42,7 +42,7 @@ class Flash implements IteratorAggregate
     {
         $flashed = $this->session->get('flash', []);
 
-        $flashed[$key][] = $message;
+        $flashed[$key] = $message;
         $this->session->set('flash', $flashed);
 
         return $this;
@@ -66,13 +66,13 @@ class Flash implements IteratorAggregate
      *
      * @param string $key
      * @param mixed $default
-     * @return array
+     * @return string
      */
-    public function get(string $key): array
+    public function get(string $key): ?string
     {
         $flashed = $this->session->get('flash', []);
 
-        $out = [];
+        $out = null;
 
         if (isset($flashed[$key])) {
             $out = $flashed[$key];

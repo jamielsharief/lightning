@@ -11,12 +11,10 @@ $flash = new Flash($session);
 $flash->set('success','Your contact has been saved.');
 
 $bool = $flash->has('success');
-$messages = $flash->get('success');
+$message = $flash->get('success');
 
 $messages = $flash->getMessages();
-foreach($flash as $group => $messages) {
-    foreach($messages as $message) {
-        echo $message;
-    }
+foreach($flash as $key => $message) {
+     echo $message;
 }
 ```

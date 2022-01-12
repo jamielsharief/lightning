@@ -40,12 +40,8 @@ final class FlashTest extends TestCase
     public function testGet(): void
     {
         $this->flash->set('success', 'it worked!');
-        $this->assertEquals(['it worked!'], $this->flash->get('success'));
-
-        $this->flash->set('success', '#1');
-        $this->flash->set('success', '#2');
-        $this->assertEquals(['#1','#2'], $this->flash->get('success'));
-        $this->assertEmpty($this->flash->get('success'));
+        $this->assertEquals('it worked!', $this->flash->get('success'));
+        $this->assertNull($this->flash->get('success'));
     }
 
     public function testGetMessages(): void
@@ -55,9 +51,7 @@ final class FlashTest extends TestCase
         $this->flash->set('a', 'b');
 
         $this->assertSame([
-            'a' => [
-                0 => 'b'
-            ]
+            'a' => 'b'
         ], $this->flash->getMessages());
     }
 
@@ -68,9 +62,7 @@ final class FlashTest extends TestCase
         $this->flash->set('a', 'b');
 
         $this->assertSame([
-            'a' => [
-                0 => 'b'
-            ]
+            'a' => 'b'
         ], iterator_to_array($this->flash));
     }
 }

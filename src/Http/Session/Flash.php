@@ -65,8 +65,7 @@ class Flash implements IteratorAggregate
      * Gets the flash messages for the group and removes from the session
      *
      * @param string $key
-     * @param mixed $default
-     * @return string
+     * @return string|null
      */
     public function get(string $key): ?string
     {

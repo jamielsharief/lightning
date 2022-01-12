@@ -1,0 +1,76 @@
+<?php declare(strict_types=1);
+
+namespace Lightning\Test\Http\Session;
+
+use PHPUnit\Framework\TestCase;
+use Lightning\Http\Session\Flash;
+use Lightning\Http\Session\PhpSession;
+
+final class FlashTest extends TestCase
+{
+    private PhpSession $session;
+    private Flash $flash;
+
+    public function setUp(): void
+    {
+        $this->session = new PhpSession();
+        $this->session->start(null);
+
+        $this->flash = new Flash($this->session);
+    }
+
+    public function tearDown(): void
+    {
+        $this->session->close();
+    }
+
+    public function testSet(): void
+    {
+        $this->assertInstanceOf(Flash::class, $this->flash->set('success', 'it worked!'));
+    }
+
+    public function testHas(): void
+    {
+        $this->flash->set('success', 'it worked!');
+
+        $this->assertFalse($this->flash->has('error'));
+        $this->assertTrue($this->flash->has('success'));
+    }
+
+    public function testGet(): void
+    {
+        $this->flash->set('success', 'it worked!');
+        $this->assertEquals(['it worked!'], $this->flash->get('success'));
+
+        $this->flash->set('success', '#1');
+        $this->flash->set('success', '#2');
+        $this->assertEquals(['#1','#2'], $this->flash->get('success'));
+        $this->assertEmpty($this->flash->get('success'));
+    }
+
+    public function testGetMessages(): void
+    {
+        $this->assertEquals([], $this->flash->getMessages());
+
+        $this->flash->set('a', 'b');
+
+        $this->assertSame([
+            'a' => [
+                0 => 'b'
+            ]
+        ], $this->flash->getMessages());
+    }
+
+    public function testGetIterator(): void
+    {
+        $this->assertEquals([], iterator_to_array($this->flash));
+
+        $this->flash->set('a', 'b');
+
+        $this->assertSame([
+            'a' => [
+                0 => 'b'
+            ]
+        ], iterator_to_array($this->flash));
+    }
+}

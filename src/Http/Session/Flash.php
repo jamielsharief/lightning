@@ -13,10 +13,13 @@
 
 namespace Lightning\Http\Session;
 
-// TODO: come back to this
-class Flash
+use Traversable;
+use ArrayIterator;
+use IteratorAggregate;
+
+class Flash implements IteratorAggregate
 {
-    private SessionInterface $session;
+    protected SessionInterface $session;
 
     /**
      * Constructor
@@ -32,13 +35,14 @@ class Flash
      * Sets a message or messages
      *
      * @param string $key
-     * @param string|array $message or messages
-     * @return self
+     * @param string $message
+     * @return static
      */
-    public function set(string $key, $message): self
+    public function set(string $key, string $message): self
     {
         $flashed = $this->session->get('flash', []);
-        $flashed[$key] = $message;
+
+        $flashed[$key][] = $message;
         $this->session->set('flash', $flashed);
 
         return $this;
@@ -58,17 +62,17 @@ class Flash
     }
 
     /**
-     * Gets the flash message and removes from the session
+     * Gets the flash messages for the group and removes from the session
      *
      * @param string $key
      * @param mixed $default
-     * @return mixed
+     * @return array
      */
-    public function get(string $key, $default = null)
+    public function get(string $key): array
     {
         $flashed = $this->session->get('flash', []);
 
-        $out = $default;
+        $out = [];
 
         if (isset($flashed[$key])) {
             $out = $flashed[$key];
@@ -81,12 +85,25 @@ class Flash
     }
 
     /**
-     * Gets the keys in flash session
+     * Gets all the flash messages and removes from session
      *
      * @return array
      */
-    public function getKeys(): array
+    public function getMessages(): array
     {
-        return array_keys($this->session->get('flash', []));
+        $messages = $this->session->get('flash', []);
+        $this->session->set('flash', []);
+
+        return $messages;
+    }
+
+    /**
+     * IteratorAggregrate
+     *
+     * @return Traversable
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->getMessages());
     }
 }

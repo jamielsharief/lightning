@@ -29,12 +29,10 @@ class ResponseEmitter
         $line = 0;
 
         if (headers_sent($filename, $line)) {
-            trigger_error("Headers were already sent in {$filename} on line {$line}", E_USER_WARNING);
+            trigger_error(sprintf('Headers were already sent in %s on line %s', $filename, $line), E_USER_WARNING);
         }
 
-        $this->sendHeader(
-            sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase())
-        );
+        $this->sendHeader(sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase()));
 
         $cookies = [];
         foreach ($response->getHeaders() as $key => $value) {
@@ -43,20 +41,16 @@ class ResponseEmitter
 
                 continue;
             }
-            $this->sendHeader(
-                sprintf('%s: %s', $key, $response->getHeaderLine($key))
-            );
+            $this->sendHeader(sprintf('%s: %s', $key, $response->getHeaderLine($key)));
         }
 
         foreach ($cookies as $cookie) {
-            $this->sendHeader(
-                sprintf('Set-Cookie: %s', $cookie)
-            );
+            $this->sendHeader(sprintf('Set-Cookie: %s', $cookie));
         }
 
         // ignore no content or not modified response
         if (! in_array($response->getStatusCode(), [204,304])) {
-            $this->send((string) $response->getBody());
+            echo (string) $response->getBody();
         }
 
         $this->exit();
@@ -71,17 +65,6 @@ class ResponseEmitter
     protected function sendHeader(string $header): void
     {
         header($header);
-    }
-
-    /**
-     * Sends the body
-     *
-     * @param string $body
-     * @return void
-     */
-    protected function send(string $body): void
-    {
-        echo $body;
     }
 
     /**

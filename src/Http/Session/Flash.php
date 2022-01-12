@@ -32,7 +32,7 @@ class Flash implements IteratorAggregate
     }
 
     /**
-     * Sets a message or messages
+     * Sets a flash messages
      *
      * @param string $key
      * @param string $message
@@ -49,7 +49,7 @@ class Flash implements IteratorAggregate
     }
 
     /**
-     * Checks if the flash messages are stored
+     * Checks if there is a flash message for the key
      *
      * @param string $key
      * @return boolean
@@ -62,7 +62,7 @@ class Flash implements IteratorAggregate
     }
 
     /**
-     * Gets the flash messages for the group and removes from the session
+     * Gets the flash message and removes from the session
      *
      * @param string $key
      * @return string|null

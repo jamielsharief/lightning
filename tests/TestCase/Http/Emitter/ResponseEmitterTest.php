@@ -25,7 +25,7 @@ class MockResponseEmitter extends ResponseEmitter
     }
 }
 
-final class EmitterTest extends TestCase
+final class ResponseEmitterTest extends TestCase
 {
     public function testEmit(): void
     {

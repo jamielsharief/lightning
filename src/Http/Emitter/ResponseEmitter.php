@@ -58,7 +58,7 @@ class ResponseEmitter
 
     /**
      * Sends a header
-     *
+     * @codeCoverageIgnore
      * @param string $header
      * @return void
      */
@@ -68,8 +68,8 @@ class ResponseEmitter
     }
 
     /**
-     * Exit te
-     *
+     * Exit
+     * @codeCoverageIgnore
      * @return void
      */
     protected function exit(): void

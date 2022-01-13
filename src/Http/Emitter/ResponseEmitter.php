@@ -45,7 +45,7 @@ class ResponseEmitter
         }
 
         foreach ($cookies as $cookie) {
-            $this->sendHeader(sprintf('Set-Cookie: %s', $cookie));
+            $this->sendHeader(sprintf('Set-Cookie: %s', $cookie), false);
         }
 
         // ignore no content or not modified response
@@ -60,11 +60,12 @@ class ResponseEmitter
      * Sends a header
      * @codeCoverageIgnore
      * @param string $header
+     * @param boolean $replace
      * @return void
      */
-    protected function sendHeader(string $header): void
+    protected function sendHeader(string $header, bool $replace = true): void
     {
-        header($header);
+        header($header, $replace);
     }
 
     /**

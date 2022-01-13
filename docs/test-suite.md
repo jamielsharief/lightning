@@ -104,3 +104,12 @@ public function testMiddleware(): void
     // Do your checks
 }
 ```
+
+There is also a `beforeHandle` method which accepts a `callback`, here you can do prechecks
+
+```php
+$handler = new TestRequestHandler(new Response())
+$handler->beforeHandle(function(ServerRequestInterface $request) use ($object){
+    $this->assertTrue($object->wasCalled());
+});
+```

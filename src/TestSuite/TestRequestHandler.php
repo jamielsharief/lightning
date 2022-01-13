@@ -31,6 +31,11 @@ class TestRequestHandler implements RequestHandlerInterface
     private ResponseInterface $response;
 
     /**
+     * @var callback
+     */
+    private $callback = null;
+
+    /**
      * Constructor
      *
      * @param ResponseInterface $response
@@ -38,6 +43,13 @@ class TestRequestHandler implements RequestHandlerInterface
     public function __construct(ResponseInterface $response)
     {
         $this->response = $response;
+    }
+
+    public function beforeHandle(callable $callback): self
+    {
+        $this->callback = $callback;
+
+        return $this;
     }
 
     /**
@@ -48,6 +60,12 @@ class TestRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $callback = $this->callback;
+
+        if ($callback) {
+            $callback($request);
+        }
+
         return $this->response;
     }
 }

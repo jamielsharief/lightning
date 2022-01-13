@@ -88,6 +88,16 @@ abstract class AbstractSession implements SessionInterface
     }
 
     /**
+     * Checks if the Session is active
+     *
+     * @return boolean
+     */
+    public function isStarted(): bool
+    {
+        return $this->isStarted;
+    }
+
+    /**
      * Generates a session ID compatible for this storage
      *
      * @return string

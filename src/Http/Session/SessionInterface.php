@@ -80,4 +80,11 @@ interface SessionInterface
      * @return boolean
      */
     public function regenerateId(): bool;
+
+    /**
+     * Checks if the current session is active
+     *
+     * @return boolean
+     */
+    public function isStarted(): bool;
 }

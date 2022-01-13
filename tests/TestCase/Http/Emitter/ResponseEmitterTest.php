@@ -10,7 +10,7 @@ class MockResponseEmitter extends ResponseEmitter
 {
     private array $headersSent = [];
 
-    protected function sendHeader(string $header): void
+    protected function sendHeader(string $header, bool $replace = false): void
     {
         $this->headersSent[] = $header;
     }
@@ -59,7 +59,8 @@ final class ResponseEmitterTest extends TestCase
     {
         $response = new Response(200, [], 'This is a test');
 
-        $response = $response->withAddedHeader('Set-Cookie', 'a=b; path=/')->withAddedHeader('Set-Cookie', 'b=c; path=/');
+        $response = $response->withAddedHeader('Set-Cookie', 'a=b; path=/')
+            ->withAddedHeader('Set-Cookie', 'b=c; path=/');
 
         $emitter = new MockResponseEmitter();
         ob_start();

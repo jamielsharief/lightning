@@ -39,7 +39,9 @@ final class SessionTest extends TestCase
      */
     public function testStart(SessionInterface $session): void
     {
+        $this->assertFalse($session->isStarted());
         $this->assertTrue($session->start($this->sessionId));
+        $this->assertTrue($session->isStarted());
         $this->assertFalse($session->start($this->sessionId));
         $session->close();
     }
@@ -63,6 +65,8 @@ final class SessionTest extends TestCase
         $session->start($this->sessionId);
 
         $this->assertTrue($session->close());
+
+        $this->assertFalse($session->isStarted());
         $this->assertFalse($session->close());
     }
 
@@ -172,6 +176,8 @@ final class SessionTest extends TestCase
         $session->start('12345');
         $this->assertTrue($session->has('foo'));
         $session->destroy();
+        $this->assertFalse($session->isStarted());
+
         $session->close();
 
         $session->start('12345');

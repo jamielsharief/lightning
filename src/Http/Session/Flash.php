@@ -17,6 +17,11 @@ use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
 
+/**
+ * Flash component
+ *
+ * @internal values for keys should be a single flash message, not groups of messages.
+ */
 class Flash implements IteratorAggregate
 {
     protected SessionInterface $session;

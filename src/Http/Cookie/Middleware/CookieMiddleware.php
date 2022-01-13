@@ -11,8 +11,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Http\Cookie;
+namespace Lightning\Http\Cookie\Middleware;
 
+use Lightning\Http\Cookie\Cookies;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;

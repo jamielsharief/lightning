@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\Http\Exception;
+namespace Lightning\Test\Http\Cookie\Middleware;
 
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\Http\Cookie\Cookie;
 use Lightning\Http\Cookie\Cookies;
-use Lightning\Http\Cookie\CookieMiddleware;
 use Lightning\TestSuite\TestRequestHandler;
+use Lightning\Http\Cookie\Middleware\CookieMiddleware;
 
 final class CookieMiddlewareTest extends TestCase
 {

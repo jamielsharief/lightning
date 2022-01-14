@@ -248,7 +248,7 @@ class Query implements IteratorAggregate
 
         return array_map(function ($row) use ($meta) {
             return $this->mapRow($row, $meta);
-        }, $statement->fetchAll(PDO::FETCH_ASSOC) ?: []);
+        }, $statement->fetchAll(PDO::FETCH_NUM) ?: []);
     }
 
     /**

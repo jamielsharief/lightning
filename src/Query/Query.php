@@ -45,6 +45,11 @@ class Query implements IteratorAggregate
      */
     private array $insert = [];
 
+    private array $selectColumns = [];
+
+    private bool $selectIsWildcard = true;
+    private string $driver;
+
     /**
      * Constructor
      *
@@ -53,6 +58,7 @@ class Query implements IteratorAggregate
     public function __construct(PDO $pdo, QueryBuilder $queryBuilder)
     {
         $this->pdo = $pdo;
+        $this->driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         $this->queryBuilder = $queryBuilder;
     }
@@ -65,7 +71,10 @@ class Query implements IteratorAggregate
      */
     public function select($columns): self
     {
-        $this->queryBuilder = $this->queryBuilder->select((array) $columns);
+        $this->selectColumns = (array) $columns;
+        $this->selectIsWildcard = in_array('*', $this->selectColumns);
+
+        $this->queryBuilder = $this->queryBuilder->select($this->selectColumns);
 
         $this->table = null;
 
@@ -142,6 +151,7 @@ class Query implements IteratorAggregate
      */
     public function innerJoin(string $table, ?string $alias = null, $condition = null): self
     {
+        $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->innerJoin($table, $alias, $condition);
 
         return $this;
@@ -155,6 +165,7 @@ class Query implements IteratorAggregate
      */
     public function leftJoin(string $table, ?string $alias = null, $condition): self
     {
+        $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->leftJoin($table, $alias, $condition);
 
         return $this;
@@ -168,6 +179,7 @@ class Query implements IteratorAggregate
      */
     public function rightJoin(string $table, ?string $alias = null, $condition): self
     {
+        $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->rightJoin($table, $alias, $condition);
 
         return $this;
@@ -181,6 +193,7 @@ class Query implements IteratorAggregate
      */
     public function fullJoin(string $table, ?string $alias = null, $condition): self
     {
+        $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->fullJoin($table, $alias, $condition);
 
         return $this;
@@ -225,16 +238,51 @@ class Query implements IteratorAggregate
         return $row ? $this->mapRow($row, $this->getColumnMeta($statement)) : null;
     }
 
+    /**
+     * @internal getColumnMeta for both postgres and sqlite returns the table name not the alias, therefore a
+     * custom getColumnMeta needs to be implemented, this only works if columns are provided to the select method.
+     * Therefore using postgres/sqlite with aliased joins wont work if you dont supply the field names.
+     *
+     * @param PDOStatement $statement
+     * @return array
+     */
     private function getColumnMeta(PDOStatement $statement): array
     {
         $result = [];
-        $max = $statement->columnCount();
-        for ($column = 0;$column < $max;$column++) {
-            $meta = $statement->getColumnMeta($column);
-            $result[] = $meta['table'] . '.' . $meta['name'];
+        if ($this->selectIsWildcard) {
+            $max = $statement->columnCount();
+            for ($column = 0;$column < $max;$column++) {
+                $meta = $statement->getColumnMeta($column);
+                $result[] = ($meta['table'] ?? null) . '.' . $meta['name'];
+            }
+        } else {
+            foreach ($this->selectColumns as $column) {
+                $alias = null;
+                if (preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i', $column)) {
+                    list($alias, $column) = explode('.', $column);
+                } elseif ($position = stripos($column, ' AS ')) {
+                    if ($position !== false) {
+                        $column = substr($column, $position + 4);
+                    }
+                }
+                $result[] = $alias . '.' . $column;
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * Doing wildcard queries on drivers
+     *
+     * @param string|null $alias
+     * @return void
+     */
+    private function checkDriverSupportsTableAliasMeta(?string $alias): void
+    {
+        if ($this->selectIsWildcard && $alias && in_array($this->driver, ['pgsql','sqlite'])) {
+            throw new BadMethodCallException('You must provide the column names for this select query');
+        }
     }
 
     /**

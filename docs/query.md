@@ -92,7 +92,7 @@ echo $result->author->name; // the information from the table authors is in its 
 To do multiple joins on the same table, use the aliases
 
 ```php
-$result = $query->select(['*'])
+$result = $query->select(['articles.id','title','author.id','author.name'])
     ->from('articles')
     ->leftJoin('authors','author', ['articles.author_id = author.id'])
     ->leftJoin('authors','owner', ['articles.owner_id = owner.id'])
@@ -101,6 +101,9 @@ $result = $query->select(['*'])
 echo $result->author->name; 
 echo $result->owner->name; 
 ```
+
+> When using Postgres or Sqlite with table aliases you must supply the column names, you cannot use wildcard `*`
+
 
 ### Group
 

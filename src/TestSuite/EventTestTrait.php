@@ -13,72 +13,130 @@
 
 namespace Lightning\TestSuite;
 
-use Lightning\TestSuite\Stubs\EventDispatcherStub;
+use RuntimeException;
 
 /**
  * # PSR-14 Event Test Trait
  */
 trait EventTestTrait
 {
-    protected EventDispatcherStub $eventDispatcherStub;
+    protected ?TestEventDispatcher $testEventDispatcher = null;
 
     /**
-     * Sets the Event Dispatcher for testings
+     * Factory method to create the test version of a Event Dispatcher
      *
-     * @param EventDispatcherStub $eventDispatcherStub
+     * @return TestEventDispatcher
+     */
+    public function createEventDispatcher(): TestEventDispatcher
+    {
+        return new TestEventDispatcher();
+    }
+
+    /**
+     * Sets the Event Dispatcher for testing
+     *
+     * @param TestEventDispatcher $testEventDispatcher
      * @return self
      */
-    public function setEventDispatcher(EventDispatcherStub $eventDispatcherStub): self
+    public function setEventDispatcher(TestEventDispatcher $testEventDispatcher): self
     {
-        $this->eventDispatcherStub = $eventDispatcherStub;
+        $this->testEventDispatcher = $testEventDispatcher;
 
         return $this;
     }
 
     /**
-     * Gets the EventDispatcherStub
+     * Gets the TestEventDispatcher
      *
-     * @return EventDispatcherStub
+     * @return TestEventDispatcher
      */
-    public function getEventDispatcher(): EventDispatcherStub
+    public function getEventDispatcher(): TestEventDispatcher
     {
-        return $this->eventDispatcherStub;
+        if (! isset($this->testEventDispatcher)) {
+            throw new RuntimeException('TestEventDispatcher not set');
+        }
+
+        return $this->testEventDispatcher;
     }
 
     /**
-     * Asserts that a particular event was called
+     * Asserts that a particular event was dispached
      *
      * @param string $event
      * @return void
      */
-    protected function assertEventCalled(string $event): void
+    protected function assertEventDispatched(string $event): void
     {
-        $this->assertContains($event, $this->eventDispatcherStub->getDispatchedEvents(), sprintf('Event `%s` was not called ', $event));
+        $this->assertTrue($this->getEventDispatcher()->hasDispatched($event), sprintf('Event `%s` was not dispatched', $event));
     }
 
     /**
-     * Asserts that all events were called in the order they provided
+     * Asserts that an Event was dispatched
      *
+     * @param string $event
      * @return void
      */
-    protected function assertEventsCalled(array $events): void
+    protected function assertEventNotDispatched(string $event): void
     {
-        $calledEvents = $this->eventDispatcherStub->getDispatchedEvents();
-        foreach ($events as  $index => $event) {
-            $called = $calledEvents[$index] ?? null;
+        $this->assertFalse($this->getEventDispatcher()->hasDispatched($event), sprintf('Event `%s` was dispatched', $event));
+    }
 
-            if (is_null($called)) {
-                $this->fail(sprintf('Event `%s` was not called ', $event));
-            }
-
-            $this->assertEquals($event, $called, sprintf('Expecting `%s` but `%s` was called before', $event, $called));
+    /**
+     * Asserts that a group of events were dispatched
+     *
+     * @param array $events
+     * @return void
+     */
+    protected function assertEventsDispatched(array $events): void
+    {
+        foreach ($events as $event) {
+            $this->assertEventNotDispatched($event);
         }
+    }
 
-        $expectedCount = count($events);
-        $actualCount = count($calledEvents);
+    /**
+     * Asserts that a group of events were not dispatched
+     *
+     * @param array $events
+     * @return void
+     */
+    protected function assertEventsNotDispatched(array $events): void
+    {
+        foreach ($events as $event) {
+            $this->assertEventNotDispatched($event);
+        }
+    }
 
-        $this->assertEquals($expectedCount, $actualCount, sprintf('Expected `%d` events but `%d` called', $expectedCount, $actualCount));
+    /**
+     * Asserts that only these events were called in a particular order
+     *
+     * @param array $events
+     * @return void
+     */
+    public function assertEventsDispatchedEquals(array $events): void
+    {
+        $this->assertEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
+    }
 
-        $this->eventDispatcherStub->reset();
+    /**
+     * Asserts that the dispatched events do not match this list of events
+     *
+     * @param array $events
+     * @return void
+     */
+    public function assertEventsDispatchedNotEquals(array $events): void
+    {
+        $this->assertNotEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
+    }
+
+    /**
+     * Asserts how many Events were caught
+     *
+     * @param integer $count
+     * @return void
+     */
+    protected function assertEventCount(int $count): void
+    {
+        $this->assertCount($count, $this->getEventDispatcher());
     }
 }

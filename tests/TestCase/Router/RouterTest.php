@@ -21,7 +21,7 @@ use Lightning\Router\Event\BeforeFilterEvent;
 use Lightning\Router\Event\AfterDispatchEvent;
 use Lightning\Router\Event\BeforeDispatchEvent;
 use Lightning\Router\Exception\RouterException;
-use Lightning\TestSuite\Stubs\EventDispatcherStub;
+use Lightning\TestSuite\TestEventDispatcher;
 
 class DummyController
 {
@@ -284,7 +284,7 @@ final class RouterTest extends TestCase
 
     public function testProcessEventsWereCalled(): void
     {
-        $eventDispatcher = new EventDispatcherStub();
+        $eventDispatcher = new TestEventDispatcher();
         $router = new Router(null, $eventDispatcher);
         $router->get('/articles', ['Lightning\Test\Router\DummyController','index']);
 

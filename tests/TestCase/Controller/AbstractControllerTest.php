@@ -9,20 +9,27 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
 use Lightning\TestSuite\EventTestTrait;
-use Lightning\TestSuite\Stubs\LoggerStub;
+use Lightning\TestSuite\LoggerTestTrait;
+use Lightning\TestSuite\TestEventDispatcher;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Lightning\TestSuite\Stubs\EventDispatcherStub;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 final class AbstractControllerTest extends TestCase
 {
     use EventTestTrait;
+    use LoggerTestTrait;
+
+    public function setUp(): void
+    {
+        $this->setEventDispatcher($this->createEventDispatcher());
+        $this->setLogger($this->createLogger());
+    }
 
     public function testRender(): void
     {
-        $eventDispatcherStub = new EventDispatcherStub();
-        $loggerStub = new LoggerStub();
-        $controller = $this->createController($eventDispatcherStub, $loggerStub);
+        $eventDispatcherStub = new TestEventDispatcher();
+
+        $controller = $this->createController($eventDispatcherStub);
 
         $response = $controller->index();
 
@@ -30,21 +37,19 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals('text/html', $response->getHeaderLine('Content-Type'));
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertEquals(
+        $this->assertEventsDispatched(
             [
                 'Lightning\Controller\Event\AfterInitializeEvent',
                 'Lightning\Controller\Event\BeforeRenderEvent',
                 'Lightning\Controller\Event\AfterRenderEvent'
-            ],
-            $eventDispatcherStub->getDispatchedEvents()
+            ]
         );
     }
 
     public function testRenderJson(): void
     {
-        $eventDispatcherStub = new EventDispatcherStub();
-        $loggerStub = new LoggerStub();
-        $controller = $this->createController($eventDispatcherStub, $loggerStub);;
+        $eventDispatcherStub = new TestEventDispatcher();
+        $controller = $this->createController($eventDispatcherStub);;
 
         $response = $controller->status(['ok']);
 
@@ -52,13 +57,12 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals('application/json', $response->getHeaderLine('Content-Type'));
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertEquals(
+        $this->assertEventsDispatched(
             [
                 'Lightning\Controller\Event\AfterInitializeEvent',
                 'Lightning\Controller\Event\BeforeRenderEvent',
                 'Lightning\Controller\Event\AfterRenderEvent'
-            ],
-            $eventDispatcherStub->getDispatchedEvents()
+            ]
         );
     }
 
@@ -73,27 +77,25 @@ final class AbstractControllerTest extends TestCase
 
     public function testRedirectEvents(): void
     {
-        $eventDispatcherStub = new EventDispatcherStub();
-        $loggerStub = new LoggerStub();
-        $controller = $this->createController($eventDispatcherStub, $loggerStub);
+        $eventDispatcherStub = new TestEventDispatcher();
+
+        $controller = $this->createController($eventDispatcherStub);
 
         $response = $controller->old('/articles/home');
         $this->assertEquals('/articles/home', $response->getHeaderLine('Location'));
 
-        $this->assertEquals(
+        $this->assertEventsDispatched(
             [
                 'Lightning\Controller\Event\AfterInitializeEvent',
                 'Lightning\Controller\Event\BeforeRedirectEvent'
-            ],
-            $eventDispatcherStub->getDispatchedEvents()
+            ]
         );
     }
 
     public function testSendFile(): void
     {
-        $eventDispatcherStub = new EventDispatcherStub();
-        $loggerStub = new LoggerStub();
-        $controller = $this->createController($eventDispatcherStub, $loggerStub);
+        $eventDispatcherStub = new TestEventDispatcher();
+        $controller = $this->createController($eventDispatcherStub);
 
         $path = __DIR__ . '/TestApp/downloads/sample.xml';
         $response = $controller->download($path);
@@ -107,13 +109,12 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals('74', $response->getHeaderLine('Content-Length'));
         $this->assertEquals('attachment; filename="sample.xml"', $response->getHeaderLine('Content-Disposition'));
 
-        $this->assertEquals(
+        $this->assertEventsDispatched(
             [
                 'Lightning\Controller\Event\AfterInitializeEvent',
                 'Lightning\Controller\Event\BeforeRenderEvent',
                 'Lightning\Controller\Event\AfterRenderEvent'
-            ],
-            $eventDispatcherStub->getDispatchedEvents()
+            ]
         );
     }
 
@@ -147,22 +148,16 @@ final class AbstractControllerTest extends TestCase
 
     public function testLogger(): void
     {
-        $eventDispatcherStub = new EventDispatcherStub();
-        $loggerStub = new LoggerStub();
-        $controller = $this->createController($eventDispatcherStub, $loggerStub);
+        $eventDispatcherStub = new TestEventDispatcher();
+
+        $controller = $this->createController($eventDispatcherStub, $this->getLogger());
 
         // invoke
         $controller->index();
 
         // check
-        $logged = $loggerStub->getLogged();
-        $this->assertEquals([
-            0 => 'debug', // Level
-            1 => 'Lightning\Test\TestCase\Controller\TestApp\ArticlesController::index', // Message
-            2 => [
-                'action' => 'index'  // Context
-            ]
-        ], $logged[0]);
+        $this->assertLogDebugContains('Lightning\Test\TestCase\Controller\TestApp\ArticlesController::index');
+        $this->assertLogCount(1);
     }
 
     public function testSetGetResponse(): void

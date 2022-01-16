@@ -11,7 +11,7 @@ use Lightning\Router\Event\AfterFilterEvent;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Lightning\Router\Event\BeforeFilterEvent;
-use Lightning\TestSuite\Stubs\EventDispatcherStub;
+use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\Router\Middleware\DispatcherMiddleware;
 
 class Foo
@@ -70,7 +70,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $route = new Route('get', '/articles/:id', [new PostsController(),'index']);
         $route->match('GET', '/articles/1234');
 
-        $eventDispatcher = new EventDispatcherStub();
+        $eventDispatcher = new TestEventDispatcher();
         $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables(), $eventDispatcher);
         $request = new ServerRequest('GET', '/not-relevant');
         $response = $middleware->process($request, new DummyRequestHandler($request));
@@ -82,7 +82,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $route = new Route('GET', '/articles/:id', [new PostsController(),'index'], ['id' => '[0-9]+']);
         $route->match('GET', '/articles/1234');
 
-        $eventDispatcher = new EventDispatcherStub();
+        $eventDispatcher = new TestEventDispatcher();
         $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables(), $eventDispatcher);
         $request = new ServerRequest('GET', '/articles/1234');
         $response = $middleware->process($request, new DummyRequestHandler($request));

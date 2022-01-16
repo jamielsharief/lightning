@@ -91,6 +91,66 @@ $this->setSession([
 ]);
 ```
 
+## Testing Events
+
+
+```php
+
+```
+
+## Testing Logging
+
+The `TestLogger` is a PSR logger for using during tests.
+
+It comes with two additional methods
+
+```php
+// Checks an exact message is in the log
+$bool = $testLogger->hasLogged('Invoice #355 was printed', LogLevel::DEBUG);
+// Checks the unrendered version
+$bool = $testLogger->hasLogged('Invoice #{number} was printed',LogLevel::DEBUG, false)
+// Check for a partial string in the log
+$bool = $testLogger->logContains('could not send email', LogLevel::ERROR);
+```
+
+
+There is also a `LoggerTestTrait` which provides various assertation methods, making it easier to test applications.
+
+```php
+use LoggerTestTrait;
+
+public function setUp(): void 
+{
+    $testLogger = $this->createLogger();
+    $this->setLogger($testLogger);
+}
+
+public function testController(): void 
+{
+    $object = new SomeObject($this->getLogger());
+    $object->doSomething();
+    $this->assertLogDebugHas('Did something');
+}
+```
+
+The following methods are provided:
+
+```php
+$this->assertLogCount(5);
+
+// Generic assertations
+$this->assertLogHas('Could not connect to SMTP server', LogLevel::ERROR);
+$this->assertLogDoesNotHave('Could not connect to SMTP server', LogLevel::ERROR);
+$this->assertLogContains('SMTP server', LogLevel::ERROR);
+$this->assertLogNotContains('SMTP server', LogLevel::ERROR);
+
+// Assertation for each level
+$this->assertLogErrorHas('Could not connect to SMTP server');
+$this->assertLogErrorDoesNotHave('Could not connect to SMTP server');
+$this->assertLogErrorContains('SMTP server');
+$this->assertLogErrorNotContains('SMTP server');
+```
+
 ## Testing Middleware
 
 The `TestRequestHandler` helps making it easy to test middleware in a consistent manner.

@@ -5,7 +5,6 @@ namespace Lightning\Test\Database;
 use PDO;
 use Exception;
 use PDOException;
-use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 use Lightning\Cache\MemoryCache;
 use Lightning\Database\Statement;
@@ -15,11 +14,13 @@ use Lightning\Database\PdoFactory;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
-use Lightning\TestSuite\Stubs\LoggerStub;
+use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\Test\Fixture\ArticlesFixture;
 
 final class ConnectionTest extends TestCase
 {
+    use LoggerTestTrait;
+
     private PDO $pdo;
     public function setUp(): void
     {
@@ -31,13 +32,15 @@ final class ConnectionTest extends TestCase
             ArticlesFixture::class,
             TagsFixture::class
         ]);
+
+        $this->setLogger($this->createLogger());
     }
 
-    private function createConnection(bool $useExceptions = true, ?LoggerInterface $logger = null): Connection
+    private function createConnection(bool $useExceptions = true): Connection
     {
         $pdo = $useExceptions ? $this->pdo : new PDO(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
-        return new Connection($pdo, $logger);
+        return new Connection($pdo, $this->getLogger());
     }
 
     public function testGetPDO(): void
@@ -87,23 +90,20 @@ final class ConnectionTest extends TestCase
 
     public function testBeginTransactionTest(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
         $this->assertTrue($connection->beginTransaction());
         $this->assertTrue($connection->inTransaction());
         $this->assertFalse($connection->beginTransaction());
 
-        $this->assertCount(1, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[0][0]);
-        $this->assertEquals('BEGIN', $logger->getLogged()[0][1]);
+        $this->assertLogDebugHas('BEGIN');
+        $this->assertLogCount(1);
 
         $connection->rollback();
     }
 
     public function testCommitTransactionTest(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
 
         $this->assertFalse($connection->commit());
         $this->assertFalse($connection->inTransaction());
@@ -112,54 +112,47 @@ final class ConnectionTest extends TestCase
         $this->assertTrue($connection->commit());
         $this->assertFalse($connection->inTransaction());
 
-        $this->assertCount(2, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[1][0]);
-        $this->assertEquals('COMMIT', $logger->getLogged()[1][1]);
+        $this->assertLogDebugHas('COMMIT');
+        $this->assertLogCount(2);
 
         $connection->rollback();
     }
 
     public function testRollbackTransactionTest(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
         $this->assertFalse($connection->rollback());
 
         $connection->beginTransaction();
 
         $this->assertTrue($connection->rollback());
 
-        $this->assertCount(2, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[1][0]);
-        $this->assertEquals('ROLLBACK', $logger->getLogged()[1][1]);
+        $this->assertLogDebugHas('ROLLBACK');
+        $this->assertLogCount(2);
     }
 
     public function testExecute(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
 
         $statement = $connection->execute('SELECT * FROM articles');
         $this->assertInstanceOf(Statement::class, $statement);
         $this->assertEquals('SELECT * FROM articles', $statement->getQueryString());
 
-        $this->assertCount(1, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[0][0]);
-        $this->assertEquals('SELECT * FROM articles', $logger->getLogged()[0][1]);
+        $this->assertLogDebugHas('SELECT * FROM articles');
+        $this->assertLogCount(1);
     }
 
     public function testExecuteWithParams(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
 
         $statement = $connection->execute('SELECT * FROM articles WHERE id = ?', [1000]);
         $this->assertEquals('SELECT * FROM articles WHERE id = ?', $statement->getQueryString());
         $this->assertCount(1, $statement->fetchAll());
 
-        $this->assertCount(1, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[0][0]);
-        $this->assertEquals('SELECT * FROM articles WHERE id = 1000', $logger->getLogged()[0][1]);
+        $this->assertLogDebugHas('SELECT * FROM articles WHERE id = 1000');
+        $this->assertLogCount(1);
     }
 
     public function testTransaction(): void
@@ -219,13 +212,12 @@ final class ConnectionTest extends TestCase
 
     public function testExecuteWasLogged(): void
     {
-        $logger = new LoggerStub();
-        $connection = $this->createConnection(true, $logger);
+        $connection = $this->createConnection(true);
 
         $result = $connection->execute('SELECT * FROM articles');
 
-        $this->assertCount(1, $logger->getLogged());
-        $this->assertEquals('debug', $logger->getLogged()[0][0]);
+        $this->assertLogDebugHas('SELECT * FROM articles');
+        $this->assertLogCount(1);
     }
 
     // public function testExecuteCache()

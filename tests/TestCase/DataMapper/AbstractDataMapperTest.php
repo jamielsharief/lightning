@@ -25,7 +25,7 @@ use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Entity\Callback\AfterLoadInterface;
 use Lightning\Entity\Callback\AfterSaveInterface;
 use Lightning\Entity\Callback\BeforeSaveInterface;
-use Lightning\TestSuite\Stubs\EventDispatcherStub;
+use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\Entity\Callback\AfterCreateInterface;
 use Lightning\Entity\Callback\AfterDeleteInterface;
 use Lightning\Entity\Callback\AfterUpdateInterface;
@@ -288,7 +288,7 @@ final class AbstractDataMapperTest extends TestCase
             TagsFixture::class,
         ]);
 
-        $this->setEventDispatcher(new EventDispatcherStub());
+        $this->setEventDispatcher(new TestEventDispatcher());
     }
 
     public function testGetDataSource(): void

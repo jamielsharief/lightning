@@ -74,7 +74,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables(), $eventDispatcher);
         $request = new ServerRequest('GET', '/not-relevant');
         $response = $middleware->process($request, new DummyRequestHandler($request));
-        $this->assertEquals([BeforeFilterEvent::class,AfterFilterEvent::class], $eventDispatcher->getDispatchedEventClasses());
+        $this->assertEquals([BeforeFilterEvent::class,AfterFilterEvent::class], $eventDispatcher->getDispatchedEvents());
     }
 
     public function testProcessAddedArgs(): void
@@ -88,8 +88,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $response = $middleware->process($request, new DummyRequestHandler($request));
 
         // Pull the request from the Event object
-        $objects = $eventDispatcher->getDispatchedEvents();
-        $event = $objects[BeforeFilterEvent::class];
+        $event = $eventDispatcher->getDispatchedEvent(BeforeFilterEvent::class);
         $this->assertEquals('1234', $event->getRequest()->getAttribute('id'));
     }
 }

@@ -95,13 +95,17 @@ abstract class AbstractLogger implements LoggerInterface
 
     /**
      * Interpolates context values into the message placeholders.
+     *
+     * @param string $message
+     * @param array $context
+     * @return void
      */
-    protected function interpolate($message, array $context = [])
+    protected function interpolate(string $message, array $context = [])
     {
         $replace = [];
-        foreach ($context as $key => $val) {
-            if (! is_array($val) && (! is_object($val) || method_exists($val, '__toString'))) {
-                $replace['{' . $key . '}'] = $val;
+        foreach ($context as $key => $value) {
+            if (! is_array($value) && (! is_object($value) || method_exists($value, '__toString'))) {
+                $replace['{' . $key . '}'] = (string) $value;
             }
         }
 

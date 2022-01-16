@@ -19,16 +19,32 @@ namespace Lightning\TestSuite;
  */
 class TestSession implements TestSessionInterface
 {
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $_SESSION = []; // Create session global in CLI
     }
 
+    /**
+     * Sets a value in the Session
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
     public function set(string $key, $value): void
     {
         $_SESSION[$key] = $value;
     }
 
+    /**
+     * Checks if the session has a value
+     *
+     * @param string $key
+     * @return boolean
+     */
     public function has(string $key): bool
     {
         return array_key_exists($key, $_SESSION);

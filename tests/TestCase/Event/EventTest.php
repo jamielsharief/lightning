@@ -11,7 +11,7 @@ final class EventTest extends TestCase
     public function testGetType(): void
     {
         $event = new Event('Test.type', $this);
-        $this->assertEquals('Test.type', $event->getType());
+        $this->assertEquals('Test.type', $event->getName());
     }
 
     public function testGetSource(): void

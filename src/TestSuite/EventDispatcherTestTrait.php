@@ -18,7 +18,7 @@ use RuntimeException;
 /**
  * # PSR-14 Event Test Trait
  */
-trait EventTestTrait
+trait EventDispatcherTestTrait
 {
     protected ?TestEventDispatcher $testEventDispatcher = null;
 
@@ -67,7 +67,7 @@ trait EventTestTrait
      */
     protected function assertEventDispatched(string $event): void
     {
-        $this->assertTrue($this->getEventDispatcher()->hasDispatched($event), sprintf('Event `%s` was not dispatched', $event));
+        $this->assertTrue($this->getEventDispatcher()->hasDispatchedEvent($event), sprintf('Event `%s` was not dispatched', $event));
     }
 
     /**
@@ -78,7 +78,7 @@ trait EventTestTrait
      */
     protected function assertEventNotDispatched(string $event): void
     {
-        $this->assertFalse($this->getEventDispatcher()->hasDispatched($event), sprintf('Event `%s` was dispatched', $event));
+        $this->assertFalse($this->getEventDispatcher()->hasDispatchedEvent($event), sprintf('Event `%s` was dispatched', $event));
     }
 
     /**
@@ -115,7 +115,7 @@ trait EventTestTrait
      */
     public function assertEventsDispatchedEquals(array $events): void
     {
-        $this->assertEquals($events, $this->getEventDispatcher()->getDispatchedEventClasses());
+        $this->assertEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
     }
 
     /**
@@ -126,7 +126,7 @@ trait EventTestTrait
      */
     public function assertEventsDispatchedNotEquals(array $events): void
     {
-        $this->assertNotEquals($events, $this->getEventDispatcher()->getDispatchedEventClasses());
+        $this->assertNotEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
     }
 
     /**
@@ -135,7 +135,7 @@ trait EventTestTrait
      * @param integer $count
      * @return void
      */
-    protected function assertEventCount(int $count): void
+    protected function assertEventsDispatchedCount(int $count): void
     {
         $this->assertCount($count, $this->getEventDispatcher());
     }

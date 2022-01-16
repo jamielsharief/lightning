@@ -14,6 +14,7 @@
 namespace Lightning\TestSuite;
 
 use Countable;
+use Lightning\Event\GenericEventInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -23,17 +24,10 @@ use Psr\EventDispatcher\EventDispatcherInterface;
  */
 class TestEventDispatcher implements Countable, EventDispatcherInterface
 {
-    protected array $dispatchedEvents = [];
-
     /**
-     * Constructor
-     *
-     * @param object[] $dispatchedEvents
+     * @var array
      */
-    public function __construct(array $dispatchedEvents = [])
-    {
-        $this->dispatchedEvents = $dispatchedEvents;
-    }
+    protected array $dispatchedEvents = [];
 
     /**
      * Dispatches an Event
@@ -43,7 +37,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      */
     public function dispatch(object $event)
     {
-        $this->dispatchedEvents[get_class($event)] = $event;
+        $this->dispatchedEvents[] = $event;
 
         return $event;
     }
@@ -53,19 +47,31 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      *
      * @return array
      */
-    public function getDispatchedEventClasses(): array
+    public function getDispatchedEvents(): array
     {
-        return array_keys($this->dispatchedEvents);
+        $result = [];
+        foreach ($this->dispatchedEvents as $event) {
+            $result[] = $this->getEventName($event);
+        }
+
+        return $result;
     }
 
     /**
-     * Gets the Event objects that were dispatched
+     * Gets an event that was dispached
      *
-     * @return array
+     * @param string $class
+     * @return object|null
      */
-    public function getDispatchedEvents(): array
+    public function getDispatchedEvent(string $class): ?object
     {
-        return $this->dispatchedEvents;
+        foreach ($this->dispatchedEvents as $event) {
+            if ($this->getEventName($event) === $class) {
+                return $event;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -74,9 +80,9 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      * @param string $class
      * @return boolean
      */
-    public function hasDispatched(string $class): bool
+    public function hasDispatchedEvent(string $class): bool
     {
-        return isset($this->dispatchedEvents[$class]);
+        return $this->getDispatchedEvent($class) !== null;
     }
 
     /**
@@ -97,5 +103,16 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
     public function reset(): void
     {
         $this->dispatchedEvents = [];
+    }
+
+    /**
+     * Determine the Event name
+     *
+     * @param object $event
+     * @return string
+     */
+    private function getEventName(object $event): string
+    {
+        return $event instanceof GenericEventInterface ? $event->getName() : get_class($event);
     }
 }

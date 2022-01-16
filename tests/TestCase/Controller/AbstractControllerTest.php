@@ -8,15 +8,15 @@ use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
-use Lightning\TestSuite\EventTestTrait;
 use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\TestSuite\TestEventDispatcher;
+use Lightning\TestSuite\EventDispatcherTestTrait;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 final class AbstractControllerTest extends TestCase
 {
-    use EventTestTrait;
+    use EventDispatcherTestTrait;
     use LoggerTestTrait;
 
     public function setUp(): void

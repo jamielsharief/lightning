@@ -290,7 +290,7 @@ final class RouterTest extends TestCase
 
         $router->dispatch(new ServerRequest('GET', '/articles'));
 
-        $this->assertEquals([BeforeDispatchEvent::class, BeforeFilterEvent::class, AfterFilterEvent::class, AfterDispatchEvent::class], $eventDispatcher->getDispatchedEventClasses());
+        $this->assertEquals([BeforeDispatchEvent::class, BeforeFilterEvent::class, AfterFilterEvent::class, AfterDispatchEvent::class], $eventDispatcher->getDispatchedEvents());
     }
 
     public function testNoResponse(): void

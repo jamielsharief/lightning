@@ -17,15 +17,15 @@ use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 
 use Lightning\Test\Fixture\TagsFixture;
-use Lightning\TestSuite\EventTestTrait;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\Test\Fixture\ArticlesFixture;
 use Lightning\DataMapper\AbstractDataMapper;
+use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Entity\Callback\AfterLoadInterface;
 use Lightning\Entity\Callback\AfterSaveInterface;
+use Lightning\TestSuite\EventDispatcherTestTrait;
 use Lightning\Entity\Callback\BeforeSaveInterface;
-use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\Entity\Callback\AfterCreateInterface;
 use Lightning\Entity\Callback\AfterDeleteInterface;
 use Lightning\Entity\Callback\AfterUpdateInterface;
@@ -270,7 +270,7 @@ class Article extends AbstractDataMapper
 
 final class AbstractDataMapperTest extends TestCase
 {
-    use EventTestTrait;
+    use EventDispatcherTestTrait;
 
     protected PDO $pdo;
     protected FixtureManager $fixtureManager;

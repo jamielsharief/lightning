@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_names=1);
 /**
  * LightningPHP
  * Copyright 2021 Jamiel Sharief.
@@ -19,14 +19,14 @@ use Psr\EventDispatcher\StoppableEventInterface;
 /**
  * Event - A generic Event
  */
-class Event implements StoppableEventInterface
+class Event implements GenericEventInterface, StoppableEventInterface
 {
     /**
-     * Event type e.g. Order.placed
+     * Event name e.g. Order.placed
      *
      * @var string
      */
-    protected string $type;
+    protected string $name;
 
     /**
      * Status
@@ -59,27 +59,27 @@ class Event implements StoppableEventInterface
     /**
      * Constructor
      *
-     * @param string $eventType Type of event e.g Order.placed
+     * @param string $name Type of event e.g Order.placed
      * @param object $source The object that triggered the event
      * @param array $data   Extra data passed to the event
      * @param boolean $cancelable If the event is cancelable
      */
-    public function __construct(string $eventType, ?object $source = null, array $data = [], bool $cancelable = true)
+    public function __construct(string $name, ?object $source = null, array $data = [], bool $cancelable = true)
     {
-        $this->type = $eventType;
+        $this->name = $name;
         $this->source = $source;
         $this->data = $data;
         $this->cancelable = $cancelable;
     }
 
     /**
-     * Gets the event type, e.g. Order.placed
+     * Gets the event name, e.g. Order.placed
      *
      * @return string
      */
-    public function getType(): string
+    public function getName(): string
     {
-        return $this->type;
+        return $this->name;
     }
 
     /**

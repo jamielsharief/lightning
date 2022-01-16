@@ -91,16 +91,65 @@ $this->setSession([
 ]);
 ```
 
-## Testing Events
+## Testing Dispatched Events
 
+### TestEventDispatcher
+
+The `TestEventDispatcher` is PSR event dispatcher which is for testing.
+
+It comes with the additional methods
 
 ```php
+$eventDispatcher = new TestEventDispatcher();
 
+$events = $eventDispatcher->getDispatchedEvents(); // [BeforeFind::class]
+$event = $eventDispatcher->getDispatchedEvent(BeforeFind::class);
+$bool = $eventDispatcher->hasDispatchedEvent(BeforeFind::class);
+```
+
+### EventDispatcherTestTrait
+
+The `EventDispatcherTestTrait` makes easier to test dispatched events in applications.
+
+```php
+use EventDispatcherTestTraitTestTrait;
+
+public function setUp(): void 
+{
+    $dispatcher = $this->createEventDispatcher();
+    $this->setEventDispatcher($dispatcher);
+}
+
+public function testDoSomething(): void 
+{
+    $object = new SomeObject($this->getEventDispatcher());
+    $object->doSomething();
+    $this->assertEventDispatched(BeforeSomething::class);
+}
+```
+
+The following methods are provided:
+
+```php
+$this->assertEventsDispatchedCount(5);
+
+$this->assertEventDispatched(BeforeSomething::class);
+$this->assertEventNotDispatched(BeforeSomething::class);
+
+// These check that events were or were not dispatched (regardless of order or other events being dispatched)
+$this->assertEventsDispatched([BeforeSomething::class]);
+$this->assertEventsNotDispatched([BeforeSomething::class]);
+
+// These check that only these events were/were not dispatched in this order
+$this->assertEventsDispatchedEquals([BeforeSomething::class]); 
+$this->assertEventsDispatchedNotEquals([BeforeSomething::class]);
 ```
 
 ## Testing Logging
 
-The `TestLogger` is a PSR logger for using during tests.
+### TestLogger
+
+The `TestLogger` is a PSR logger event dispatcher which is for testing.
 
 It comes with two additional methods
 
@@ -111,10 +160,12 @@ $bool = $testLogger->hasLogged('Invoice #355 was printed', LogLevel::DEBUG);
 $bool = $testLogger->hasLogged('Invoice #{number} was printed',LogLevel::DEBUG, false)
 // Check for a partial string in the log
 $bool = $testLogger->logContains('could not send email', LogLevel::ERROR);
+count($testLogger); // count the logged items
 ```
 
+### LoggerTestTrait
 
-There is also a `LoggerTestTrait` which provides various assertation methods, making it easier to test applications.
+The `LoggerTestTrait` provides various assertation methods, making it easier to test applications.
 
 ```php
 use LoggerTestTrait;
@@ -125,7 +176,7 @@ public function setUp(): void
     $this->setLogger($testLogger);
 }
 
-public function testController(): void 
+public function testDoSomething(): void 
 {
     $object = new SomeObject($this->getLogger());
     $object->doSomething();

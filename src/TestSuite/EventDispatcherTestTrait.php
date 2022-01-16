@@ -13,7 +13,7 @@
 
 namespace Lightning\TestSuite;
 
-use RuntimeException;
+use BadMethodCallException;
 
 /**
  * # PSR-14 Event Test Trait
@@ -53,7 +53,7 @@ trait EventDispatcherTestTrait
     public function getEventDispatcher(): TestEventDispatcher
     {
         if (! isset($this->testEventDispatcher)) {
-            throw new RuntimeException('TestEventDispatcher not set');
+            throw new BadMethodCallException('TestEventDispatcher is not set');
         }
 
         return $this->testEventDispatcher;
@@ -90,7 +90,7 @@ trait EventDispatcherTestTrait
     protected function assertEventsDispatched(array $events): void
     {
         foreach ($events as $event) {
-            $this->assertEventNotDispatched($event);
+            $this->assertEventDispatched($event);
         }
     }
 

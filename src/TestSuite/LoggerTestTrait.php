@@ -14,7 +14,7 @@
 namespace Lightning\TestSuite;
 
 use Psr\Log\LogLevel;
-use RuntimeException;
+use BadMethodCallException;
 
 trait LoggerTestTrait
 {
@@ -51,7 +51,7 @@ trait LoggerTestTrait
     public function getLogger(): TestLogger
     {
         if (! isset($this->testLogger)) {
-            throw new RuntimeException('TestLogger not set');
+            throw new BadMethodCallException('TestLogger is not set');
         }
 
         return $this->testLogger;

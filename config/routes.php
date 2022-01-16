@@ -1,5 +1,6 @@
 <?php
 
+use Lightning\Router\Router;
 use Lightning\Router\RoutesInterface;
 use App\Controllers\ArticlesController;
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +17,7 @@ return function (RoutesInterface $routes) {
         $response->getBody()->write(json_encode($request->getAttribute('id')));
 
         return $response;
-    }, ['id' => '[0-9]+']);
+    }, ['id' => Router::NUMERIC]);
 
     $routes->get('/articles/index', [ArticlesController::class,'index']);
 

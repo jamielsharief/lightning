@@ -117,10 +117,10 @@ Here is an example for reference on a sample configuration
 $router->get('/articles/new', [ArticlesController::class,'new']);
 $router->get('articles', [ArticlesController::class,'index']);
 $router->post('articles', [ArticlesController::class,'create']);
-$router->get('/articles/:id/edit', [ArticlesController::class,'edit'], ['id' => '[0-9]{1,11}']);
-$router->get('/articles/:id', [ArticlesController::class,'show'], ['id' => '[0-9]{1,11}']);
-$router->patch('/articles/:id', [ArticlesController::class,'update'], ['id' => '[0-9]{1,11}']);
-$router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' => '[0-9]{1,11}']);
+$router->get('/articles/:id/edit', [ArticlesController::class,'edit'], ['id' => '[0-9]+']);
+$router->get('/articles/:id', [ArticlesController::class,'show'], ['id' => '[0-9]+']);
+$router->patch('/articles/:id', [ArticlesController::class,'update'], ['id' => '[0-9]+']);
+$router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' => '[0-9]+']);
 ```
 
 ## PSR-14: Event Dispatcher

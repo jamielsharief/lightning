@@ -8,10 +8,10 @@ use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Router\Event\AfterFilterEvent;
+use Lightning\TestSuite\TestEventDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Lightning\Router\Event\BeforeFilterEvent;
-use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\Router\Middleware\DispatcherMiddleware;
 
 class Foo
@@ -74,7 +74,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables(), $eventDispatcher);
         $request = new ServerRequest('GET', '/not-relevant');
         $response = $middleware->process($request, new DummyRequestHandler($request));
-        $this->assertEquals([BeforeFilterEvent::class,AfterFilterEvent::class], $eventDispatcher->getDispatchedEvents());
+        $this->assertEquals([BeforeFilterEvent::class,AfterFilterEvent::class], $eventDispatcher->getDispatchedEventClasses());
     }
 
     public function testProcessAddedArgs(): void
@@ -88,7 +88,7 @@ final class DispatcherMiddlewareTest extends TestCase
         $response = $middleware->process($request, new DummyRequestHandler($request));
 
         // Pull the request from the Event object
-        $objects = $eventDispatcher->getDispatchedEventObjects();
+        $objects = $eventDispatcher->getDispatchedEvents();
         $event = $objects[BeforeFilterEvent::class];
         $this->assertEquals('1234', $event->getRequest()->getAttribute('id'));
     }

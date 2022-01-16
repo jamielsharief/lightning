@@ -53,7 +53,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      *
      * @return array
      */
-    public function getDispatchedEvents(): array
+    public function getDispatchedEventClasses(): array
     {
         return array_keys($this->dispatchedEvents);
     }
@@ -63,7 +63,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      *
      * @return array
      */
-    public function getDispatchedEventObjects(): array
+    public function getDispatchedEvents(): array
     {
         return $this->dispatchedEvents;
     }

@@ -115,7 +115,7 @@ trait EventTestTrait
      */
     public function assertEventsDispatchedEquals(array $events): void
     {
-        $this->assertEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
+        $this->assertEquals($events, $this->getEventDispatcher()->getDispatchedEventClasses());
     }
 
     /**
@@ -126,7 +126,7 @@ trait EventTestTrait
      */
     public function assertEventsDispatchedNotEquals(array $events): void
     {
-        $this->assertNotEquals($events, $this->getEventDispatcher()->getDispatchedEvents());
+        $this->assertNotEquals($events, $this->getEventDispatcher()->getDispatchedEventClasses());
     }
 
     /**

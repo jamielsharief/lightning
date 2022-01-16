@@ -107,9 +107,9 @@ final class QueryTest extends TestCase
     {
         $query = $this->createQuery();
         $this->assertSame(
-            'SELECT * FROM articles LEFT JOIN authors AS a ON articles.author_id = a.id',
+            'SELECT articles.id, authors.id FROM articles LEFT JOIN authors AS a ON articles.author_id = a.id',
             (string) $query
-                ->select(['*'])
+                ->select(['articles.id','authors.id'])
                 ->from('articles')
                 ->leftJoin('authors', 'a', ['articles.author_id = a.id'])
         );
@@ -119,9 +119,9 @@ final class QueryTest extends TestCase
     {
         $query = $this->createQuery();
         $this->assertSame(
-            'SELECT * FROM articles RIGHT JOIN authors AS a ON articles.author_id = a.id',
+            'SELECT articles.id, authors.id FROM articles RIGHT JOIN authors AS a ON articles.author_id = a.id',
             (string) $query
-                ->select(['*'])
+                ->select(['articles.id','authors.id'])
                 ->from('articles')
                 ->rightJoin('authors', 'a', ['articles.author_id = a.id'])
         );
@@ -131,9 +131,9 @@ final class QueryTest extends TestCase
     {
         $query = $this->createQuery();
         $this->assertSame(
-            'SELECT * FROM articles FULL JOIN authors AS a ON articles.author_id = a.id',
+            'SELECT articles.id, authors.id FROM articles FULL JOIN authors AS a ON articles.author_id = a.id',
             (string) $query
-                ->select(['*'])
+                ->select(['articles.id','authors.id'])
                 ->from('articles')
                 ->fullJoin('authors', 'a', ['articles.author_id = a.id'])
         );

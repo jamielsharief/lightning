@@ -76,7 +76,7 @@ $router->delete('/articles/:id', 'App\Controller\ArticlesController::delete',[
 You can group your route definitions together, these routes will only be processed if there is a match on the prefix.
 
 ```php
-$router->group('/admin', function (RouteCollection $routes) {
+$router->group('/admin', function (RoutesInterface $routes) {
     $routes->get('/dashboard', 'App\Controller\AdminController::dashboard'); // GET /admin/dashboard
 });
 ```
@@ -89,6 +89,12 @@ To add `Middleware` on all routes
 $router->middleware(new FooMiddleware);
 ```
 
+To add a `Middleware` to the start of the queue
+
+```php
+$router->prependMiddleware(new FooMiddleware);
+```
+
 To add for an individual `Route`
 
 ```php
@@ -98,7 +104,7 @@ $router->get('/articles', [new ArticlesController,'index'])->middleware(new Auth
 To add `Middleware` for all `Routes` in a group.
 
 ```php
-$router->group('/admin', function (RouteCollection $routes) {
+$router->group('/admin', function (RoutesInterface $routes) {
     $routes->get('/dashboard', 'App\Controller\AdminController::dashboard'); // GET /admin/dashboard
 })->middleware(new AuthMiddleware);
 ```

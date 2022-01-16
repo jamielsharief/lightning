@@ -17,6 +17,7 @@ use Lightning\Autowire\Autowire;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Lightning\Router\Event\AfterDispatchEvent;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Http\Exception\NotFoundException;
@@ -24,7 +25,7 @@ use Lightning\Router\Event\BeforeDispatchEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Router\Middleware\DispatcherMiddleware;
 
-class Router
+class Router implements RequestHandlerInterface, RoutesInterface
 {
     use RouteTrait;
     use MiddlewareTrait;
@@ -148,6 +149,17 @@ class Router
     }
 
     /**
+     * Calls dispatch part of the RequestHandlerInterface
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->dispatch($request);
+    }
+
+    /**
      * Creates a callable that can be autowired
      *
      * @param callable $callable
@@ -179,7 +191,7 @@ class Router
      * @param array $constraints
      * @return Route
      */
-    public function map(string $method, string $path, $handler, array $constraints): Route
+    public function map(string $method, string $path, $handler, array $constraints = []): Route
     {
         return $this->routes->map($method, $path, $handler, $constraints);
     }

@@ -13,7 +13,7 @@
 
 namespace Lightning\Router;
 
-class RouteCollection
+class RouteCollection implements RoutesInterface
 {
     use MiddlewareTrait;
     use RouteTrait;

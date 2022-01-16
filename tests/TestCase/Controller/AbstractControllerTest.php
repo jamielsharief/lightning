@@ -4,14 +4,13 @@ namespace Lightning\Test\Controller;
 
 use Lightning\View\View;
 use Nyholm\Psr7\Response;
-use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
+use Lightning\TestSuite\TestLogger;
 use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\TestSuite\EventDispatcherTestTrait;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 final class AbstractControllerTest extends TestCase
@@ -27,9 +26,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testRender(): void
     {
-        $eventDispatcherStub = new TestEventDispatcher();
-
-        $controller = $this->createController($eventDispatcherStub);
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $response = $controller->index();
 
@@ -48,8 +45,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testRenderJson(): void
     {
-        $eventDispatcherStub = new TestEventDispatcher();
-        $controller = $this->createController($eventDispatcherStub);;
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());;
 
         $response = $controller->status(['ok']);
 
@@ -68,7 +64,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testRedirect(): void
     {
-        $controller = $this->createController();
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $response = $controller->old('/articles/new');
         $this->assertEquals(302, $response->getStatusCode());
@@ -77,9 +73,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testRedirectEvents(): void
     {
-        $eventDispatcherStub = new TestEventDispatcher();
-
-        $controller = $this->createController($eventDispatcherStub);
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $response = $controller->old('/articles/home');
         $this->assertEquals('/articles/home', $response->getHeaderLine('Location'));
@@ -94,8 +88,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testSendFile(): void
     {
-        $eventDispatcherStub = new TestEventDispatcher();
-        $controller = $this->createController($eventDispatcherStub);
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $path = __DIR__ . '/TestApp/downloads/sample.xml';
         $response = $controller->download($path);
@@ -120,7 +113,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testSendFileWithRelativePath(): void
     {
-        $controller = $this->createController();
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Path `/var/www/../file` is a relative path');
@@ -130,7 +123,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testSendFileNoDownload(): void
     {
-        $controller = $this->createController();
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $path = __DIR__ . '/TestApp/downloads/sample.xml';
         $response = $controller->download($path, ['download' => false]);
@@ -148,9 +141,7 @@ final class AbstractControllerTest extends TestCase
 
     public function testLogger(): void
     {
-        $eventDispatcherStub = new TestEventDispatcher();
-
-        $controller = $this->createController($eventDispatcherStub, $this->getLogger());
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         // invoke
         $controller->index();
@@ -162,14 +153,14 @@ final class AbstractControllerTest extends TestCase
 
     public function testSetGetResponse(): void
     {
-        $controller = $this->createController();
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
         $response = new Response(404, [], 'not found');
         $controller->setResponse($response);
 
         $this->assertEquals($response, $controller->getResponse());
     }
 
-    private function createController(?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null): ArticlesController
+    private function createController(?TestEventDispatcher $eventDispatcher = null, ?TestLogger $logger = null): ArticlesController
     {
         $path = __DIR__ .'/TestApp/templates';
 

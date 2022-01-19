@@ -124,7 +124,11 @@ class Router implements RequestHandlerInterface, RoutesInterface
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new BeforeDispatchEvent($request));
+            $event = new BeforeDispatchEvent($request);
+            $this->eventDispatcher->dispatch($event);
+            if ($response = $event->getResponse()) {
+                return $response;
+            }
         }
 
         $route = $this->match($request);
@@ -140,14 +144,12 @@ class Router implements RequestHandlerInterface, RoutesInterface
             };
         }
 
-        array_push($middleware, new DispatcherMiddleware(
-            $callable, $variables, $this->eventDispatcher, $this->responseFactory)
-        );
+        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->responseFactory));
 
         $response = (new RequestHandler($middleware))->handle($request);
 
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new AfterDispatchEvent($request, $response));
+            $response = $this->eventDispatcher->dispatch(new AfterDispatchEvent($request, $response))->getResponse();
         }
 
         return $response;
@@ -180,6 +182,11 @@ class Router implements RequestHandlerInterface, RoutesInterface
             }
 
             if (is_array($callable)) {
+                // decided to this way rather than events or hooks
+                if (method_exists($callable[0], 'setRequest')) {
+                    $callable[0]->setRequest($request);
+                }
+
                 return $this->autowire->method($callable[0], $callable[1], $params);
             }
 

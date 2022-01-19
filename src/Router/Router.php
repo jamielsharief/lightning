@@ -182,12 +182,13 @@ class Router implements RequestHandlerInterface, RoutesInterface
             }
 
             if (is_array($callable)) {
+                // In future here we can use attributes #SetServerRequest, #BeforeFilter #AfterFilter
                 // decided to this way rather than events or hooks
                 if (method_exists($callable[0], 'setRequest')) {
                     $callable[0]->setRequest($request);
                 }
 
-                return $this->autowire->method($callable[0], $callable[1], $params);
+                return  $this->autowire->method($callable[0], $callable[1], $params);
             }
 
             return $this->autowire->function($callable, $params);

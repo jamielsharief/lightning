@@ -134,6 +134,8 @@ class Autowire
      */
     protected function resolveParameter(ReflectionParameter $parameter, array $vars = [])
     {
+
+        /** @var ReflectionNamedType */
         $parameterType = $parameter->getType();
 
         if (! $parameterType) {

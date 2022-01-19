@@ -246,7 +246,7 @@ final class QueryTest extends TestCase
         $query = $this->createQuery();
 
         $result = $query
-            ->select(['*'])
+            ->select(['articles.id','articles.title','articles.author_id','authors.id','authors.name'])
             ->from('articles')
             ->leftJoin('authors', 'authors', ['articles.author_id = authors.id'])
             ->first();

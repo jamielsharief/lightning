@@ -144,7 +144,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
             };
         }
 
-        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->responseFactory));
+        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->eventDispatcher, $this->responseFactory));
 
         $response = (new RequestHandler($middleware))->handle($request);
 

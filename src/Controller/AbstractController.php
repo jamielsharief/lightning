@@ -22,7 +22,9 @@ use Lightning\Hook\HookInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Lightning\Controller\Event\AfterFilterEvent;
 use Lightning\Controller\Event\AfterRenderEvent;
+use Lightning\Controller\Event\BeforeFilterEvent;
 use Lightning\Controller\Event\BeforeRenderEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Controller\Event\BeforeRedirectEvent;
@@ -92,11 +94,11 @@ abstract class AbstractController implements HookInterface
     {
         $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
         if ($event && $response = $event->getResponse()) {
-            return $response;
+            return $this->response = $response;
         }
 
         if (! $this->triggerHook('beforeRender')) {
-            return $this->response;
+            return $this->response = $response;
         }
 
         $this->response = $this->buildResponse(
@@ -106,7 +108,7 @@ abstract class AbstractController implements HookInterface
         $this->triggerHook('afterRender', [], false);
         $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $event ? $event->getResponse() : $this->response;
+        return $this->response = $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -121,11 +123,11 @@ abstract class AbstractController implements HookInterface
     {
         $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
         if ($event && $response = $event->getResponse()) {
-            return $response;
+            return $this->response = $response;
         }
 
         if (! $this->triggerHook('beforeRender')) {
-            return $this->response;
+            return $this->response = $response;
         }
 
         $this->response = $this->buildResponse(
@@ -135,7 +137,7 @@ abstract class AbstractController implements HookInterface
         $this->triggerHook('afterRender', [], false);
         $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $event ? $event->getResponse() : $this->response;
+        return $this->response = $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -174,11 +176,11 @@ abstract class AbstractController implements HookInterface
         }
         $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
         if ($event && $response = $event->getResponse()) {
-            return $response;
+            return $this->response = $response;
         }
 
         if (! $this->triggerHook('beforeRender')) {
-            return $this->response;
+            return $this->response = $response;
         }
 
         $response = $this->response
@@ -199,7 +201,7 @@ abstract class AbstractController implements HookInterface
         $this->triggerHook('afterRender', [], false);
         $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $event ? $event->getResponse() : $this->response;
+        return $this->response = $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -213,14 +215,16 @@ abstract class AbstractController implements HookInterface
     {
         $event = $this->dispatchEvent(new BeforeRedirectEvent($this, $uri, $this->request));
         if ($event && $response = $event->getResponse()) {
-            return $response;
+            return $this->response = $response;
         }
 
         if (! $this->triggerHook('beforeRedirect', [$uri])) {
-            return $this->response;
+            return $this->response = $response;
         }
 
-        return $this->response->withHeader('Location', $uri)->withStatus($status);
+        return $this->response = $this->response
+            ->withHeader('Location', $uri)
+            ->withStatus($status);
     }
 
     /**

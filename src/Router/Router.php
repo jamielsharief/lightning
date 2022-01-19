@@ -14,6 +14,7 @@
 namespace Lightning\Router;
 
 use Lightning\Autowire\Autowire;
+use Lightning\Hook\HookInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -124,8 +125,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->eventDispatcher) {
-            $event = new BeforeDispatchEvent($request);
-            $this->eventDispatcher->dispatch($event);
+            $event = $this->eventDispatcher->dispatch(new BeforeDispatchEvent($request));
             if ($response = $event->getResponse()) {
                 return $response;
             }
@@ -176,19 +176,27 @@ class Router implements RequestHandlerInterface, RoutesInterface
     {
         return function (ServerRequestInterface $request, ?ResponseInterface $response = null) use ($callable) {
             $params = [ServerRequestInterface::class => $request];
-
             if ($response) {
                 $params[ResponseInterface::class] = $response;
             }
 
             if (is_array($callable)) {
-                // In future here we can use attributes #SetServerRequest, #BeforeFilter #AfterFilter
-                // decided to this way rather than events or hooks
-                if (method_exists($callable[0], 'setRequest')) {
-                    $callable[0]->setRequest($request);
+                /**
+                 * @internal hooks and immutable objects means they cant be changed in hooks
+                 * TODO: In future here we can use attributes #SetServerRequest, #BeforeFilter #AfterFilter
+                 */
+
+                if ($callable[0] instanceof HookInterface) {
+                    $callable[0]->triggerHook('beforeFilter', [$request], false);
                 }
 
-                return  $this->autowire->method($callable[0], $callable[1], $params);
+                $response = $this->autowire->method($callable[0], $callable[1], $params);
+
+                if ($callable[0] instanceof HookInterface) {
+                    $callable[0]->triggerHook('afterFilter', [$request, $response], false);
+                }
+
+                return $response;
             }
 
             return $this->autowire->function($callable, $params);

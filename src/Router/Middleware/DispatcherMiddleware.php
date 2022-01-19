@@ -13,7 +13,6 @@
 
 namespace Lightning\Router\Middleware;
 
-use Lightning\Hook\HookInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Lightning\Router\Event\AfterFilterEvent;
@@ -63,35 +62,35 @@ class DispatcherMiddleware implements MiddlewareInterface
         }
 
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new BeforeFilterEvent($request));
+            $event = $this->eventDispatcher->dispatch(new BeforeFilterEvent($request));
+            if ($response = $event->getResponse()) {
+                return $response;
+            }
         }
 
         $response = $this->dispatch($this->callable, $request);
 
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response));
+            $response = $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
         }
 
         return $response;
     }
 
+    /**
+     * Dispatch
+     *
+     * @param callable $callable
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
     private function dispatch(callable $callable, ServerRequestInterface $request): ResponseInterface
     {
-        $arguments = $this->responseFactory ? [$request,$this->responseFactory->createResponse()] : [$request];
-
-        $isHookable = is_array($callable) && $callable[0] instanceof HookInterface;
-
-        if ($isHookable) {
-            $response = $callable[0]->triggerHook('beforeFilter', [$request], false);
-        }
+        $arguments = $this->responseFactory ? [$request, $this->responseFactory->createResponse()] : [$request];
 
         $response = $callable(...$arguments);
         if (! $response instanceof ResponseInterface) {
             throw new RouterException('No response was returned');
-        }
-
-        if ($isHookable) {
-            $callable[0]->triggerHook('afterFilter', [$response,$request], false);
         }
 
         return $response;

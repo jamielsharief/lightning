@@ -5,11 +5,14 @@ namespace Lightning\Test\Controller;
 use Lightning\View\View;
 use Nyholm\Psr7\Response;
 use InvalidArgumentException;
+use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
 use Lightning\TestSuite\TestLogger;
+use Psr\Http\Message\ResponseInterface;
 use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\TestSuite\TestEventDispatcher;
+use Psr\Http\Message\ServerRequestInterface;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
@@ -155,9 +158,16 @@ final class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
         $response = new Response(404, [], 'not found');
-        $controller->setResponse($response);
+        $this->assertInstanceOf(ArticlesController::class, $controller->setResponse($response));
+        $this->assertInstanceOf(ResponseInterface::class, $controller->getResponse($response));
+    }
 
-        $this->assertEquals($response, $controller->getResponse());
+    public function testSetGetRequest(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $request = new ServerRequest('GET', '/');
+        $this->assertInstanceOf(ArticlesController::class, $controller->setRequest($request));
+        $this->assertInstanceOf(ServerRequestInterface::class, $controller->getRequest($request));
     }
 
     private function createController(?TestEventDispatcher $eventDispatcher = null, ?TestLogger $logger = null): ArticlesController

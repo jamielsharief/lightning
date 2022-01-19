@@ -13,23 +13,28 @@
 
 namespace Lightning\Controller\Event;
 
+use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractControllerEvent
 {
     protected AbstractController $controller;
-    protected array $data = [];
+    protected ?ResponseInterface $response;
+    protected ?ServerRequestInterface $request;
 
     /**
      * Constructor
      *
      * @param AbstractController $controller
-     * @param array $data
+     * @param ServerRequestInterface|null $request
+     * @param ResponseInterface|null $response
      */
-    public function __construct(AbstractController $controller, array $data = [])
+    public function __construct(AbstractController $controller, ?ServerRequestInterface $request = null, ?ResponseInterface $response = null)
     {
         $this->controller = $controller;
-        $this->data = $data;
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**
@@ -43,12 +48,47 @@ abstract class AbstractControllerEvent
     }
 
     /**
-     * Gets the data/payload for this Event (if any)
+     * Undocumented function
      *
-     * @return array
+     * @return ServerRequestInterface|null
      */
-    public function getData(): array
+    public function getRequest(): ?ServerRequestInterface
     {
-        return $this->data;
+        return $this->request;
+    }
+
+    /**
+     * Sets the request
+     *
+     * @param ServerRequestInterface $request
+     * @return self
+     */
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Sets the Response
+     *
+     * @param ResponseInterface $response
+     * @return self
+     */
+    public function setResponse(ResponseInterface  $response): self
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+    /**
+     * Gets the Response if Available
+     *
+     * @return ResponseInterface|null
+     */
+    public function getResponse(): ?ResponseInterface
+    {
+        return $this->response;
     }
 }

@@ -13,14 +13,15 @@
 
 namespace Lightning\Controller;
 
-use SplFileObject;
 use Lightning\View\View;
 
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Lightning\Hook\HookTrait;
 use Lightning\Hook\HookInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\Controller\Event\BeforeRenderEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -33,8 +34,11 @@ abstract class AbstractController implements HookInterface
 
     protected ResponseInterface $response;
     protected View $view;
+
     protected ?EventDispatcherInterface $eventDispatcher = null;
     protected ?LoggerInterface $logger = null;
+    protected ?ServerRequestInterface $request = null;
+
     protected ?string $layout = null;
 
     /**
@@ -86,8 +90,12 @@ abstract class AbstractController implements HookInterface
      */
     protected function render(string $view, array $data = [], int $statusCode = 200): ResponseInterface
     {
-        $this->dispatchEvent(new BeforeRenderEvent($this, $data));
-        if (! $this->triggerHook('beforeRender', [$data])) {
+        $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
+        if ($event && $response = $event->getResponse()) {
+            return $response;
+        }
+
+        if (! $this->triggerHook('beforeRender')) {
             return $this->response;
         }
 
@@ -95,10 +103,10 @@ abstract class AbstractController implements HookInterface
             $this->view->withLayout($this->layout ?? null)->render($view, $data), 'text/html', $statusCode
         );
 
-        $this->triggerHook('afterRender', [$this->response], false);
-        $this->dispatchEvent(new AfterRenderEvent($this));
+        $this->triggerHook('afterRender', [], false);
+        $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $this->response;
+        return $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -111,8 +119,12 @@ abstract class AbstractController implements HookInterface
      */
     protected function renderJson($payload, int $statusCode = 200, int $jsonFlags = 0): ResponseInterface
     {
-        $this->dispatchEvent(new BeforeRenderEvent($this, $payload));
-        if (! $this->triggerHook('beforeRender', [$payload])) {
+        $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
+        if ($event && $response = $event->getResponse()) {
+            return $response;
+        }
+
+        if (! $this->triggerHook('beforeRender')) {
             return $this->response;
         }
 
@@ -120,10 +132,10 @@ abstract class AbstractController implements HookInterface
             json_encode($payload, $jsonFlags), 'application/json', $statusCode
         );
 
-        $this->triggerHook('afterRender', [$this->response], false);
-        $this->dispatchEvent(new AfterRenderEvent($this));
+        $this->triggerHook('afterRender', [], false);
+        $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $this->response;
+        return $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -154,27 +166,28 @@ abstract class AbstractController implements HookInterface
      */
     protected function renderFile(string $path, array $options = []): ResponseInterface
     {
-        $options += [
-            'name' => basename($path),
-            'download' => true
-        ];
+        $name = basename($path);
+        $isDownload = $options['download'] ?? true;
 
         if (strpos($path, '../') !== false) {
-            throw new InvalidArgumentException("Path `{$path}` is a relative path");
+            throw new InvalidArgumentException(sprintf('Path `%s` is a relative path', $path));
+        }
+        $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
+        if ($event && $response = $event->getResponse()) {
+            return $response;
         }
 
-        $fileObject = new SplFileObject($path);
-        $this->dispatchEvent(new BeforeRenderEvent($this, [$fileObject]));
-        if (! $this->triggerHook('beforeRender', [$fileObject])) {
+        if (! $this->triggerHook('beforeRender')) {
             return $this->response;
         }
 
         $response = $this->response
-            ->withHeader('Content-Type', mime_content_type($fileObject->getPathname()))
-            ->withHeader('Content-Length', (string) filesize($fileObject->getPathname()) ?: 0);
+            ->withStatus(200)
+            ->withHeader('Content-Type', mime_content_type($path))
+            ->withHeader('Content-Length', (string) filesize($path) ?: 0);
 
-        if ($options['download']) {
-            $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $options['name']));
+        if ($isDownload) {
+            $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $name));
         }
 
         $stream = $this->response->getBody();
@@ -183,10 +196,10 @@ abstract class AbstractController implements HookInterface
 
         $this->response = $response->withBody($stream);
 
-        $this->triggerHook('afterRender', [$this->response], false);
-        $this->dispatchEvent(new AfterRenderEvent($this));
+        $this->triggerHook('afterRender', [], false);
+        $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $this->response;
+        return $event ? $event->getResponse() : $this->response;
     }
 
     /**
@@ -198,7 +211,11 @@ abstract class AbstractController implements HookInterface
     */
     protected function redirect(string $uri, int $status = 302): ResponseInterface
     {
-        $this->dispatchEvent(new BeforeRedirectEvent($this));
+        $event = $this->dispatchEvent(new BeforeRedirectEvent($this, $uri, $this->request));
+        if ($event && $response = $event->getResponse()) {
+            return $response;
+        }
+
         if (! $this->triggerHook('beforeRedirect', [$uri])) {
             return $this->response;
         }
@@ -255,5 +272,28 @@ abstract class AbstractController implements HookInterface
     public function getResponse(): ResponseInterface
     {
         return $this->response;
+    }
+
+    /**
+     * Sets the Request object
+     *
+     * @param ServerRequestInterface $request
+     * @return self
+     */
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Request object
+     *
+     * @return RequestInterface|null
+     */
+    public function getRequest(): ?RequestInterface
+    {
+        return $this->request;
     }
 }

@@ -13,19 +13,54 @@
 
 namespace Lightning\Router\Event;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractBeforeEvent
 {
     protected ServerRequestInterface $request;
+    protected ?ResponseInterface $response = null;
 
+    /**
+     * Constructor
+     *
+     * @param ServerRequestInterface $request
+     */
     public function __construct(ServerRequestInterface $request)
     {
         $this->request = $request;
     }
 
+    /**
+     * Gets the Request object
+     *
+     * @return ServerRequestInterface
+     */
     public function getRequest(): ServerRequestInterface
     {
         return $this->request;
+    }
+
+    /**
+     * Sets the Response object
+     *
+     * @param ResponseInterface $response
+     * @return self
+     */
+    public function setResponse(ResponseInterface $response): self
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Response object
+     *
+     * @return ResponseInterface|null
+     */
+    public function getResponse(): ?ResponseInterface
+    {
+        return $this->response;
     }
 }

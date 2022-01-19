@@ -109,6 +109,34 @@ abstract class AbstractController implements HookInterface
     }
 
     /**
+     * This hook is called before the render process starts
+     *
+     * @return void
+     */
+    protected function beforeRender(): void
+    {
+    }
+
+    /**
+     * This hook is called after the render has taken place
+     *
+     * @return void
+     */
+    protected function afterRender(): void
+    {
+    }
+
+    /**
+     * This hook is called before the redirect response is setup
+     *
+     * @param string $url
+     * @return void
+     */
+    protected function beforeRedirect(string $url): void
+    {
+    }
+
+    /**
      * Renders a view using the View package
      *
      * @param string $view e.g. articles/index
@@ -126,7 +154,7 @@ abstract class AbstractController implements HookInterface
             $this->view->withLayout($this->layout ?? null)->render($view, $data), 'text/html', $statusCode
         );
 
-        return $this->doAfterRender();
+        return $this->response = $this->doAfterRender();
     }
 
     /**
@@ -147,7 +175,7 @@ abstract class AbstractController implements HookInterface
             json_encode($payload, $jsonFlags), 'application/json', $statusCode
         );
 
-        return $this->doAfterRender();
+        return $this->response = $this->doAfterRender();
     }
 
     /**
@@ -165,7 +193,7 @@ abstract class AbstractController implements HookInterface
 
         $this->response = $this->buildFileResponse($path, $options['download'] ?? true);
 
-        return $this->doAfterRender();
+        return $this->response = $this->doAfterRender();
     }
 
     /*
@@ -308,7 +336,7 @@ abstract class AbstractController implements HookInterface
             $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $name));
         }
 
-        $stream = $this->response->getBody();
+        $stream = $response->getBody();
         $stream->rewind();
         $stream->write(file_get_contents($path));
 
@@ -344,6 +372,6 @@ abstract class AbstractController implements HookInterface
         $this->triggerHook('afterRender', [], false);
         $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
-        return $this->response = $event ? $event->getResponse() : $this->response;
+        return $event ? $event->getResponse() : $this->response;
     }
 }

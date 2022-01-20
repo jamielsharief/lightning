@@ -342,11 +342,9 @@ abstract class AbstractController implements HookInterface
             $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $name));
         }
 
-        $stream = $response->getBody();
-        $stream->rewind();
-        $stream->write(file_get_contents($path));
+        $response->getBody()->write(file_get_contents($path));
 
-        return $response->withBody($stream);
+        return $response;
     }
 
     /**

@@ -40,7 +40,7 @@ class ArticlesController
 {
     public function show(ServerRequestInterface $request) : ResponseInterface
     {
-        $id = $request->getAttribute('id');
+        $id = (int) $request->getAttribute('id');
 
         $response = new Response();
         $response->getBody()->write("<h1>Articles <small>{$id}</small></h1>");
@@ -60,7 +60,7 @@ $router->get('/articles/:id', 'App\Controller\ArticlesController::show');
 This will be added to the ``ServerRequestInterface` object.
 
 ```php
-$id = $request->getAttribute('id')
+$id = (int) $request->getAttribute('id')
 ```
 
 For security you can make sure that the data that is being passed matches a regular expression pattern. Note: `#^`and `$#` will be added automatically.

@@ -61,14 +61,27 @@ abstract class AbstractController implements HookInterface
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
 
-        $this->registerHook('beforeFilter', 'setRequest');
-        $this->registerHook('beforeFilter', 'beforeFilter');
-        $this->registerHook('afterFilter', 'afterFilter');
+        $this->registerHooks();
 
         $this->initialize();
 
         $this->dispatchEvent(new AfterInitializeEvent($this));
         $this->triggerHook('afterInitialize', [], false);
+    }
+
+    /**
+     * Registers the controller hooks
+     *
+     * @return void
+     */
+    private function registerHooks(): void
+    {
+        $this->registerHook('beforeFilter', 'setRequest');
+        $this->registerHook('beforeFilter', 'beforeFilter');
+        $this->registerHook('afterFilter', 'afterFilter');
+        $this->registerHook('beforeRender', 'beforeRender');
+        $this->registerHook('afterRender', 'afterRender');
+        $this->registerHook('beforeRedirect', 'beforeRedirect');
     }
 
     /**

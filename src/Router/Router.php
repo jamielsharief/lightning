@@ -26,6 +26,13 @@ use Lightning\Router\Event\BeforeDispatchEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Router\Middleware\DispatcherMiddleware;
 
+/**
+ * Router
+ *
+ * @internal
+ *  - HTTP Methods are typically uppercase, but are case senstive, so these should not be modified.
+ *    @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.1
+ */
 class Router implements RequestHandlerInterface, RoutesInterface
 {
     use RouteTrait;

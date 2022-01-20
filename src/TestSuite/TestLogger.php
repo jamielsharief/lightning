@@ -170,9 +170,9 @@ class TestLogger implements Countable, LoggerInterface
      *
      * @param string $message
      * @param array $context
-     * @return void
+     * @return string
      */
-    protected function interpolate(string $message, array $context = [])
+    protected function interpolate(string $message, array $context = []): string
     {
         $replace = [];
         foreach ($context as $key => $value) {

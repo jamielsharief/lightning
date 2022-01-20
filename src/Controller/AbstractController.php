@@ -41,6 +41,9 @@ abstract class AbstractController implements HookInterface
 
     protected ?string $layout = null;
 
+    /**
+     * Default settings for the renderJson method
+     */
     protected const JSON_FLAGS = 0;
 
     /**
@@ -58,16 +61,6 @@ abstract class AbstractController implements HookInterface
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
 
-        $this->initializeController();
-    }
-
-    /**
-     * Calls hooks and events
-     *
-     * @return void
-     */
-    protected function initializeController(): void
-    {
         $this->registerHook('beforeFilter', 'setRequest');
         $this->registerHook('beforeFilter', 'beforeFilter');
         $this->registerHook('afterFilter', 'afterFilter');
@@ -147,7 +140,7 @@ abstract class AbstractController implements HookInterface
     protected function render(string $view, array $data = [], int $statusCode = 200): ResponseInterface
     {
         if ($response = $this->doBeforeRender()) {
-            return $response;
+            return $this->response = $response;
         }
 
         $this->response = $this->buildResponse(
@@ -168,7 +161,7 @@ abstract class AbstractController implements HookInterface
     protected function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
     {
         if ($response = $this->doBeforeRender()) {
-            return $response;
+            return $this->response = $response;
         }
 
         $this->response = $this->buildResponse(
@@ -188,7 +181,7 @@ abstract class AbstractController implements HookInterface
     protected function renderFile(string $path, array $options = []): ResponseInterface
     {
         if ($response = $this->doBeforeRender()) {
-            return $response;
+            return $this->response = $response;
         }
 
         $this->response = $this->buildFileResponse($path, $options['download'] ?? true);
@@ -352,11 +345,11 @@ abstract class AbstractController implements HookInterface
     {
         $event = $this->dispatchEvent(new BeforeRenderEvent($this, $this->request));
         if ($event && $response = $event->getResponse()) {
-            return $this->response = $response;
+            return $response;
         }
 
         if (! $this->triggerHook('beforeRender') || $this->response->getStatusCode() === 302) {
-            return $this->response = $response;
+            return $response;
         }
 
         return null;

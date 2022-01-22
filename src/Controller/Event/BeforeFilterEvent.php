@@ -11,8 +11,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Router\Event;
+namespace Lightning\Controller\Event;
 
-class BeforeFilterEvent extends AbstractBeforeEvent
+class BeforeFilterEvent extends AbstractControllerEvent
 {
 }

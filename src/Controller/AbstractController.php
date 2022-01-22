@@ -19,16 +19,18 @@ use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Lightning\Hook\HookTrait;
 use Lightning\Hook\HookInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Lightning\Router\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Lightning\Controller\Event\AfterFilterEvent;
 use Lightning\Controller\Event\AfterRenderEvent;
+use Lightning\Controller\Event\BeforeFilterEvent;
 use Lightning\Controller\Event\BeforeRenderEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Controller\Event\BeforeRedirectEvent;
 use Lightning\Controller\Event\AfterInitializeEvent;
 
-abstract class AbstractController implements HookInterface
+abstract class AbstractController implements HookInterface, ControllerInterface
 {
     use HookTrait;
 
@@ -76,7 +78,6 @@ abstract class AbstractController implements HookInterface
      */
     private function registerHooks(): void
     {
-        $this->registerHook('beforeFilter', 'setRequest');
         $this->registerHook('beforeFilter', 'beforeFilter');
         $this->registerHook('afterFilter', 'afterFilter');
         $this->registerHook('beforeRender', 'beforeRender');
@@ -85,7 +86,7 @@ abstract class AbstractController implements HookInterface
     }
 
     /**
-     * This is a hook that is called when the Controller is created
+     * This is called when the Controller is created, so that you don't have to overide the constructor
      *
      * @return void
      */
@@ -97,10 +98,11 @@ abstract class AbstractController implements HookInterface
      * This is hook is called before the action is invoked. This is for setting up the controller or application.
      *
      * @param ServerRequestInterface $request
-     * @return void
+     * @return bool
      */
-    protected function beforeFilter(ServerRequestInterface $request): void
+    protected function beforeFilter(ServerRequestInterface $request): bool
     {
+        return true;
     }
 
     /**
@@ -115,12 +117,14 @@ abstract class AbstractController implements HookInterface
     }
 
     /**
-     * This hook is called before the render process starts
+     * This hook is called before the render process starts, if this returns false or is used to set a redirect in
+     * response object, then the response object will be returned instead of rendering.
      *
-     * @return void
+     * @return bool
      */
-    protected function beforeRender(): void
+    protected function beforeRender(): bool
     {
+        return true;
     }
 
     /**
@@ -254,52 +258,6 @@ abstract class AbstractController implements HookInterface
     }
 
     /**
-     * Sets the current controller response
-     *
-     * @param ResponseInterface $response
-     * @return static
-     */
-    public function setResponse(ResponseInterface $response): self
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
-    /**
-     * Gets the current controller Response
-     *
-     * @return ResponseInterface
-     */
-    public function getResponse(): ResponseInterface
-    {
-        return $this->response;
-    }
-
-    /**
-     * Sets the Request object
-     *
-     * @param ServerRequestInterface $request
-     * @return static
-     */
-    public function setRequest(ServerRequestInterface $request): self
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * Gets the Request object
-     *
-     * @return RequestInterface|null
-     */
-    public function getRequest(): ?RequestInterface
-    {
-        return $this->request;
-    }
-
-    /**
     * Builds the response object
     *
     * @param string $body
@@ -328,7 +286,11 @@ abstract class AbstractController implements HookInterface
     private function buildFileResponse(string $path, bool $isDownload): ResponseInterface
     {
         if (strpos($path, '../') !== false) {
-            throw new InvalidArgumentException(sprintf('Path `%s` is a relative path', $path));
+            throw new InvalidArgumentException(sprintf('`%s` is a relative path', $path));
+        }
+
+        if (! file_exists($path)) {
+            throw new InvalidArgumentException(sprintf('`%s` does not exist or is not a file', $path));
         }
 
         $name = basename($path);
@@ -377,5 +339,90 @@ abstract class AbstractController implements HookInterface
         $event = $this->dispatchEvent(new AfterRenderEvent($this, $this->request, $this->response));
 
         return $event ? $event->getResponse() : $this->response;
+    }
+
+    /**
+     * Starts the Controller
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface|null
+     */
+    public function startup(ServerRequestInterface $request): ?ResponseInterface
+    {
+        $this->request = $request;
+
+        $event = $this->dispatchEvent(new BeforeFilterEvent($this, $this->request));
+        if ($event && $response = $event->getResponse()) {
+            return $response;
+        }
+        if (! $this->triggerHook('beforeFilter', [$request]) || $this->response->getStatusCode() === 302) {
+            return $response;
+        }
+
+        return null;
+    }
+
+    /**
+     * Shuts down the Controller
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function shutdown(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        $this->request = $request;
+        $this->response = $response;
+
+        $this->triggerHook('afterFilter', [$request,$this->response], false);
+        $event = $this->dispatchEvent(new AfterFilterEvent($this, $this->request, $this->response));
+
+        return $event ? $event->getResponse() : $this->response;
+    }
+
+    /**
+     * Sets the current controller response
+     *
+     * @param ResponseInterface $response
+     * @return static
+     */
+    public function setResponse(ResponseInterface $response): self
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Gets the current controller Response
+     *
+     * @return ResponseInterface
+     */
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * Sets the Request object
+     *
+     * @param ServerRequestInterface $request
+     * @return static
+     */
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Request object
+     *
+     * @return ServerRequestInterface|null
+     */
+    public function getRequest(): ?ServerRequestInterface
+    {
+        return $this->request;
     }
 }

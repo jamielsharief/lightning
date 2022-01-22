@@ -15,10 +15,8 @@ namespace Lightning\Router\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Lightning\Router\Event\AfterFilterEvent;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Lightning\Router\Event\BeforeFilterEvent;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Router\Exception\RouterException;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -29,7 +27,6 @@ class DispatcherMiddleware implements MiddlewareInterface
     private array $arguments;
 
     private ?ResponseFactoryInterface $responseFactory;
-    private ?EventDispatcherInterface $eventDispatcher;
 
     /**
      * Constructor
@@ -39,12 +36,10 @@ class DispatcherMiddleware implements MiddlewareInterface
      * @param EventDispatcherInterface|null $eventDispatcher
      * @param ResponseFactoryInterface|null $responseFactory
      */
-    public function __construct(callable $callable, array $arguments, ?EventDispatcherInterface $eventDispatcher = null, ?ResponseFactoryInterface $responseFactory = null)
+    public function __construct(callable $callable, array $arguments, ?ResponseFactoryInterface $responseFactory = null)
     {
         $this->callable = $callable;
         $this->arguments = $arguments;
-
-        $this->eventDispatcher = $eventDispatcher;
         $this->responseFactory = $responseFactory;
     }
 
@@ -61,20 +56,7 @@ class DispatcherMiddleware implements MiddlewareInterface
             $request = $request->withAttribute($name, $value);
         }
 
-        if ($this->eventDispatcher) {
-            $event = $this->eventDispatcher->dispatch(new BeforeFilterEvent($request));
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
-        }
-
-        $response = $this->dispatch($this->callable, $request);
-
-        if ($this->eventDispatcher) {
-            $response = $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
-        }
-
-        return $response;
+        return $this->dispatch($this->callable, $request);
     }
 
     /**

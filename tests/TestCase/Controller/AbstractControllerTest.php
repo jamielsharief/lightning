@@ -119,7 +119,7 @@ final class AbstractControllerTest extends TestCase
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Path `/var/www/../file` is a relative path');
+        $this->expectExceptionMessage('`/var/www/../file` is a relative path');
 
         $response = $controller->download('/var/www/../file');
     }

@@ -13,12 +13,10 @@ use Lightning\Router\RouteCollection;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Lightning\Router\Event\AfterFilterEvent;
 use Lightning\TestSuite\TestEventDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use Lightning\Router\Event\BeforeFilterEvent;
 use Lightning\Router\Event\AfterDispatchEvent;
 use Lightning\Router\Event\BeforeDispatchEvent;
 use Lightning\Router\Exception\RouterException;
@@ -290,7 +288,7 @@ final class RouterTest extends TestCase
 
         $router->dispatch(new ServerRequest('GET', '/articles'));
 
-        $this->assertEquals([BeforeDispatchEvent::class, BeforeFilterEvent::class, AfterFilterEvent::class, AfterDispatchEvent::class], $eventDispatcher->getDispatchedEvents());
+        $this->assertEquals([BeforeDispatchEvent::class, AfterDispatchEvent::class], $eventDispatcher->getDispatchedEvents());
     }
 
     public function testNoResponse(): void

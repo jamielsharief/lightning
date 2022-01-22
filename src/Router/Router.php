@@ -14,7 +14,6 @@
 namespace Lightning\Router;
 
 use Lightning\Autowire\Autowire;
-use Lightning\Hook\HookInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -146,12 +145,13 @@ class Router implements RequestHandlerInterface, RoutesInterface
             $callable = $this->autowire ? $this->createAutowireCallable($route->getCallable()) : $route->getCallable();
         } else {
             $message = 'The requested URL %s was not found';
+
             $callable = function (ServerRequestInterface $request) use ($message) {
                 throw new NotFoundException(sprintf($message, $request->getRequestTarget()));
             };
         }
 
-        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->eventDispatcher, $this->responseFactory));
+        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->responseFactory));
 
         $response = (new RequestHandler($middleware))->handle($request);
 
@@ -188,19 +188,14 @@ class Router implements RequestHandlerInterface, RoutesInterface
             }
 
             if (is_array($callable)) {
-                /**
-                 * @internal hooks and immutable objects means they cant be changed in hooks
-                 * TODO: In future here we can use attributes #SetServerRequest, #BeforeFilter #AfterFilter
-                 */
-
-                if ($callable[0] instanceof HookInterface) {
-                    $callable[0]->triggerHook('beforeFilter', [$request], false);
+                if ($callable[0] instanceof ControllerInterface && $result = $callable[0]->startup($request)) {
+                    return $result;
                 }
 
                 $response = $this->autowire->method($callable[0], $callable[1], $params);
 
-                if ($callable[0] instanceof HookInterface) {
-                    $callable[0]->triggerHook('afterFilter', [$request, $response], false);
+                if ($callable[0] instanceof ControllerInterface) {
+                    $response = $callable[0]->shutdown($request, $response);
                 }
 
                 return $response;

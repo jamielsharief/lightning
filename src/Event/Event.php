@@ -1,4 +1,4 @@
-<?php declare(strict_names=1);
+<?php declare(strict_types=1);
 /**
  * LightningPHP
  * Copyright 2021 Jamiel Sharief.

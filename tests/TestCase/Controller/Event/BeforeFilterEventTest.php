@@ -7,11 +7,11 @@ use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
-use App\Controllers\ArticlesController;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController;
 use Psr\Http\Message\ServerRequestInterface;
 use Lightning\Controller\Event\BeforeFilterEvent;
+use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 final class BeforeFilterEventTest extends TestCase
 {

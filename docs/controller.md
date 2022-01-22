@@ -60,9 +60,31 @@ When the `Controller` is created will run the `initialize` method so that you do
 
 The following PSR events are triggered
 
-- AfterInitialize
+- AfterInitialize-  Psr\EventDispatcher\StoppableEventInterface
+- BeforeFilter - Psr\EventDispatcher\StoppableEventInterface
 - BeforeRender - Psr\EventDispatcher\StoppableEventInterface
-- BeforeRedirect - Psr\EventDispatcher\StoppableEventInterface
 - AfterRender
+- BeforeRedirect - Psr\EventDispatcher\StoppableEventInterface
+- AfterFilter
 
-If you want to change the response in the event, then make sure to update the `Controller` since responses are immutable.
+> The beforeFilter and afterFilter are called when the controller startup and shutdown methods are triggered, which is called by the Lighting router, you can use a different router but you will need to call those methods for this to work.
+
+If you want to change a `Response` in an `Event` then simply set the `Response` object.
+
+
+## Hooks
+
+The `Controller` uses the `Hook` component.
+
+The following Hooks can be triggered
+
+- AfterInitialize
+- BeforeFilter - Stoppable
+- BeforeRender - Stoppable
+- BeforeRedirect - Stoppable
+- AfterRender
+- AfterFilter
+
+If you return `false` in the stoppable hooks, the `Controller` response will be returned, likewise if in those methods you change the `Controller` response to a redirect, this will stop the processing and return that response.
+
+

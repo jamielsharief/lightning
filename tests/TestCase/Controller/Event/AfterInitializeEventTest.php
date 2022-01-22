@@ -1,66 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\Controller;
+namespace Lightning\Test\Controller\Event;
 
-use Lightning\View\View;
-use Nyholm\Psr7\Response;
-use Nyholm\Psr7\ServerRequest;
-use PHPUnit\Framework\TestCase;
-use Lightning\View\ViewCompiler;
-use Psr\Http\Message\ResponseInterface;
-use Lightning\Controller\AbstractController;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
 use Lightning\Controller\Event\AfterInitializeEvent;
-use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
+use Lightning\Test\TestCase\Controller\Event\AbstractControllerEventTestCase;
 
-final class AfterInitializeEventTest extends TestCase
+final class AfterInitializeEventTest extends AbstractControllerEventTestCase
 {
-    public function testGetController(): void
+    public function createEvent(): AfterInitializeEvent
     {
-        $controller = $this->createController();
-        $event = new AfterInitializeEvent($controller);
-        $this->assertInstanceOf(ArticlesController::class, $event->getController());
+        return new AfterInitializeEvent($this->createController());
     }
 
-    public function testGetRequest(): void
+    public function testNotStoppable(): void
     {
-        $controller = $this->createController();
-        $request = new ServerRequest('GET', '/');
-
-        $event = new AfterInitializeEvent($controller, $request);
-        $this->assertInstanceOf(ServerRequestInterface::class, $event->getRequest());
-    }
-
-    public function testGetRequestNull(): void
-    {
-        $controller = $this->createController();
-        $event = new AfterInitializeEvent($controller);
-        $this->assertNull($event->getRequest());
-    }
-
-    public function testGetResponse(): void
-    {
-        $controller = $this->createController();
-        $request = new ServerRequest('GET', '/');
-        $response = new Response();
-
-        $event = new AfterInitializeEvent($controller, $request, $response);
-        $this->assertInstanceOf(ResponseInterface::class, $event->getResponse());
-    }
-
-    public function testGetResponseNull(): void
-    {
-        $controller = $this->createController();
-        $event = new AfterInitializeEvent($controller);
-        $this->assertNull($event->getResponse());
-    }
-
-    private function createController(): AbstractController
-    {
-        $path = __DIR__ .'/TestApp/templates';
-
-        return  new ArticlesController(
-            new Response(), new View(new ViewCompiler($path, sys_get_temp_dir()), $path)
-        );
+        $this->assertNotInstanceOf(StoppableEventInterface::class, $this->createEvent());
     }
 }

@@ -2,43 +2,23 @@
 
 namespace Lightning\Test\Controller\Event;
 
-use Lightning\View\View;
-use Nyholm\Psr7\Response;
-use Nyholm\Psr7\ServerRequest;
-use PHPUnit\Framework\TestCase;
-use Lightning\View\ViewCompiler;
-use Psr\Http\Message\ResponseInterface;
-use Lightning\Controller\AbstractController;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
 use Lightning\Controller\Event\BeforeFilterEvent;
-use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
+use Lightning\Test\TestCase\Controller\Event\AbstractControllerEventTestCase;
 
-final class BeforeFilterEventTest extends TestCase
+final class BeforeFilterEventTest extends AbstractControllerEventTestCase
 {
-    public function testGetRequest(): void
+    public function createEvent(): BeforeFilterEvent
     {
-        $this->assertInstanceOf(ServerRequestInterface::class, $this->createEvent()->getRequest());
+        return new BeforeFilterEvent($this->createController());
     }
 
-    public function testGetResponse(): void
+    public function testStop(): void
     {
-        $this->assertInstanceOf(ResponseInterface::class, $this->createEvent()->getResponse());
-    }
-
-    private function createEvent(): BeforeFilterEvent
-    {
-        $request = new ServerRequest('GET', '/not-relevant');
-        $response = new Response(302);
-
-        return new BeforeFilterEvent($this->createController(), $request, $response);
-    }
-
-    private function createController(): AbstractController
-    {
-        $path = __DIR__ .'/TestApp/templates';
-
-        return  new ArticlesController(
-            new Response(), new View(new ViewCompiler($path, sys_get_temp_dir()), $path)
-        );
+        $event = $this->createEvent();
+        $this->assertInstanceOf(StoppableEventInterface::class, $event);
+        $this->assertFalse($event->isPropagationStopped());
+        $event->stop();
+        $this->assertTrue($event->isPropagationStopped());
     }
 }

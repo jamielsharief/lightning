@@ -121,7 +121,7 @@ final class AbstractControllerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('`/var/www/../file` is a relative path');
 
-        $response = $controller->download('/var/www/../file');
+        $controller->download('/var/www/../file');
     }
 
     public function testSendFileNoDownload(): void

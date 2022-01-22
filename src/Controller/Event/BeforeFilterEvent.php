@@ -13,6 +13,6 @@
 
 namespace Lightning\Controller\Event;
 
-class BeforeFilterEvent extends AbstractControllerEvent
+class BeforeFilterEvent extends AbstractControllerStoppableEvent
 {
 }

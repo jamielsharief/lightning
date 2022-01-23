@@ -46,6 +46,15 @@ final class AbstractControllerTest extends TestCase
         );
     }
 
+    public function testRenderStopped(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $controller->registerHook('beforeRender', 'stopHook');
+        $response = $controller->index();
+
+        $this->assertStringNotContainsString('<h1>Articles</h1>', (string) $response->getBody());
+    }
+
     public function testStartup(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
@@ -132,6 +141,15 @@ final class AbstractControllerTest extends TestCase
         );
     }
 
+    public function testRenderJsonStopped(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $controller->registerHook('beforeRender', 'stopHook');
+        $response = $controller->status(['ok']);
+
+        $this->assertStringNotContainsString('["ok"]', (string) $response->getBody());
+    }
+
     public function testRedirect(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
@@ -139,6 +157,15 @@ final class AbstractControllerTest extends TestCase
         $response = $controller->old('/articles/new');
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals('/articles/new', $response->getHeaderLine('Location'));
+    }
+
+    public function testRedirectStopped(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $controller->registerHook('beforeRedirect', 'stopHook');
+        $response = $controller->old('/articles/new');
+
+        $this->assertNotEquals(302, $response->getStatusCode());
     }
 
     public function testRedirectEvents(): void

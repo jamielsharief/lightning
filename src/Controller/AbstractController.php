@@ -221,7 +221,7 @@ abstract class AbstractController implements HookInterface, ControllerInterface
         }
 
         if (! $this->triggerHook('beforeRedirect', [$uri]) || $this->response->getStatusCode() === 302) {
-            return $this->response = $response;
+            return $this->response;
         }
 
         return $this->response = $this->response

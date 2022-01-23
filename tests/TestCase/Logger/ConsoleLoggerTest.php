@@ -41,7 +41,7 @@ final class ConsoleLoggerTest extends TestCase
         $this->assertStringContainsString($loremipsum ."\033[0", $buffer);
     }
 
-    public function invalidLogLevel(): void
+    public function testInvalidLogLevel(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The stream is not a valid resource');

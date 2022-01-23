@@ -322,7 +322,7 @@ abstract class AbstractController implements HookInterface, ControllerInterface
         }
 
         if (! $this->triggerHook('beforeRender') || $this->response->getStatusCode() === 302) {
-            return $response;
+            return $this->response;
         }
 
         return null;
@@ -355,8 +355,9 @@ abstract class AbstractController implements HookInterface, ControllerInterface
         if ($event && $response = $event->getResponse()) {
             return $response;
         }
+
         if (! $this->triggerHook('beforeFilter', [$request]) || $this->response->getStatusCode() === 302) {
-            return $response;
+            return $this->response;
         }
 
         return null;

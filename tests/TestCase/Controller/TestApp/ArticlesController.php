@@ -3,6 +3,7 @@
 namespace Lightning\Test\TestCase\Controller\TestApp;
 
 use Psr\Log\LogLevel;
+use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController as BaseController;
 use Lightning\Controller\Event\AbstractControllerStoppableEvent;
@@ -10,6 +11,7 @@ use Lightning\Controller\Event\AbstractControllerStoppableEvent;
 class ArticlesController extends BaseController
 {
     protected array $stopEvents = [];
+    protected bool $hookWasCalled = false;
 
     public function stopEvent(string $class): self
     {
@@ -59,5 +61,30 @@ class ArticlesController extends BaseController
         }
 
         return $result;
+    }
+
+    /**
+     * Register this as a method to test stop
+     *
+     * @return boolean
+     */
+    protected function stopHook(): bool
+    {
+        return false;
+    }
+
+    protected function setRedirectResponse()
+    {
+        $this->response = new Response(302);
+    }
+
+    protected function logHook(): bool
+    {
+        return $this->hookWasCalled = true;
+    }
+
+    public function hookWasCalled(): bool
+    {
+        return $this->hookWasCalled;
     }
 }

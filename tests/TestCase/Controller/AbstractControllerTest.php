@@ -46,6 +46,73 @@ final class AbstractControllerTest extends TestCase
         );
     }
 
+    public function testStartup(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+
+        $request = new ServerRequest('GET', '/articles/index');
+        $controller->registerHook('beforeFilter', 'logHook');
+
+        $this->assertNull($controller->startup($request));
+        $controller->index();
+
+        $this->assertEventsDispatched(
+            [
+                'Lightning\Controller\Event\AfterInitializeEvent',
+                'Lightning\Controller\Event\BeforeFilterEvent',
+                'Lightning\Controller\Event\BeforeRenderEvent',
+                'Lightning\Controller\Event\AfterRenderEvent',
+            ]
+        );
+        $this->assertTrue($controller->hookWasCalled());
+    }
+
+    public function testStartupHookStopped(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $controller->setResponse(new Response());
+        $controller->registerHook('beforeFilter', 'stopHook');
+        $request = new ServerRequest('GET', '/articles/index');
+
+        $this->assertInstanceOf(ResponseInterface::class, $controller->startup($request));;
+    }
+
+    public function testShutdown(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+
+        $controller->registerHook('afterFilter', 'logHook');
+        $request = new ServerRequest('GET', '/articles/index');
+
+        $response = $controller->index();
+        $this->assertInstanceOf(ResponseInterface::class, $controller->shutdown($request, $response));
+
+        $this->assertEventsDispatched(
+            [
+                'Lightning\Controller\Event\AfterInitializeEvent',
+                'Lightning\Controller\Event\BeforeRenderEvent',
+                'Lightning\Controller\Event\AfterRenderEvent',
+                'Lightning\Controller\Event\AfterFilterEvent',
+            ]
+        );
+
+        $this->assertTrue($controller->hookWasCalled());
+    }
+
+    public function testShutdownHookStop(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+
+        $controller->setResponse(new Response());
+        $controller->registerHook('afterFilter', 'logHook');
+
+        $request = new ServerRequest('GET', '/articles/index');
+
+        $this->assertInstanceOf(ResponseInterface::class, $controller->shutdown($request, new Response()));
+
+        $this->assertTrue($controller->hookWasCalled());
+    }
+
     public function testRenderJson(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());;

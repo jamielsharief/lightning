@@ -107,6 +107,15 @@ $event = $eventDispatcher->getDispatchedEvent(BeforeFind::class);
 $bool = $eventDispatcher->hasDispatchedEvent(BeforeFind::class);
 ```
 
+Sometimes you might want to do something on an event during a test, which you can use the `on` method which will register
+a single listener to an `Event`.
+
+```php
+$eventDispatcher->on(BeforeFind::class, function(BeforeFind $event){
+    $event->stop();
+})
+```
+
 ### EventDispatcherTestTrait
 
 The `EventDispatcherTestTrait` makes easier to test dispatched events in applications.

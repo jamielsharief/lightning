@@ -28,6 +28,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      * @var array
      */
     protected array $dispatchedEvents = [];
+    protected array $listeners = [];
 
     /**
      * Dispatches an Event
@@ -39,7 +40,29 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
     {
         $this->dispatchedEvents[] = $event;
 
+        $callable = $this->listeners[get_class($event)] ?? null;
+
+        if ($callable) {
+            $callable($event);
+        }
+
         return $event;
+    }
+
+    /**
+     * Registers a callable that will be called on a particular event
+     *
+     * @internal this is for testing, only one per event
+     *
+     * @param string $event
+     * @param callable $callable
+     * @return self
+     */
+    public function on(string $event, callable $callable): self
+    {
+        $this->listeners[$event] = $callable;
+
+        return $this;
     }
 
     /**

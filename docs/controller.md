@@ -67,7 +67,7 @@ The following PSR events are triggered
 - BeforeRedirect - Psr\EventDispatcher\StoppableEventInterface
 - AfterFilter
 
-> The beforeFilter and afterFilter are called when the controller startup and shutdown methods are triggered, which is called by the Lighting router, you can use a different router but you will need to call those methods for this to work.
+> The `beforeFilter` and `afterFilter` events are dispatched when the controller `startup` and `shutdown` methods are called, which are called by the Lightning router, you can use a different router but you will need to call those methods.
 
 If you want to change a `Response` in an `Event` then simply set the `Response` object.
 
@@ -84,6 +84,8 @@ The following Hooks can be triggered
 - BeforeRedirect - Stoppable
 - AfterRender
 - AfterFilter
+
+> The `beforeFilter` and `afterFilter` hooks are triggered when the controller `startup` and `shutdown` methods are called, which are called by the Lightning router, you can use a different router but you will need to call those methods.
 
 If you return `false` in the stoppable hooks, the `Controller` response will be returned, likewise if in those methods you change the `Controller` response to a redirect, this will stop the processing and return that response.
 

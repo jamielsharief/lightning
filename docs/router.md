@@ -128,8 +128,6 @@ $router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' =>
 When you create the `Router` object, if you supply a `EventDispatcher` object, the following events will be called
 
 - BeforeDispatch
-- BeforeFilter
-- AfterFilter
 - AfterDispatch
 
 ## PSR-11: Container

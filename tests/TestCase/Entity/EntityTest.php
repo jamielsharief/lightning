@@ -82,7 +82,8 @@ final class EntityTest extends TestCase
     public function testSet(): void
     {
         $article = new Entity();
-        $article->set('title', 'Foo');
+        $this->assertInstanceOf(Entity::class, $article->set('title', 'Foo'));
+
         $this->assertEquals('Foo', $article->get('title'));
 
         $article = new Entity();
@@ -92,6 +93,18 @@ final class EntityTest extends TestCase
         $article = new Entity();
         $article['foo'] = 'bar';
         $this->assertEquals('bar', $article['foo']);
+    }
+
+    public function testSetArray(): void
+    {
+        $article = Entity::fromState([
+            'title' => 'a',
+            'status' => 'b'
+        ]);
+
+        $this->assertInstanceOf(Entity::class, $article->set(['title' => 'foo','status' => 'bar']));
+
+        $this->assertEquals(['title' => 'foo','status' => 'bar'], $article->toArray());
     }
 
     public function testSetError()

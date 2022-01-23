@@ -13,6 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\TestSuite\TestEventDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
+use Lightning\Controller\Event\BeforeFilterEvent;
+use Lightning\Controller\Event\BeforeRenderEvent;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
@@ -55,6 +57,18 @@ final class AbstractControllerTest extends TestCase
         $this->assertStringNotContainsString('<h1>Articles</h1>', (string) $response->getBody());
     }
 
+    public function testRenderStoppedWithEvent(): void
+    {
+        $eventDispatcher = $this->getEventDispatcher();
+        $controller = $this->createController($eventDispatcher, $this->getLogger());
+        $eventDispatcher->on(BeforeRenderEvent::class, function (BeforeRenderEvent $event) {
+            $event->setResponse(new Response(418));
+        });
+        $response = $controller->index();
+
+        $this->assertEquals(418, $response->getStatusCode());
+    }
+
     public function testStartup(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
@@ -76,6 +90,18 @@ final class AbstractControllerTest extends TestCase
         $this->assertTrue($controller->hookWasCalled());
     }
 
+    public function testStartupEvent(): void
+    {
+        $eventDispatcher = $this->getEventDispatcher();
+        $controller = $this->createController($eventDispatcher, $this->getLogger());
+        $eventDispatcher->on(BeforeFilterEvent::class, function (BeforeFilterEvent $event) {
+            $event->setResponse(new Response(418));
+        });
+        $request = new ServerRequest('GET', '/articles/index');
+
+        $this->assertInstanceOf(ResponseInterface::class, $controller->startup($request));;
+    }
+
     public function testStartupHookStopped(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
@@ -85,6 +111,18 @@ final class AbstractControllerTest extends TestCase
 
         $this->assertInstanceOf(ResponseInterface::class, $controller->startup($request));;
     }
+
+    // public function testRenderStoppedWithEvent(): void
+    // {
+    //     $eventDispatcher = $this->getEventDispatcher();
+    //     $controller = $this->createController($eventDispatcher, $this->getLogger());
+    //     $eventDispatcher->on(BeforeRenderEvent::class, function (BeforeRenderEvent $event) {
+    //         $event->setResponse(new Response(418));
+    //     });
+    //     $response = $controller->index();
+
+    //     $this->assertEquals(418, $response->getStatusCode());
+    // }
 
     public function testShutdown(): void
     {
@@ -183,7 +221,7 @@ final class AbstractControllerTest extends TestCase
         );
     }
 
-    public function testSendFile(): void
+    public function testRenderFile(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
 
@@ -206,6 +244,17 @@ final class AbstractControllerTest extends TestCase
                 'Lightning\Controller\Event\AfterRenderEvent'
             ]
         );
+    }
+
+    public function testRenderFileStopped(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+        $controller->registerHook('beforeRender', 'stopHook');
+
+        $path = __DIR__ . '/TestApp/downloads/sample.xml';
+        $response = $controller->download($path);
+
+        $this->assertNotEquals('text/xml', $response->getHeaderLine('Content-Type'));
     }
 
     public function testSendFileWithRelativePath(): void

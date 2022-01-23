@@ -14,6 +14,7 @@
 namespace Lightning\Entity;
 
 use ArrayAccess;
+use InvalidArgumentException;
 
 /**
  * Entity
@@ -288,10 +289,9 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
     public function offsetSet($key, $value)
     {
         if (is_null($key)) {
-            $this->fields[] = $value;
-        } else {
-            $this->fields[$key] = $value;
+            throw new InvalidArgumentException('Field cannot be empty');
         }
+        $this->fields[$key] = $value;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Lightning\Test\Entity;
 
 use Lightning\Entity\Entity;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class User extends Entity
@@ -93,6 +94,9 @@ final class EntityTest extends TestCase
         $article = new Entity();
         $article['foo'] = 'bar';
         $this->assertEquals('bar', $article['foo']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $article[] = 'foo';
     }
 
     public function testSetArray(): void

@@ -60,7 +60,7 @@ abstract class AbstractLogger implements LoggerInterface
     public function withLogLevel(string $level): self
     {
         if (! in_array($level, $this->logLevels)) {
-            throw new InvalidArgumentException("Unkown log level `{$level}`");
+            throw new InvalidArgumentException(sprintf('Invalid log level `%s`', $level));
         }
 
         $clone = clone $this;
@@ -115,7 +115,7 @@ abstract class AbstractLogger implements LoggerInterface
     protected function checkLevel(string $level): void
     {
         if (! in_array($level, $this->logLevels)) {
-            throw new InvalidArgumentException("Invalid log level `{$level}`");
+            throw new InvalidArgumentException(sprintf('Invalid log level `%s`', $level));
         }
     }
 }

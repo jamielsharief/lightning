@@ -3,6 +3,7 @@
 namespace Lightning\Test\Logger;
 
 use Psr\Log\LogLevel;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Logger\FileLogger;
 
@@ -54,6 +55,26 @@ final class AbstractLoggerTest extends TestCase
         $this->assertFileContains('ALERT: Error #1', $path);
         $this->assertFileContains('ERROR: Error #2', $path);
         $this->assertFileNotContains('WARNING: Error #3', $path);
+    }
+
+    public function testWithLogLevelException(): void
+    {
+        $path = $this->generateTempName();
+        $logger = new FileLogger($path);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid log level `foo`');
+
+        $logger->withLogLevel('foo');
+    }
+
+    public function testLogInvalidArgument(): void
+    {
+        $path = $this->generateTempName();
+        $logger = new FileLogger($path);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid log level `foo`');
+
+        $logger->log('foo', 'bar');
     }
 
     public function testWithChannel(): void

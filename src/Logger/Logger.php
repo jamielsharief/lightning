@@ -59,7 +59,7 @@ class Logger implements LoggerInterface
      * @param AbstractLogger $logger
      * @return self
      */
-    public function pushLogger(AbstractLogger $logger): self
+    public function pushLogger(LoggerInterface $logger): self
     {
         $this->loggers[] = $logger;
 

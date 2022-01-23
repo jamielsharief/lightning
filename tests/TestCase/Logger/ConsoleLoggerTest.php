@@ -3,6 +3,7 @@
 namespace Lightning\Test\Logger;
 
 use Psr\Log\LogLevel;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Logger\ConsoleLogger;
 
@@ -38,5 +39,13 @@ final class ConsoleLoggerTest extends TestCase
 
         $this->assertStringStartsWith("\033", $buffer);
         $this->assertStringContainsString($loremipsum ."\033[0", $buffer);
+    }
+
+    public function invalidLogLevel(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The stream is not a valid resource');
+
+        new ConsoleLogger('foo');
     }
 }

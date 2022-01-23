@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Lightning\Controller\Event\BeforeFilterEvent;
 use Lightning\Controller\Event\BeforeRenderEvent;
 use Lightning\TestSuite\EventDispatcherTestTrait;
+use Lightning\Controller\Event\BeforeRedirectEvent;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 final class AbstractControllerTest extends TestCase
@@ -197,6 +198,17 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals('/articles/new', $response->getHeaderLine('Location'));
     }
 
+    public function testRedirectEventChangedResponse(): void
+    {
+        $eventDispatcher = $this->getEventDispatcher();
+        $controller = $this->createController($eventDispatcher, $this->getLogger());
+        $eventDispatcher->on(BeforeRedirectEvent::class, function (BeforeRedirectEvent $event) {
+            $event->setResponse(new Response(418));
+        });
+
+        $response = $controller->old('/articles/new');
+        $this->assertEquals(418, $response->getStatusCode());
+    }
     public function testRedirectStopped(): void
     {
         $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
@@ -265,6 +277,16 @@ final class AbstractControllerTest extends TestCase
         $this->expectExceptionMessage('`/var/www/../file` is a relative path');
 
         $controller->download('/var/www/../file');
+    }
+
+    public function testSendFileDoesNotExist(): void
+    {
+        $controller = $this->createController($this->getEventDispatcher(), $this->getLogger());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('`/somewhere/somefile` does not exist or is not a file');
+
+        $controller->download('/somewhere/somefile');
     }
 
     public function testSendFileNoDownload(): void

@@ -289,7 +289,7 @@ abstract class AbstractController implements HookInterface, ControllerInterface
             throw new InvalidArgumentException(sprintf('`%s` is a relative path', $path));
         }
 
-        if (! file_exists($path)) {
+        if (! is_file($path)) {
             throw new InvalidArgumentException(sprintf('`%s` does not exist or is not a file', $path));
         }
 

@@ -111,6 +111,13 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
         return $result;
     }
 
+    /**
+     * Executes a query
+     *
+     * @param string $sql
+     * @param array $params
+     * @return boolean
+     */
     private function execute(string $sql, array $params = []): bool
     {
         $statement = $this->pdo->prepare($sql);
@@ -118,13 +125,22 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
         return $statement ? $statement->execute($params) : false;
     }
 
+    /**
+     * Executes a query and fetches a single row
+     *
+     * @param string $sql
+     * @param array $params
+     * @return array|null
+     */
     private function query(string $sql, array $params = []): ?array
     {
+        $result = null;
+
         $statement = $this->pdo->prepare($sql);
         if ($statement && $statement->execute($params)) {
-            return $statement->fetch(PDO::FETCH_ASSOC) ?: null;
+            $result = $statement->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
-        return null;
+        return $result;
     }
 }

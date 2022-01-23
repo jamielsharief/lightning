@@ -229,6 +229,14 @@ final class EntityTest extends TestCase
         );
     }
 
+    public function testJsonSerializeable()
+    {
+        $this->assertEquals(
+            ['name' => 'Article'],
+            Entity::fromState(['name' => 'Article'])->jsonSerialize()
+        );
+    }
+
     public function testToArray()
     {
         $article = Entity::fromState(['name' => 'Article']);

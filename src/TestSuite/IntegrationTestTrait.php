@@ -14,6 +14,7 @@
 namespace Lightning\TestSuite;
 
 use Throwable;
+use RuntimeException;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -714,5 +715,33 @@ trait IntegrationTestTrait
         $this->env = $env;
 
         return $this;
+    }
+
+    /**
+     * Gets the Server Request
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        if (! isset($this->serverRequest)) {
+            throw new RuntimeException('Server request not set');
+        }
+
+        return $this->serverRequest;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return ResponseInterface
+     */
+    public function getResponse(): ResponseInterface
+    {
+        if (! isset($this->response)) {
+            throw new RuntimeException('Response not set');
+        }
+
+        return $this->response;
     }
 }

@@ -101,7 +101,7 @@ class FixtureManager
      * @param string $table
      * @return void
      */
-    private function truncate(string $table): void
+    public function truncate(string $table): void
     {
         $this->executeStatements($this->sqlDialect->truncate($table));
     }

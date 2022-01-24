@@ -9,7 +9,7 @@ use Lightning\Console\ConsoleIo;
 use Lightning\ServiceObject\Result;
 use Lightning\Console\AbstractCommand;
 use Lightning\Console\ConsoleArgumentParser;
-use Lightning\Console\TestSuite\ConsoleIoStub;
+use Lightning\Console\TestSuite\TestConsoleIo;
 use Lightning\Console\TestSuite\ConsoleIntegrationTestTrait;
 
 class DummyCommand extends AbstractCommand
@@ -62,21 +62,21 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Console IO stub not created');
-        $this->getIo();
+        $this->getConsoleIo();
     }
 
-    public function testCreateConsoleIoStub(): void
+    public function testCreateTestConsoleIo(): void
     {
-        $this->assertInstanceOf(ConsoleIoStub::class, $this->createConsoleIoStub());
+        $this->assertInstanceOf(TestConsoleIo::class, $this->createConsoleIo());
     }
 
     /**
-     * @depends testCreateConsoleIoStub
+     * @depends testCreateTestConsoleIo
      */
-    public function testGetConsoleIoStub(): void
+    public function testGetTestConsoleIo(): void
     {
-        $this->createConsoleIoStub();
-        $this->assertInstanceOf(ConsoleIoStub::class, $this->getIo());
+        $this->createConsoleIo();
+        $this->assertInstanceOf(TestConsoleIo::class, $this->getConsoleIo());
     }
 
     public function testExitSuccesss(): void
@@ -119,7 +119,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertOutputNotContains('hello world');
     }
@@ -129,7 +129,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertOutputEmpty();
     }
@@ -155,7 +155,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertOutputDoesNotMatchRegularExpression('/hello world/');
     }
@@ -176,7 +176,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertErrorNotContains('an error has occured');
     }
@@ -186,7 +186,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertErrorEmpty();
     }
@@ -212,7 +212,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
         $command = $this->createCommand(DummyCommand::class);
         $this->execute($command);
 
-        $this->getIo()->reset();
+        $this->getConsoleIo()->reset();
 
         $this->assertErrorDoesNotMatchRegularExpression('/an error has occured/');
     }

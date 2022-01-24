@@ -4,26 +4,26 @@ namespace Lightning\Test\Console;
 
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
-use Lightning\Console\TestSuite\ConsoleIoStub;
+use Lightning\Console\TestSuite\TestConsoleIo;
 
-final class ConsoleIoStubTest extends TestCase
+final class TestConsoleIoTest extends TestCase
 {
     public function testDefaultOutputMode(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('<yellow>test</yellow>');
         $this->assertEquals("<yellow>test</yellow>\n", $io->getStdout());
     }
 
     public function testStdoutNone(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $this->assertEquals('', $io->getStdout());
     }
 
     public function testStderrNone(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $this->assertEquals(
             '', $io->getStderr()
         );
@@ -31,7 +31,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testStdout(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('test');
         $this->assertEquals(
             "test\n", $io->getStdout()
@@ -40,7 +40,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testStdoutMulti(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('foo');
         $io->out('bar');
         $this->assertEquals(
@@ -50,7 +50,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testStderr(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('test');
         $this->assertEquals(
             "test\n", $io->getStdout()
@@ -59,7 +59,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testStderrMulti(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->err('foo');
         $io->err('bar');
         $this->assertEquals(
@@ -69,7 +69,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testInput(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $io->setInput(['data']);
         $this->assertEquals('data', $io->in());
@@ -77,7 +77,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testInputMulti(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $io->setInput(['one','two','three']);
         $this->assertEquals('one', $io->in());
@@ -87,7 +87,7 @@ final class ConsoleIoStubTest extends TestCase
 
     public function testInputNone(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Console input is requesting more input that what was provided');

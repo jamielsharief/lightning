@@ -5,13 +5,13 @@ namespace Lightning\Test\Console;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Console\ConsoleIo;
-use Lightning\Console\TestSuite\ConsoleIoStub;
+use Lightning\Console\TestSuite\TestConsoleIo;
 
 final class ConsoleIoTest extends TestCase
 {
     public function testSetOutput(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputLevel(ConsoleIo::QUIET);
         $io->out('test', 0);
         $this->assertEquals('', $io->getStdout());
@@ -21,7 +21,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetOutputException(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid output level 100');
@@ -30,7 +30,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetOutputMode(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::PLAIN);
         $io->out('<white>test<white>', 0);
 
@@ -39,7 +39,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetOutputModeException(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid output mode 100');
@@ -48,7 +48,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetStyle(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIO::COLOR);
         $io->setStyle('test', [
             'background' => 'red',
@@ -67,7 +67,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetStyleInvalidBackgroundColor(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid background color `pink`');
@@ -78,7 +78,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetStyleInvalidColor(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid color `pink`');
@@ -89,7 +89,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testOut(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('foo');
         $this->assertEquals(
             "foo\n", $io->getStdout()
@@ -98,7 +98,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testOutArray(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out(['foo','bar']);
         $this->assertEquals(
             "foo\nbar\n", $io->getStdout()
@@ -107,7 +107,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testOutNoNewLine(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('foo', 0);
         $this->assertEquals(
             'foo', $io->getStdout()
@@ -116,7 +116,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testOutMultiple(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->out('foo')->out('bar');
         $this->assertEquals(
             "foo\nbar\n", $io->getStdout()
@@ -125,7 +125,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testOutOutputMode(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputLevel(ConsoleIo::QUIET);
         $io->out('foo');
         $io->out('bar', 0, ConsoleIo::QUIET);
@@ -137,7 +137,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testErr(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->err('foo');
         $this->assertEquals(
             "foo\n", $io->getStderr()
@@ -146,7 +146,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testErrArray(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->err(['foo','bar']);
         $this->assertEquals(
             "foo\nbar\n", $io->getStderr()
@@ -155,7 +155,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testErrNoNewLine(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->err('foo', 0);
         $this->assertEquals(
             'foo', $io->getStderr()
@@ -164,7 +164,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testErrMultiple(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->err('foo')->err('bar');
         $this->assertEquals(
             "foo\nbar\n", $io->getStderr()
@@ -228,7 +228,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testAsk(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setInput(['']);
         $io->ask('What is your name?');
         $this->assertEquals("What is your name?\n<white>></white> ", $io->getStdout());
@@ -236,7 +236,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testAskWithDefault(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setInput(['jimbo']);
 
         $io->ask('Do you want to continue?', 'n');
@@ -245,7 +245,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testAskChoices(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setInput(['-','y']);;
 
         $this->assertEquals('y', $io->askChoice('Do you want to continue? (y/n)', ['y','n']));
@@ -253,7 +253,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testNl(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->nl();
         $this->assertEquals("\n", $io->getStdout());
 
@@ -264,7 +264,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testHr(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->hr();
 
         $this->assertEquals(str_repeat('-', 80) . "\n", $io->getStdout());
@@ -272,7 +272,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testInfo(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::COLOR);
         $io->info('INFO', 'Hello world');
 
@@ -284,7 +284,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testSuccess(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::COLOR);
         $io->success('SUCCESS', 'Hello world');
 
@@ -296,7 +296,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testWarning(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::COLOR);
         $io->warning('WARNING', 'Hello world');
 
@@ -308,7 +308,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testError(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::COLOR);
         $io->error('ERROR', 'Hello world');
 
@@ -320,22 +320,22 @@ final class ConsoleIoTest extends TestCase
 
     public function testStatus(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->status('ok', 'it worked');
         $this->assertEquals("<white>[</white> <green>OK</green> <white>] it worked</white>\n", $io->getStdout());
 
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->status('warning', 'it worked');
         $this->assertEquals("<white>[</white> <yellow>WARNING</yellow> <white>] it worked</white>\n", $io->getStdout());
 
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->status('error', 'it worked');
         $this->assertEquals("<white>[</white> <red>ERROR</red> <white>] it worked</white>\n", $io->getStdout());
     }
 
     public function testStatusException(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unkown status `foo`');
@@ -344,16 +344,16 @@ final class ConsoleIoTest extends TestCase
 
     public function testSetStatus(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
 
-        $this->assertInstanceOf(ConsoleIoStub::class, $io->setStatus('foo', 'blue'));
+        $this->assertInstanceOf(TestConsoleIo::class, $io->setStatus('foo', 'blue'));
         $io->status('foo', 'bar');
         $this->assertEquals("<white>[</white> <blue>FOO</blue> <white>] bar</white>\n", $io->getStdout());
     }
 
     public function testProgressBar(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::COLOR);
         $io->progressBar(50, 100);
         $this->assertEquals(
@@ -364,7 +364,7 @@ final class ConsoleIoTest extends TestCase
 
     public function testProgressBarNoColor(): void
     {
-        $io = new ConsoleIoStub();
+        $io = new TestConsoleIo();
         $io->setOutputMode(ConsoleIo::PLAIN);
         $io->progressBar(50, 100);
         $this->assertEquals(

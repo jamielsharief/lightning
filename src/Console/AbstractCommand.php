@@ -307,4 +307,14 @@ abstract class AbstractCommand implements CommandInterface
 
         throw new StopException($title, $code);
     }
+
+    /**
+     * Get the ConsoleIO object
+     *
+     * @return ConsoleIo
+     */
+    public function getConsoleIo(): ConsoleIo
+    {
+        return $this->io;
+    }
 }

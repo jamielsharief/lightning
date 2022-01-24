@@ -16,7 +16,7 @@ namespace Lightning\Console\TestSuite;
 use RuntimeException;
 use Lightning\Console\ConsoleIo;
 
-final class ConsoleIoStub extends ConsoleIo
+final class TestConsoleIo extends ConsoleIo
 {
     protected string $stdoutOutput = '';
     protected string $stderrOutput = '';

@@ -137,7 +137,8 @@ $io->setStatus('ignored','yellow');
 
 ## Testing
 
-Create your PHP test file and add the `ConsoleIntegrationTestTrait`
+Create your PHP test file and add the `ConsoleIntegrationTestTrait`, then create the `Command` object using the `TestConsoleIo` and call the `setupIntegrationTesting` function.
+
 
 ```php
 <?php declare(strict_types=1);
@@ -151,29 +152,32 @@ final class HelloWordCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    public function setUp(): void 
+    {
+        $command = new HelloWorldCommand(new ConsoleArgumentParser(), new TestConsoleIo());
+        $this->setupIntegrationTesting($command);
+    }
+
+
     public function testExitSuccesss(): void
     {
-        $command = $this->createCommand(HelloWorld::class);
-        
-        $this->execute($command);
+        $this->execute();
         $this->assertExitSuccess();
         $this->assertOutputContains('Hello world!');
     }
 }
 ```
 
-To execute a command with arguments
+To execute the `Command` with arguments
 
 ```php
-$command = $this->createCommand(HelloPerson::class);
-$this->execute($command,['--bold','jon']);
+$this->execute(['--bold','jon']);
 ```
 
 If your command asks for input from the user, you can pass the input in the `execute method`
 
 ```php
-$command = $this->createCommand(HelloPerson::class);
-$this->execute($command,[],['jon']);
+$this->execute([],['jon']);
 ```
 
 ### Assertion methods

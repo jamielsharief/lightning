@@ -8,7 +8,7 @@ use Lightning\Console\ConsoleIo;
 use Lightning\Console\AbstractCommand;
 use Lightning\Console\ConsoleApplication;
 use Lightning\Console\ConsoleArgumentParser;
-use Lightning\Console\TestSuite\ConsoleIoStub;
+use Lightning\Console\TestSuite\TestConsoleIo;
 
 class FooCommand extends AbstractCommand
 {
@@ -40,7 +40,7 @@ final class ConsoleApplicationTest extends TestCase
 {
     public function testGetName(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $this->assertEquals('unkown', $app->getName());
     }
@@ -50,7 +50,7 @@ final class ConsoleApplicationTest extends TestCase
      */
     public function testSetName(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $this->assertInstanceOf(ConsoleApplication::class, $app->setName('foo'));
 
@@ -59,7 +59,7 @@ final class ConsoleApplicationTest extends TestCase
 
     public function testGetDescription(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $this->assertEquals('', $app->getDescription());
     }
@@ -69,7 +69,7 @@ final class ConsoleApplicationTest extends TestCase
      */
     public function testSetDescription(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $this->assertInstanceOf(ConsoleApplication::class, $app->setDescription('foo'));
 
@@ -78,7 +78,7 @@ final class ConsoleApplicationTest extends TestCase
 
     public function testAdd(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $this->assertInstanceOf(ConsoleApplication::class, $app->add(new FooCommand(new ConsoleArgumentParser(), $consoleIo)));
     }
@@ -88,7 +88,7 @@ final class ConsoleApplicationTest extends TestCase
         */
     public function testDisplayHelp(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $app->add(new FooCommand(new ConsoleArgumentParser(), $consoleIo));
         $app->add(new BarCommand(new ConsoleArgumentParser(), $consoleIo));
@@ -102,7 +102,7 @@ final class ConsoleApplicationTest extends TestCase
      */
     public function testRun(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $app->add(new FooCommand(new ConsoleArgumentParser(), $consoleIo));
         $this->assertEquals(0, $app->run(['bin/foo','foo']));
@@ -114,7 +114,7 @@ final class ConsoleApplicationTest extends TestCase
     */
     public function testRunWithArgs(): void
     {
-        $consoleIo = new ConsoleIoStub();
+        $consoleIo = new TestConsoleIo();
         $app = new ConsoleApplication($consoleIo);
         $app->add(new FooCommand(new ConsoleArgumentParser(), $consoleIo));
         $this->assertEquals(0, $app->run(['bin/foo','foo','bar']));

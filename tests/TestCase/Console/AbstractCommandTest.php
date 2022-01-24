@@ -8,7 +8,7 @@ use Lightning\Console\ConsoleIo;
 use Lightning\Console\AbstractCommand;
 use Lightning\Console\ConsoleArgumentParser;
 use Lightning\Console\Exception\StopException;
-use Lightning\Console\TestSuite\ConsoleIoStub;
+use Lightning\Console\TestSuite\TestConsoleIo;
 
 class HelloCommand extends AbstractCommand
 {
@@ -42,22 +42,28 @@ class HelloCommand extends AbstractCommand
 
 final class AbstractCommandTest extends TestCase
 {
+    public function testGetConsoleIo(): void
+    {
+        $command = new HelloCommand(new ConsoleArgumentParser(), new TestConsoleIo());
+        $this->assertInstanceOf(ConsoleIo::class, $command->getConsoleIo());
+    }
+
     public function testGetName(): void
     {
-        $command = new HelloCommand(new ConsoleArgumentParser(), new ConsoleIoStub());
+        $command = new HelloCommand(new ConsoleArgumentParser(), new TestConsoleIo());
         $this->assertEquals('hello', $command->getName());
     }
 
     public function testGetDescription(): void
     {
-        $command = new HelloCommand(new ConsoleArgumentParser(), new ConsoleIoStub());
+        $command = new HelloCommand(new ConsoleArgumentParser(), new TestConsoleIo());
         $this->assertEquals('hello world', $command->getDescription());
     }
 
     public function testAddOption(): void
     {
         $parser = new ConsoleArgumentParser();
-        $command = new HelloCommand($parser, new ConsoleIoStub());
+        $command = new HelloCommand($parser, new TestConsoleIo());
 
         $this->assertEquals(
             'change name to uppercase',
@@ -68,7 +74,7 @@ final class AbstractCommandTest extends TestCase
     public function testAddArgument(): void
     {
         $parser = new ConsoleArgumentParser();
-        $command = new HelloCommand($parser, new ConsoleIoStub());
+        $command = new HelloCommand($parser, new TestConsoleIo());
 
         $this->assertEquals(
             'name to use (default: "world")',
@@ -78,7 +84,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testExit(): void
     {
-        $command = new HelloCommand(new ConsoleArgumentParser(), new ConsoleIoStub());
+        $command = new HelloCommand(new ConsoleArgumentParser(), new TestConsoleIo());
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('Command exited');
@@ -89,7 +95,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testAbort(): void
     {
-        $command = new HelloCommand(new ConsoleArgumentParser(), new ConsoleIoStub());
+        $command = new HelloCommand(new ConsoleArgumentParser(), new TestConsoleIo());
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('Command aborted');
@@ -100,7 +106,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testRun(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
 
         $this->assertEquals(AbstractCommand::SUCCESS, $command->run(['bin/console']));
@@ -109,7 +115,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testRunCatchStopException(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
 
         $this->assertEquals(AbstractCommand::ERROR, $command->run(['bin/console','--abort']));
@@ -117,7 +123,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testOut(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $command->out('foo');
         $this->assertStringContainsString('foo', $stub->getStdout());
@@ -125,7 +131,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testError(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $command->error('foo');
         $this->assertStringContainsString('foo', $stub->getStderr());
@@ -133,7 +139,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testVerbose(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $command->verbose('foo');
         $this->assertEmpty($stub->getStdout());
@@ -146,7 +152,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testQuiet(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $stub->setOutputLevel(ConsoleIo::QUIET);
         $command->out('normal');
@@ -158,7 +164,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testDisplayHelp(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $command->run(['bin/console', '-h']);
 
@@ -169,7 +175,7 @@ final class AbstractCommandTest extends TestCase
 
     public function testThrowError(): void
     {
-        $stub = new ConsoleIoStub();
+        $stub = new TestConsoleIo();
         $command = new HelloCommand(new ConsoleArgumentParser(), $stub);
         $stub->setOutputMode(ConsoleIo::RAW);
         $this->expectException(StopException::class);

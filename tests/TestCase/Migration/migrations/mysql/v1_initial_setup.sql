@@ -9,7 +9,7 @@ CREATE TABLE posts_m (
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE articles_m (
-  id int unsissgned NOT NULL AUTO_INCREMENT,
+  id int unsigned NOT NULL AUTO_INCREMENT,
   title varchar(50) DEFAULT NULL,
   body text,
   created_at datetime NOT NULL,

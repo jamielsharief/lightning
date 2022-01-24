@@ -41,6 +41,13 @@ class MigrateUpCommand extends AbstractCommand
         parent::__construct($parser, $io);
     }
 
+    /**
+     * Executes the command
+     *
+     * @param Arguments $args
+     * @param ConsoleIo $io
+     * @return integer
+     */
     protected function execute(Arguments $args, ConsoleIo $io): int
     {
         $this->migration->up(function ($migration) {

@@ -15,7 +15,7 @@ final class SqliteMigrationTest extends TestCase
     protected PDO $pdo;
     protected string $migrationFolder;
 
-    protected $fixtureManager;
+    protected FixtureManager $fixtureManager;
 
     public function setUp(): void
     {

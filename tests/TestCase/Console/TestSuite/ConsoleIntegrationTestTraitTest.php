@@ -61,7 +61,7 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
     public function testGetIoException(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Console IO stub not created');
+        $this->expectExceptionMessage('Console IO stub not set');
         $this->getConsoleIo();
     }
 
@@ -75,38 +75,44 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
      */
     public function testGetTestConsoleIo(): void
     {
-        $this->createConsoleIo();
+        $this->setConsoleIo(new TestConsoleIo());
         $this->assertInstanceOf(TestConsoleIo::class, $this->getConsoleIo());
     }
 
     public function testExitSuccesss(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->assertTrue($this->execute($command));
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo());
+        $this->setupIntegrationTesting($command);
+
+        $this->assertTrue($this->execute());
         $this->assertExitSuccess();
     }
 
     public function testExitError(): void
     {
-        $command = $this->createCommand(DummyCommand::class, new Result());
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
 
-        $this->assertFalse($this->execute($command, ['--abort']));
+        $this->assertFalse($this->execute(['--abort']));
         $this->assertExitError();
     }
 
     public function testExitCode(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
 
-        $this->execute($command, ['--abort']);
+        $this->execute(['--abort']);
 
         $this->assertExitCode(3);
     }
 
     public function testOutputContains(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertOutputContains('hello world');
     }
@@ -116,8 +122,10 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
      */
     public function testOutputNotContains(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 
@@ -126,8 +134,10 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
 
     public function testOutputEmpty(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 
@@ -136,24 +146,30 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
 
     public function testOutputNotEmpty(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertOutputNotEmpty();
     }
 
     public function testOutputMatchesRegularExpression(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertOutputMatchesRegularExpression('/hello world/');
     }
 
     public function testOutputDoesNotMatchRegularExpression(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 
@@ -162,8 +178,10 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
 
     public function testErrorContains(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertErrorContains('an error has occured');
     }
@@ -173,8 +191,10 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
      */
     public function testErrorNotContains(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 
@@ -183,8 +203,10 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
 
     public function testErrorEmpty(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 
@@ -193,24 +215,30 @@ final class ConsoleIntegrationTestTraitTest extends TestCase
 
     public function testErrorNotEmpty(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertErrorNotEmpty();
     }
 
     public function testErrorMatchesRegularExpression(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->assertErrorMatchesRegularExpression('/an error has occured/');
     }
 
     public function testErrorDoesNotMatchRegularExpression(): void
     {
-        $command = $this->createCommand(DummyCommand::class);
-        $this->execute($command);
+        $command = new DummyCommand(new ConsoleArgumentParser(), new TestConsoleIo(), new Result());
+        $this->setupIntegrationTesting($command);
+
+        $this->execute();
 
         $this->getConsoleIo()->reset();
 

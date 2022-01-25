@@ -6,8 +6,9 @@ on:
 env:
   REDIS_HOST: '127.0.0.1'
   REDIS_PORT: 6379
+  COVERALLS_PARALLEL: true
 jobs:
-  test:
+  tests:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-20.04"
     strategy:
@@ -81,20 +82,10 @@ jobs:
             fi;
 
             php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel: true
-          flag-name: run-${{ matrix.test_number }}
+      - name: Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_FLAG_NAME: run-${{ matrix.test_number }}
+        run: "php vendor/bin/php-coveralls --verbose"
       - name: Run PHPStan
         run: "vendor/bin/phpstan analyse src --error-format=github"
-  finish:
-    needs: test
-    runs-on: "ubuntu-20.04"
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v1.1.0
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true

@@ -6,7 +6,6 @@ on:
 env:
   REDIS_HOST: '127.0.0.1'
   REDIS_PORT: 6379
-  COVERALLS_PARALLEL: true
 jobs:
   tests:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
@@ -82,10 +81,9 @@ jobs:
             fi;
 
             php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-      - name: Coveralls.io
+      - name: Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_FLAG_NAME: run-${{ matrix.test_number }}
         run: "php vendor/bin/php-coveralls --verbose"
       - name: Run PHPStan
         run: "vendor/bin/phpstan analyse src --error-format=github"

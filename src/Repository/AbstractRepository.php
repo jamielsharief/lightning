@@ -79,7 +79,7 @@ abstract class AbstractRepository
      * @param QueryObject|null $query
      * @return integer
      */
-    public function findCount(?QueryObject $query): int
+    public function findCount(?QueryObject $query = null): int
     {
         return $this->mapper->findCount($query);
     }
@@ -94,7 +94,7 @@ abstract class AbstractRepository
      *  - groupField: optional
      * @return array
      */
-    public function findList(?QueryObject $query, array $fields = []): array
+    public function findList(?QueryObject $query = null, array $fields = []): array
     {
         return $this->mapper->findList($query, $fields);
     }

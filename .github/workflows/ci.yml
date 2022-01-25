@@ -7,7 +7,7 @@ env:
   REDIS_HOST: '127.0.0.1'
   REDIS_PORT: 6379
 jobs:
-  tests:
+  test:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-20.04"
     strategy:
@@ -89,3 +89,12 @@ jobs:
           flag-name: run-${{ matrix.test_number }}
       - name: Run PHPStan
         run: "vendor/bin/phpstan analyse src --error-format=github"
+  finish:
+    needs: test
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v1.1.0
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true

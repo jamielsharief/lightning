@@ -87,6 +87,5 @@ jobs:
           github-token: ${{ secrets.github_token }}
           parallel: true
           flag-name: run-${{ matrix.test_number }}
-        run: "php vendor/bin/php-coveralls --verbose"
       - name: Run PHPStan
         run: "vendor/bin/phpstan analyse src --error-format=github"

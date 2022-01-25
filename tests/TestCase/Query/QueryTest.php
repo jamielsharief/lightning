@@ -3,6 +3,7 @@
 namespace Lightning\Test\Query;
 
 use PDO;
+use ArrayIterator;
 use Lightning\Query\Query;
 use BadMethodCallException;
 use Lightning\Database\Row;
@@ -124,6 +125,18 @@ final class QueryTest extends TestCase
                 ->select(['articles.id','authors.id'])
                 ->from('articles')
                 ->rightJoin('authors', 'a', ['articles.author_id = a.id'])
+        );
+    }
+
+    public function testSelectInnerJoin(): void
+    {
+        $query = $this->createQuery();
+        $this->assertSame(
+            'SELECT articles.id, authors.id FROM articles INNER JOIN authors AS a ON articles.author_id = a.id',
+            (string) $query
+                ->select(['articles.id','authors.id'])
+                ->from('articles')
+                ->innerJoin('authors', 'a', ['articles.author_id = a.id'])
         );
     }
 
@@ -275,6 +288,36 @@ final class QueryTest extends TestCase
         $this->assertEquals(1, $query->execute());
     }
 
+    public function testGetLastInsertId(): void
+    {
+        $query = $this->createQuery();
+
+        $query->insertInto('posts')
+            ->values([
+                'id' => 12345678,
+                'title' => 'This is an article',
+                'body' => 'ss',
+                'created_at' => '2021-10-23 15:35:00',
+                'updated_at' => '2021-10-23 15:35:00',
+            ]);
+
+        $this->assertEquals(1, $query->execute());
+
+        $this->assertIsString($query->getLastInsertId());
+    }
+
+    public function testValuesException(): void
+    {
+        $query = $this->createQuery();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('InsertInto must be called first');
+
+        $query->values([
+            'a' => 'b'
+        ]);
+    }
+
     public function testUpdate(): void
     {
         $query = $this->createQuery();
@@ -339,5 +382,18 @@ final class QueryTest extends TestCase
             ->where(['id' => 10001]);
 
         $this->assertEquals(0, $query->execute());
+    }
+
+    public function testGetIterator(): void
+    {
+        $query = $this->createQuery();
+        $query->select('*')->from('posts');
+
+        $this->assertInstanceOf(ArrayIterator::class, $query->getIterator());
+    }
+
+    public function testGetPDO(): void
+    {
+        $this->assertInstanceOf(PDO::class, $this->createQuery()->getPdo());
     }
 }

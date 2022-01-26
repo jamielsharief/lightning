@@ -135,6 +135,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
             if ($response = $event->getResponse()) {
                 return $response;
             }
+            $request = $event->getRequest();
         }
 
         $route = $this->match($request);

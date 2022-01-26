@@ -13,6 +13,69 @@
 
 namespace Lightning\Router\Event;
 
-class AfterDispatchEvent extends AbstractAfterEvent
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+class AfterDispatchEvent
 {
+    protected ServerRequestInterface $request;
+    protected ResponseInterface $response;
+
+    /**
+     * Constructor
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
+    public function __construct(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $this->request = $request;
+        $this->response = $response;
+    }
+
+    /**
+     * Set the Request object
+     *
+     * @param ServerRequestInterface $request
+     * @return self
+     */
+    public function setRequest(ServerRequestInterface $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Request object
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    /**
+     * Sets the Response object
+     *
+     * @param ResponseInterface $response
+     * @return self
+     */
+    public function setResponse(ResponseInterface $response): self
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Response object
+     *
+     * @return ResponseInterface
+     */
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
 }

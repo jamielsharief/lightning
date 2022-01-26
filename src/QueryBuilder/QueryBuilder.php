@@ -629,10 +629,6 @@ class QueryBuilder implements Stringable
      */
     private function compileUpdate(): string
     {
-        if (empty($this->table)) {
-            throw new BadMethodCallException('Table for the query was not set');
-        }
-
         $sets = [];
         foreach ($this->parts['set'] as $key => $value) {
             $sets[] = $this->quote($key) . ' = ' .   $this->getPlaceholder($value);

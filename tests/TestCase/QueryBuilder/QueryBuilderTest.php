@@ -2,6 +2,8 @@
 
 namespace Lightning\Test\QueryBuilder;
 
+use RuntimeException;
+use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Lightning\QueryBuilder\QueryBuilder;
 
@@ -31,6 +33,8 @@ final class QueryBuilderTest extends TestCase
             'INSERT INTO `articles` (`title`, `body`, `author_id`, `created_at`, `updated_at`) VALUES (:v0, :v1, :v2, :v3, :v4)',
             (string) $builder
         );
+
+        $this->assertEquals('insert', $builder->getType());
     }
 
     public function testDelete()
@@ -42,6 +46,8 @@ final class QueryBuilderTest extends TestCase
             'DELETE FROM `articles`',
             (string) $builder
         );
+
+        $this->assertEquals('delete', $builder->getType());
     }
 
     public function testDeleteWithConditions()
@@ -75,6 +81,8 @@ final class QueryBuilderTest extends TestCase
             'UPDATE `articles` SET `title` = :v0',
             (string) $builder
         );
+
+        $this->assertEquals('update', $builder->getType());
     }
 
     public function testUpdateWithConditions()
@@ -134,6 +142,19 @@ final class QueryBuilderTest extends TestCase
             'SELECT articles.id, articles.name, articles.email FROM articles WHERE id = :id',
             (string) $builder
         );
+    }
+
+    public function testInvalidExpression(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id <-o->' => 1234]);
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Invalid expression `<-o->`');
+
+        (string) $builder;
     }
 
     public function testWhereSingle()
@@ -643,5 +664,104 @@ final class QueryBuilderTest extends TestCase
             'SELECT articles.id, articles.name, articles.email FROM articles WHERE articles.id = :v0 AND NOT (articles.status = :v1 AND articles.deleted IS NULL)',
             (string) $builder
         );
+    }
+
+    public function testIsNull(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id' => null]);
+
+        $this->assertEquals(
+            'SELECT articles.id, articles.name, articles.email FROM articles WHERE articles.id IS NULL',
+            (string) $builder
+        );
+    }
+
+    public function testIsNotNull(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id !=' => null]);
+
+        $this->assertEquals(
+            'SELECT articles.id, articles.name, articles.email FROM articles WHERE articles.id IS NOT NULL',
+            (string) $builder
+        );
+    }
+
+    public function testErrorParsingException(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id >' => ['foo']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Error parsing expression');
+
+        (string) $builder;
+    }
+
+    public function testErrorParsingExceptionLike(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id LIKE' => ['foo']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Error parsing expression');
+
+        (string) $builder;
+    }
+
+    public function testSetParameter(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id = :id']);
+
+        $this->assertInstanceOf(QueryBuilder::class, $builder->setParameter('id', 123456));
+        $this->assertInstanceOf(QueryBuilder::class, $builder->setParameter('status', 'foo'));
+    }
+
+    public function testGetParameter(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id = :id']);
+
+        $builder->setParameter('id', 123456);
+        $builder->setParameter('status', 'foo');
+
+        $this->assertEquals([
+            ':id' => 123456,
+            ':status' => 'foo'
+        ], $builder->getParameters());
+    }
+
+    public function testSelectTableNotSet(): void
+    {
+        $builder = $this->createBuilder()->select(['*']);
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Table for the query was not set');
+
+        $builder->toString();
+    }
+
+    public function testDeleteTableNotSet(): void
+    {
+        $builder = $this->createBuilder()->delete();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Table for the query was not set');
+
+        $builder->toString();
     }
 }

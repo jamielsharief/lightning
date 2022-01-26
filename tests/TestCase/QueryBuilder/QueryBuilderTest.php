@@ -718,6 +718,32 @@ final class QueryBuilderTest extends TestCase
         (string) $builder;
     }
 
+    public function testErrorParsingExceptionBetween(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id BETWEEN' => 1234]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Error parsing expression');
+
+        (string) $builder;
+    }
+
+    public function testErrorParsingExceptionIn(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id IN' => 1234]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Error parsing expression');
+
+        (string) $builder;
+    }
+
     public function testSetParameter(): void
     {
         $builder = $this->createBuilder()
@@ -745,9 +771,33 @@ final class QueryBuilderTest extends TestCase
         ], $builder->getParameters());
     }
 
+    public function testSetParameters(): void
+    {
+        $builder = $this->createBuilder()
+            ->select(['id', 'name','email'])
+            ->from('articles')
+            ->where(['id = :id']);
+
+        $this->assertInstanceOf(QueryBuilder::class, $builder->setParameters(['id' => 123456,'status' => 'foo']));
+        $this->assertEquals([
+            ':id' => 123456,
+            ':status' => 'foo'
+        ], $builder->getParameters());
+    }
+
     public function testSelectTableNotSet(): void
     {
         $builder = $this->createBuilder()->select(['*']);
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Table for the query was not set');
+
+        $builder->toString();
+    }
+
+    public function testInsertTableNotSet(): void
+    {
+        $builder = $this->createBuilder()->insert(['id']);
 
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Table for the query was not set');

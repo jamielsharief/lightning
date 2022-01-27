@@ -19,7 +19,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Lightning\Router\Event\AfterDispatchEvent;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Http\Exception\NotFoundException;
 use Lightning\Router\Event\BeforeDispatchEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -44,7 +43,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
     protected ?ContainerInterface $container;
     protected ?EventDispatcherInterface $eventDispatcher;
-    protected ?ResponseFactoryInterface $responseFactory;
+    protected ?ResponseInterface $emptyResponse ;
     protected ?Autowire $autowire;
 
     protected RouteCollection $routes;
@@ -55,15 +54,15 @@ class Router implements RequestHandlerInterface, RoutesInterface
      *
      * @param ContainerInterface|null $container
      * @param EventDispatcherInterface|null $eventDispatcher
-     * @param ResponseFactoryInterface|null $responseFactory
      * @param Autowire|null $autowire
+     * @param ResponseInterface|null $emptyResponse
      */
     public function __construct(
-        ?ContainerInterface $container = null, ?EventDispatcherInterface $eventDispatcher = null, ?ResponseFactoryInterface $responseFactory = null, ?Autowire $autowire = null
+        ?ContainerInterface $container = null, ?EventDispatcherInterface $eventDispatcher = null, ?Autowire $autowire = null, ?ResponseInterface $emptyResponse = null
         ) {
         $this->container = $container;
         $this->eventDispatcher = $eventDispatcher;
-        $this->responseFactory = $responseFactory;
+        $this->emptyResponse = $emptyResponse;
         $this->autowire = $autowire;
         $this->routes = $this->createRouteCollection();
     }
@@ -152,7 +151,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
             };
         }
 
-        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->responseFactory));
+        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->emptyResponse));
 
         $response = (new RequestHandler($middleware))->handle($request);
 

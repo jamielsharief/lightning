@@ -17,30 +17,27 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Router\Exception\RouterException;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class DispatcherMiddleware implements MiddlewareInterface
 {
     private $callable;
     private array $arguments;
 
-    private ?ResponseFactoryInterface $responseFactory;
+    private ?ResponseInterface $response;
 
     /**
      * Constructor
      *
      * @param callable $callable
      * @param array $arguments
-     * @param EventDispatcherInterface|null $eventDispatcher
-     * @param ResponseFactoryInterface|null $responseFactory
+     * @param ResponseInterface|null $response
      */
-    public function __construct(callable $callable, array $arguments, ?ResponseFactoryInterface $responseFactory = null)
+    public function __construct(callable $callable, array $arguments, ?ResponseInterface $response = null)
     {
         $this->callable = $callable;
         $this->arguments = $arguments;
-        $this->responseFactory = $responseFactory;
+        $this->response = $response;
     }
 
     /**
@@ -68,7 +65,7 @@ class DispatcherMiddleware implements MiddlewareInterface
      */
     private function dispatch(callable $callable, ServerRequestInterface $request): ResponseInterface
     {
-        $arguments = $this->responseFactory ? [$request, $this->responseFactory->createResponse()] : [$request];
+        $arguments = $this->response ? [$request, $this->response] : [$request];
 
         $response = $callable(...$arguments);
         if (! $response instanceof ResponseInterface) {

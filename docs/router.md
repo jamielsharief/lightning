@@ -33,7 +33,7 @@ $router->get('/articles/index', ArticlesIndexController::class); // __invoke met
 
 ## Method arguments
 
-By default the `ServerRequestInterface` object will be passed to the `callable`, and if you created the `Router` with `ResponseFactory` then it will also pass a second argument, a `Response` object.
+By default the `ServerRequestInterface` object will be passed to the `callable`, and if you created the `Router` with a blank `ResponseInterface` object this will be passed as a second argument.
 
 ```php
 class ArticlesController

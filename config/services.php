@@ -6,8 +6,8 @@ use Nyholm\Psr7\Response;
 use Lightning\Router\Router;
 use Psr\Log\LoggerInterface;
 use App\View\ApplicationView;
-use Lightning\Logger\FileLogger;
 use Lightning\Autowire\Autowire;
+use Lightning\Logger\FileLogger;
 use Lightning\View\ViewCompiler;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
@@ -34,7 +34,7 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
      },
 
      Router::class => function (ContainerInterface $container) {
-         $router = new Router($container, $container->get(EventDispatcherInterface::class), new Psr17Factory(), new Autowire($container));
+         $router = new Router($container, $container->get(EventDispatcherInterface::class), new Autowire($container), new Response());
 
          $function = include __DIR__ . '/routes.php';
          $function($router);

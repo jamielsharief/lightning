@@ -278,7 +278,10 @@ abstract class AbstractDataMapper implements HookInterface
      * Returns a single instance
      *
      * @param array $criteria
-     * @param array $options
+     * @param array $options Options vary between datasources, but the following should be supported
+     *  - limit
+     *  - offset
+     *  - sort
      * @return EntityInterface|null
      */
     public function findBy(array $criteria = [], array $options = []): ?EntityInterface

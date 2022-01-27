@@ -608,15 +608,15 @@ trait IntegrationTestTrait
             foreach ($this->response->getHeader('Set-Cookie') as $cookie) {
 
                 // Ignore expired cookies, aka deleting
-                if (preg_match('/expires=([^;]*)/', $cookie, $matches) && strtotime($matches[1]) < time()) {
-                    continue;
+                $hasExpired = preg_match('/expires=([^;]*)/', $cookie, $matches) && strtotime($matches[1]) < time();
+
+                if (! $hasExpired) {
+                    // parse cookie name and value
+                    preg_match('/^([^;]*)/', $cookie, $matches);
+                    list($name, $value) = explode('=', $matches[1]);
+
+                    $result[$name] = $value;
                 }
-
-                // parse cookie name and value
-                preg_match('/^([^;]*)/', $cookie, $matches);
-                list($name, $value) = explode('=', $matches[1]);
-
-                $result[$name] = $value;
             }
         }
 

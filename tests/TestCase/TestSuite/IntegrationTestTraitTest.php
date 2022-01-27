@@ -393,6 +393,24 @@ final class IntegrationTestTraitTest extends TestCase
         $this->assertEquals('bar', $_SESSION['foo']);
     }
 
+    public function testSetHeader(): void
+    {
+        $this->setHeaders(['foo' => 'bar']);
+
+        $this->get('/articles/index');
+
+        $this->assertEquals('bar', $this->getRequest()->getHeaderLine('foo'));
+    }
+
+    public function testSetCookies(): void
+    {
+        $this->setCookieParams(['foo' => 'bar']);
+
+        $this->get('/articles/index');
+
+        $this->assertEquals('bar', $this->getRequest()->getCookieParams()['foo']);
+    }
+
     # # # Tests that require dispatching
 
     public function testResponseErrorHandling(): void

@@ -20,10 +20,12 @@ use Lightning\Test\TestCase\TestSuite\TestApp\ArticlesController;
 class App implements RequestHandlerInterface
 {
     private Router $router;
+
     public function __construct(Router $router)
     {
         $this->router = $router;
     }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->router->dispatch($request);
@@ -57,6 +59,69 @@ final class IntegrationTestTraitTest extends TestCase
         $this->setupIntegrationTesting(
             new ServerRequestFactory(new Psr17Factory()), new Psr17Factory(), new App($router), new TestSession()
         );
+    }
+
+    public function testGet(): void
+    {
+        $this->get('/test-get');
+        $request = $this->getRequest();
+
+        $this->assertEquals('GET', $request->getMethod());
+        $this->assertEquals('/test-get', (string) $request->getUri());
+    }
+
+    public function testPost(): void
+    {
+        $this->post('/test-post', ['foo' => 'bar']);
+        $request = $this->getRequest();
+        $this->assertEquals('POST', $request->getMethod());
+        $this->assertEquals('/test-post', (string) $request->getUri());
+        $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
+    }
+
+    public function testPatch(): void
+    {
+        $this->patch('/test-patch', ['foo' => 'bar']);
+        $request = $this->getRequest();
+        $this->assertEquals('PATCH', $request->getMethod());
+        $this->assertEquals('/test-patch', (string) $request->getUri());
+        $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
+    }
+
+    public function testPut(): void
+    {
+        $this->put('/test-put', ['foo' => 'bar']);
+        $request = $this->getRequest();
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('/test-put', (string) $request->getUri());
+        $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
+    }
+
+    public function testDelete(): void
+    {
+        $this->delete('/test-delete');
+        $request = $this->getRequest();
+
+        $this->assertEquals('DELETE', $request->getMethod());
+        $this->assertEquals('/test-delete', (string) $request->getUri());
+    }
+
+    public function testHead(): void
+    {
+        $this->head('/test-head');
+        $request = $this->getRequest();
+
+        $this->assertEquals('HEAD', $request->getMethod());
+        $this->assertEquals('/test-head', (string) $request->getUri());
+    }
+
+    public function testOptions(): void
+    {
+        $this->options('/test-options');
+        $request = $this->getRequest();
+
+        $this->assertEquals('OPTIONS', $request->getMethod());
+        $this->assertEquals('/test-options', (string) $request->getUri());
     }
 
     private function createResponse(string $body, int $statusCode = 200)
@@ -302,6 +367,30 @@ final class IntegrationTestTraitTest extends TestCase
         $this->response->getBody()->write('fooo');
 
         $this->assertResponseFile('foo.zip');
+    }
+
+    public function testSetServerParams(): void
+    {
+        $this->setServerParams(['key' => 'value']);
+        $response = $this->get('/articles/index');
+        $this->assertEquals(['key' => 'value'], $this->getRequest()->getServerParams());
+    }
+
+    public function testSetEnv(): void
+    {
+        $this->setEnvironment(['FOO' => 'bar']);
+        $this->get('/articles/index');
+        $this->assertEquals('bar', $_ENV['FOO']);
+    }
+
+    public function testSetSession(): void
+    {
+        $this->assertArrayNotHasKey('foo', $_SESSION);
+
+        $this->setSession(['foo' => 'bar']);
+
+        $this->get('/articles/index');
+        $this->assertEquals('bar', $_SESSION['foo']);
     }
 
     # # # Tests that require dispatching

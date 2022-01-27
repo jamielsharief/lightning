@@ -13,6 +13,7 @@ class ServiceObject extends AbstractServiceObject
 
     protected function initialize(): void
     {
+        parent::initialize();
         $this->initialized = true;
     }
     public function execute(Params $params, Result $result): Result

@@ -101,4 +101,18 @@ final class EventDispatcherTestTraitTest extends TestCase
 
         $this->assertEventsDispatchedNotEquals([BarEvent::class,FooEvent::class]);
     }
+
+    public function testAssertEventdsDispatchedCount(): void
+    {
+        $eventDispatcher = new TestEventDispatcher();
+        $this->setEventDispatcher($eventDispatcher);
+
+        $this->assertEventsDispatchedCount(0);
+
+        $eventDispatcher->dispatch(new FooEvent());
+        $this->assertEventsDispatchedCount(1);
+
+        $eventDispatcher->dispatch(new FooEvent());
+        $this->assertEventsDispatchedCount(2);
+    }
 }

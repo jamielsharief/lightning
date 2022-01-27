@@ -135,7 +135,7 @@ class Autowire
     protected function resolveParameter(ReflectionParameter $parameter, array $vars = [])
     {
 
-        /** @var ReflectionNamedType */
+        /** @var \ReflectionNamedType $parameterType */
         $parameterType = $parameter->getType();
 
         if (! $parameterType) {
@@ -159,7 +159,6 @@ class Autowire
             throw new AutowireException(sprintf('parameter `%s` has no default value', $parameter->name));
         }
 
-        /** @var \ReflectionNamedType $parameterType */
         $service = $parameterType->getName();
 
         if ($this->container && $this->container->has($service)) {

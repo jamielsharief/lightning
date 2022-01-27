@@ -25,6 +25,14 @@ final class ResultTest extends TestCase
         $this->assertFalse((new Result(false))->getSuccess());
     }
 
+    public function testWithSuccess(): void
+    {
+        $result = new Result(false);
+
+        $this->assertFalse($result->getSuccess());
+        $this->assertTrue($result->withSuccess(true)->getSuccess());
+    }
+
     public function testSetSuccess(): void
     {
         $result = new Result(true);

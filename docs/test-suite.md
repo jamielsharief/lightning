@@ -192,26 +192,23 @@ public function testDoSomething(): void
 {
     $object = new SomeObject($this->getLogger());
     $object->doSomething();
-    $this->assertLogDebugHas('Did something');
+    
+    $this->assertLogHasMessage('Could not do something', LogLevel::ERROR);
 }
 ```
 
 The following methods are provided:
 
 ```php
-$this->assertLogCount(5);
+$this->assertLogHasMessage('Could not connect to SMTP server', LogLevel::ERROR);
+$this->assertLogHasMessageThatContains('SMTP server', LogLevel::ERROR);
+$this->assertLogHasMessageThatMatches('Error sending (email|sms)', LogLevel::ERROR);
 
-// Generic assertations
-$this->assertLogHas('Could not connect to SMTP server', LogLevel::ERROR);
-$this->assertLogDoesNotHave('Could not connect to SMTP server', LogLevel::ERROR);
-$this->assertLogContains('SMTP server', LogLevel::ERROR);
-$this->assertLogNotContains('SMTP server', LogLevel::ERROR);
+$this->assertLogDoesNotHaveMessage('Could not connect to SMTP server', LogLevel::ERROR);
+$this->assertLogDoesNotHaveMessageThatContains('SMTP server', LogLevel::ERROR);
+$this->assertLogDoesNotHaveMessageThatMatches('Error sending (email|sms)', LogLevel::ERROR);
 
-// Assertation for each level
-$this->assertLogErrorHas('Could not connect to SMTP server');
-$this->assertLogErrorDoesNotHave('Could not connect to SMTP server');
-$this->assertLogErrorContains('SMTP server');
-$this->assertLogErrorNotContains('SMTP server');
+$this->assertLogMessagesCount(5);
 ```
 
 ## Testing Middleware

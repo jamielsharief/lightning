@@ -65,7 +65,7 @@ trait EventDispatcherTestTrait
      * @param string $event
      * @return void
      */
-    protected function assertEventDispatched(string $event): void
+    public function assertEventDispatched(string $event): void
     {
         $this->assertTrue($this->getEventDispatcher()->hasDispatchedEvent($event), sprintf('Event `%s` was not dispatched', $event));
     }
@@ -76,7 +76,7 @@ trait EventDispatcherTestTrait
      * @param string $event
      * @return void
      */
-    protected function assertEventNotDispatched(string $event): void
+    public function assertEventNotDispatched(string $event): void
     {
         $this->assertFalse($this->getEventDispatcher()->hasDispatchedEvent($event), sprintf('Event `%s` was dispatched', $event));
     }
@@ -87,7 +87,7 @@ trait EventDispatcherTestTrait
      * @param array $events
      * @return void
      */
-    protected function assertEventsDispatched(array $events): void
+    public function assertEventsDispatched(array $events): void
     {
         foreach ($events as $event) {
             $this->assertEventDispatched($event);
@@ -100,7 +100,7 @@ trait EventDispatcherTestTrait
      * @param array $events
      * @return void
      */
-    protected function assertEventsNotDispatched(array $events): void
+    public function assertEventsNotDispatched(array $events): void
     {
         foreach ($events as $event) {
             $this->assertEventNotDispatched($event);
@@ -135,7 +135,7 @@ trait EventDispatcherTestTrait
      * @param integer $count
      * @return void
      */
-    protected function assertEventsDispatchedCount(int $count): void
+    public function assertEventsDispatchedCount(int $count): void
     {
         $this->assertCount($count, $this->getEventDispatcher());
     }

@@ -104,7 +104,7 @@ class TestLogger implements Countable, LoggerInterface
         $messages = $this->filter(function (array $logged) use ($string, $level, $interpolated) {
             $haystack = $interpolated ? $logged['rendered'] : $logged['message'];
 
-            return strpos($string, $haystack) !== false && $logged['level'] === $level;
+            return strpos($haystack, $string) !== false && $logged['level'] === $level;
         });
 
         return ! empty($messages);

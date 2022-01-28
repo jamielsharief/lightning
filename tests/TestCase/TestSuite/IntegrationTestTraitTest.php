@@ -2,6 +2,7 @@
 
 namespace Lightning\Test\TestSuite;
 
+use Exception;
 use Nyholm\Psr7\Response;
 use Lightning\Router\Router;
 use Nyholm\Psr7\UploadedFile;
@@ -409,6 +410,47 @@ final class IntegrationTestTraitTest extends TestCase
         $this->get('/articles/index');
 
         $this->assertEquals('bar', $this->getRequest()->getCookieParams()['foo']);
+    }
+
+    public function testGetRequest(): void
+    {
+        $this->get('/articles/index');
+        $this->assertInstanceOf(ServerRequestInterface::class, $this->getRequest());
+    }
+
+    public function testGetRequestException(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Server request not set');
+        $this->getRequest();
+    }
+
+    public function testGetResponse(): void
+    {
+        $this->get('/articles/index');
+        $this->assertInstanceOf(ResponseInterface::class, $this->getResponse());
+    }
+
+    public function testGetResponseException(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Response not set');
+        $this->getResponse();
+    }
+
+    public function testGetSession(): void
+    {
+        $this->get('/articles/index');
+        $this->assertInstanceOf(TestSession::class, $this->getSession());
+    }
+
+    public function testGetSessionException(): void
+    {
+        unset($this->testSession); // this is set when callinjg setup regardless if request is sent
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test Session not set');
+        $this->getSession();
     }
 
     # # # Tests that require dispatching

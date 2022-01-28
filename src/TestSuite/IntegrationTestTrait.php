@@ -13,8 +13,8 @@
 
 namespace Lightning\TestSuite;
 
+use Exception;
 use Throwable;
-use RuntimeException;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -33,8 +33,7 @@ trait IntegrationTestTrait
     protected ResponseFactoryInterface $responseFactory;
     protected RequestHandlerInterface $requestHandler;
 
-    protected TestSessionInterface $testSession;
-
+    protected ?TestSessionInterface $testSession = null;
     protected ?ServerRequestInterface $serverRequest = null;
     protected ?ResponseInterface $response = null;
 
@@ -81,7 +80,7 @@ trait IntegrationTestTrait
      * @param string $uri
      * @return ResponseInterface
      */
-    protected function get(string $uri): ResponseInterface
+    public function get(string $uri): ResponseInterface
     {
         return $this->sendRequest('GET', $uri);
     }
@@ -93,7 +92,7 @@ trait IntegrationTestTrait
      * @param array $data
      * @return ResponseInterface
      */
-    protected function post(string $uri, array $data = []): ResponseInterface
+    public function post(string $uri, array $data = []): ResponseInterface
     {
         return $this->sendRequest('POST', $uri, $data);
     }
@@ -105,7 +104,7 @@ trait IntegrationTestTrait
      * @param array $data
      * @return ResponseInterface
      */
-    protected function patch(string $uri, array $data = []): ResponseInterface
+    public function patch(string $uri, array $data = []): ResponseInterface
     {
         return $this->sendRequest('PATCH', $uri, $data);
     }
@@ -117,7 +116,7 @@ trait IntegrationTestTrait
      * @param array $data
      * @return ResponseInterface
      */
-    protected function put(string $uri, array $data = []): ResponseInterface
+    public function put(string $uri, array $data = []): ResponseInterface
     {
         return $this->sendRequest('PUT', $uri, $data);
     }
@@ -128,7 +127,7 @@ trait IntegrationTestTrait
      * @param string $uri
      * @return ResponseInterface
      */
-    protected function delete(string $uri): ResponseInterface
+    public function delete(string $uri): ResponseInterface
     {
         return $this->sendRequest('DELETE', $uri);
     }
@@ -139,7 +138,7 @@ trait IntegrationTestTrait
      * @param string $uri
      * @return ResponseInterface
      */
-    protected function head(string $uri): ResponseInterface
+    public function head(string $uri): ResponseInterface
     {
         return $this->sendRequest('HEAD', $uri);
     }
@@ -150,7 +149,7 @@ trait IntegrationTestTrait
      * @param string $uri
      * @return ResponseInterface
      */
-    protected function options(string $uri): ResponseInterface
+    public function options(string $uri): ResponseInterface
     {
         return $this->sendRequest('OPTIONS', $uri);
     }
@@ -216,11 +215,9 @@ trait IntegrationTestTrait
      * @param integer $statusCode
      * @return void
      */
-    protected function assertResponseCode(int $statusCode): void
+    public function assertResponseCode(int $statusCode): void
     {
-        $this->checkRequestWasHandled();
-
-        $this->assertEquals($statusCode, $this->response->getStatusCode(), sprintf('Response code was %d', $statusCode));
+        $this->assertEquals($statusCode, $this->getResponse()->getStatusCode(), sprintf('Response code was %d', $statusCode));
     }
 
     /**
@@ -297,10 +294,9 @@ trait IntegrationTestTrait
      * @param string $needle
      * @return void
      */
-    protected function assertResponseEquals(string $needle): void
+    public function assertResponseEquals(string $needle): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertEquals($needle, (string) $this->response->getBody());
+        $this->assertEquals($needle, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -309,10 +305,9 @@ trait IntegrationTestTrait
      * @param string $needle
      * @return void
      */
-    protected function assertResponseNotEquals(string $needle): void
+    public function assertResponseNotEquals(string $needle): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertNotEquals($needle, (string) $this->response->getBody());
+        $this->assertNotEquals($needle, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -321,10 +316,9 @@ trait IntegrationTestTrait
      * @param string $filename
      * @return void
      */
-    protected function assertResponseFile(string $filename): void
+    public function assertResponseFile(string $filename): void
     {
-        $this->checkRequestWasHandled();
-        $header = $this->response->getHeaderLine('Content-Disposition');
+        $header = $this->getResponse()->getHeaderLine('Content-Disposition');
 
         $this->assertNotNull($header, 'Response does not have the `Content-Disposition` header');
         $this->assertStringContainsString('attachment', $header, 'Response content is not downloadable');
@@ -338,10 +332,9 @@ trait IntegrationTestTrait
      * @param string $needle
      * @return void
      */
-    protected function assertResponseContains(string $needle): void
+    public function assertResponseContains(string $needle): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertStringContainsString($needle, (string) $this->response->getBody());
+        $this->assertStringContainsString($needle, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -349,10 +342,9 @@ trait IntegrationTestTrait
      *
      * @return void
      */
-    protected function assertResponseEmpty(): void
+    public function assertResponseEmpty(): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertEmpty((string) $this->response->getBody());
+        $this->assertEmpty((string) $this->getResponse()->getBody());
     }
 
     /**
@@ -360,10 +352,9 @@ trait IntegrationTestTrait
     *
     * @return void
     */
-    protected function assertResponseNotEmpty(): void
+    public function assertResponseNotEmpty(): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertNotEmpty((string) $this->response->getBody());
+        $this->assertNotEmpty((string) $this->getResponse()->getBody());
     }
 
     /**
@@ -372,10 +363,9 @@ trait IntegrationTestTrait
     * @param string $needle
     * @return void
     */
-    protected function assertResponseNotContains(string $needle): void
+    public function assertResponseNotContains(string $needle): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertStringNotContainsString($needle, (string) $this->response->getBody());
+        $this->assertStringNotContainsString($needle, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -384,10 +374,9 @@ trait IntegrationTestTrait
      * @param string $pattern
      * @return void
      */
-    protected function assertResponseMatchesRegularExpression(string $pattern): void
+    public function assertResponseMatchesRegularExpression(string $pattern): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertMatchesRegularExpression($pattern, (string) $this->response->getBody());
+        $this->assertMatchesRegularExpression($pattern, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -396,10 +385,9 @@ trait IntegrationTestTrait
     * @param string $pattern
     * @return void
     */
-    protected function assertResponseDoesNotMatchRegularExpression(string $pattern): void
+    public function assertResponseDoesNotMatchRegularExpression(string $pattern): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertDoesNotMatchRegularExpression($pattern, (string) $this->response->getBody());
+        $this->assertDoesNotMatchRegularExpression($pattern, (string) $this->getResponse()->getBody());
     }
 
     /**
@@ -410,9 +398,7 @@ trait IntegrationTestTrait
      */
     public function assertHeaderSet(string $header): void
     {
-        $this->checkRequestWasHandled();
-
-        $this->assertNotEmpty($this->response->getHeaderLine($header), sprintf('Response does not have the header `%s`', $header));
+        $this->assertNotEmpty($this->getResponse()->getHeaderLine($header), sprintf('Response does not have the header `%s`', $header));
     }
 
     /**
@@ -423,8 +409,7 @@ trait IntegrationTestTrait
      */
     public function assertHeaderNotSet(string $header): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertEmpty($this->response->getHeaderLine($header), sprintf('Response has the header `%s`', $header));
+        $this->assertEmpty($this->getResponse()->getHeaderLine($header), sprintf('Response has the header `%s`', $header));
     }
 
     /**
@@ -434,11 +419,9 @@ trait IntegrationTestTrait
      * @param string $value
      * @return void
      */
-    protected function assertHeaderEquals(string $header, string $value): void
+    public function assertHeaderEquals(string $header, string $value): void
     {
-        $this->checkRequestWasHandled();
-
-        $actual = $this->response->getHeaderLine($header);
+        $actual = $this->getResponse()->getHeaderLine($header);
         $this->assertNotEmpty($actual, sprintf('Response does not have the header `%s`', $header));
         $this->assertEquals($value, $actual, sprintf('Response header `%s` is not equal to `%s`', $header, $value));
     }
@@ -450,11 +433,9 @@ trait IntegrationTestTrait
      * @param string $value
      * @return void
     */
-    protected function assertHeaderNotEquals(string $header, string $value): void
+    public function assertHeaderNotEquals(string $header, string $value): void
     {
-        $this->checkRequestWasHandled();
-
-        $actual = $this->response->getHeaderLine($header);
+        $actual = $this->getResponse()->getHeaderLine($header);
         $this->assertNotEmpty($actual, sprintf('Response does not have the header `%s`', $header));
         $this->assertNotEquals($value, $actual, sprintf('Response header `%s` equals `%s`', $header, $value));
     }
@@ -466,11 +447,9 @@ trait IntegrationTestTrait
      * @param string $value
      * @return void
      */
-    protected function assertHeaderContains(string $header, string $value): void
+    public function assertHeaderContains(string $header, string $value): void
     {
-        $this->checkRequestWasHandled();
-
-        $actual = $this->response->getHeaderLine($header);
+        $actual = $this->getResponse()->getHeaderLine($header);
         $this->assertNotEmpty($actual, sprintf('Response has header `%s`', $header));
         $this->assertStringContainsString($value, $actual, sprintf('Response header `%s` does not contain `%s`', $header, $value));
     }
@@ -482,11 +461,9 @@ trait IntegrationTestTrait
      * @param string $value
      * @return void
      */
-    protected function assertHeaderNotContains(string $header, string $value): void
+    public function assertHeaderNotContains(string $header, string $value): void
     {
-        $this->checkRequestWasHandled();
-
-        $actual = $this->response->getHeaderLine($header);
+        $actual = $this->getResponse()->getHeaderLine($header);
         $this->assertNotEmpty($actual, sprintf('Response has header `%s`', $header));
         $this->assertStringNotContainsString($value, $actual, sprintf('Response header `%s` contains `%s`', $header, $value));
     }
@@ -497,10 +474,9 @@ trait IntegrationTestTrait
      * @param string $key
      * @return void
      */
-    protected function assertSessionHas(string $key): void
+    public function assertSessionHas(string $key): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertArrayHasKey($key, $_SESSION, sprintf('Session does not have the key `%s`', $key));
+        $this->assertTrue($this->getSession()->has($key), sprintf('Session does not have the key `%s`', $key));
     }
 
     /**
@@ -509,10 +485,9 @@ trait IntegrationTestTrait
      * @param string $key
      * @return void
      */
-    protected function assertSessionDoesNotHave(string $key): void
+    public function assertSessionDoesNotHave(string $key): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertArrayNotHasKey($key, $_SESSION, sprintf('Session has the key `%s`', $key));
+        $this->assertFalse($this->getSession()->has($key), sprintf('Session has the key `%s`', $key));
     }
 
     /**
@@ -522,11 +497,10 @@ trait IntegrationTestTrait
      * @param mixed $value
      * @return void
      */
-    protected function assertSessionEquals(string $key, $value): void
+    public function assertSessionEquals(string $key, $value): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertArrayHasKey($key, $_SESSION, sprintf('Session does not have the key `%s`', $key));
-        $this->assertEquals($value, $_SESSION[$key], sprintf('Session key `%s` does not equal `%s`', $key, $value));
+        $this->assertTrue($this->getSession()->has($key), sprintf('Session does not have the key `%s`', $key));
+        $this->assertEquals($value, $this->getSession()->get($key), sprintf('Session key `%s` does not equal `%s`', $key, $value));
     }
 
     /**
@@ -536,11 +510,10 @@ trait IntegrationTestTrait
      * @param mixed $value
      * @return void
      */
-    protected function assertSessionNotEquals(string $key, $value): void
+    public function assertSessionNotEquals(string $key, $value): void
     {
-        $this->checkRequestWasHandled();
-        $this->assertArrayHasKey($key, $_SESSION, sprintf('Session does not have the key `%s`', $key));
-        $this->assertNotEquals($value, $_SESSION[$key], sprintf('Session key `%s` equals `%s`', $key, $value));
+        $this->assertTrue($this->getSession()->has($key), sprintf('Session does not have the key `%s`', $key));
+        $this->assertNotEquals($value, $this->getSession()->get($key), sprintf('Session key `%s`equals `%s`', $key, $value));
     }
 
     /**
@@ -549,9 +522,8 @@ trait IntegrationTestTrait
      * @param string $name
      * @return void
      */
-    protected function assertCookieSet(string $name): void
+    public function assertCookieSet(string $name): void
     {
-        $this->checkRequestWasHandled();
         $this->assertContains($name, array_keys($this->getResponseCookies()), sprintf('Cookie `%s` is not set', $name));
     }
 
@@ -562,9 +534,8 @@ trait IntegrationTestTrait
      * @return void
      */
 
-    protected function assertCookieNotSet(string $name): void
+    public function assertCookieNotSet(string $name): void
     {
-        $this->checkRequestWasHandled();
         $this->assertNotContains($name, array_keys($this->getResponseCookies()), sprintf('Cookie `%s` is set', $name));
     }
 
@@ -575,9 +546,8 @@ trait IntegrationTestTrait
      * @param string $value
      * @return void
      */
-    protected function assertCookieEquals(string $name, string $value): void
+    public function assertCookieEquals(string $name, string $value): void
     {
-        $this->checkRequestWasHandled();
         $this->assertContains($name, array_keys($this->getResponseCookies()), sprintf('Cookie `%s` is not set', $name));
         $this->assertEquals($value, $this->getResponseCookies()[$name], sprintf('Cookie `%s` does not equal `%s`', $name, $value));
     }
@@ -589,9 +559,8 @@ trait IntegrationTestTrait
     * @param string $value
     * @return void
     */
-    protected function assertCookieNotEquals(string $name, string $value): void
+    public function assertCookieNotEquals(string $name, string $value): void
     {
-        $this->checkRequestWasHandled();
         $this->assertContains($name, array_keys($this->getResponseCookies()), sprintf('Cookie `%s` is not set', $name));
         $this->assertNotEquals($value, $this->getResponseCookies()[$name], sprintf('Cookie `%s` equals `%s`', $name, $value));
     }
@@ -604,30 +573,21 @@ trait IntegrationTestTrait
     private function getResponseCookies(): array
     {
         $result = [];
-        if ($this->response) {
-            foreach ($this->response->getHeader('Set-Cookie') as $cookie) {
+        foreach ($this->getResponse()->getHeader('Set-Cookie') as $cookie) {
 
-                // Ignore expired cookies, aka deleting
-                $hasExpired = preg_match('/expires=([^;]*)/', $cookie, $matches) && strtotime($matches[1]) < time();
+            // Ignore expired cookies, aka deleting
+            $hasExpired = preg_match('/expires=([^;]*)/', $cookie, $matches) && strtotime($matches[1]) < time();
 
-                if (! $hasExpired) {
-                    // parse cookie name and value
-                    preg_match('/^([^;]*)/', $cookie, $matches);
-                    list($name, $value) = explode('=', $matches[1]);
+            if (! $hasExpired) {
+                // parse cookie name and value
+                preg_match('/^([^;]*)/', $cookie, $matches);
+                list($name, $value) = explode('=', $matches[1]);
 
-                    $result[$name] = $value;
-                }
+                $result[$name] = $value;
             }
         }
 
         return $result;
-    }
-
-    private function checkRequestWasHandled(): void
-    {
-        if (is_null($this->response)) {
-            $this->fail('No response object, request was not handled');
-        }
     }
 
     /**
@@ -636,7 +596,7 @@ trait IntegrationTestTrait
      * @param array $headers ['PHP_AUTH_USER' => 'somebody@example.com']
      * @return self
      */
-    protected function setHeaders(array $headers): self
+    public function setHeaders(array $headers): self
     {
         $this->headers = $headers;
 
@@ -651,7 +611,7 @@ trait IntegrationTestTrait
      * @param array $cookies key - value pairs
      * @return void
      */
-    protected function setCookieParams(array $cookies): self
+    public function setCookieParams(array $cookies): self
     {
         $this->cookies = $cookies;
 
@@ -664,12 +624,12 @@ trait IntegrationTestTrait
      * @param array $files an array of UploadedFileInterface files
      * @return self
      */
-    protected function setUploadedFiles(array $files): self
+    public function setUploadedFiles(array $files): self
     {
         // Check file types
         foreach ($files as $file) {
             if (! $file instanceof UploadedFileInterface) {
-                throw new InvalidArgumentException('setFiles takes an array of UploadedFileInterface objects');
+                throw new InvalidArgumentException('setUploadedFiles takes an array of UploadedFileInterface objects');
             }
         }
 
@@ -684,7 +644,7 @@ trait IntegrationTestTrait
      * @param array $session key values pairs e.g. ['token' => 1234];
      * @return self
      */
-    protected function setSession(array $session): self
+    public function setSession(array $session): self
     {
         $this->session = $session;
 
@@ -697,7 +657,7 @@ trait IntegrationTestTrait
      * @param array $serverParams
      * @return self
      */
-    protected function setServerParams(array $serverParams): self
+    public function setServerParams(array $serverParams): self
     {
         $this->serverParams = $serverParams;
 
@@ -710,7 +670,7 @@ trait IntegrationTestTrait
      * @param array $env
      * @return self
      */
-    protected function setEnvironment(array $env): self
+    public function setEnvironment(array $env): self
     {
         $this->env = $env;
 
@@ -725,23 +685,37 @@ trait IntegrationTestTrait
     public function getRequest(): ServerRequestInterface
     {
         if (! isset($this->serverRequest)) {
-            throw new RuntimeException('Server request not set');
+            throw new Exception('Server request not set');
         }
 
         return $this->serverRequest;
     }
 
     /**
-     * Undocumented function
+     * Gets the Response object
      *
      * @return ResponseInterface
      */
     public function getResponse(): ResponseInterface
     {
         if (! isset($this->response)) {
-            throw new RuntimeException('Response not set');
+            throw new Exception('Response not set');
         }
 
         return $this->response;
+    }
+
+    /**
+     * Gets the Test Session
+     *
+     * @return TestSession
+     */
+    public function getSession(): TestSession
+    {
+        if (! isset($this->testSession)) {
+            throw new Exception('Test Session not set');
+        }
+
+        return $this->testSession;
     }
 }

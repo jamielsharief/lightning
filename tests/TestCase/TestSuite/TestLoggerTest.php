@@ -3,11 +3,21 @@
 namespace Lightning\Test\TestSuite;
 
 use Psr\Log\LogLevel;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Lightning\TestSuite\TestLogger;
 
 final class TestLoggerTest extends TestCase
 {
+    public function testLogException(): void
+    {
+        $logger = new TestLogger();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unkown log level `foo`');
+
+        $logger->log('foo', 'What happened');
+    }
+
     public function testHasMessage(): void
     {
         $logger = new TestLogger();

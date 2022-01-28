@@ -13,7 +13,7 @@ final class PoMessageLoaderTest extends TestCase
     public function setUp(): void
     {
         $this->tempPath = sys_get_temp_dir() . '/' . uniqid();
-        mkdir($this->tempPath);
+        mkdir($this->tempPath, 0777, true);
 
         $this->loader = new PoMessageLoader(dirname(__DIR__). '/locale', $this->tempPath);
     }

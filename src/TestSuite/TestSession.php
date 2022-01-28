@@ -58,7 +58,7 @@ class TestSession implements TestSessionInterface
      */
     public function get(string $key)
     {
-        return $_SESSION[$key] ?: null;
+        return $_SESSION[$key] ?? null;
     }
 
     /**

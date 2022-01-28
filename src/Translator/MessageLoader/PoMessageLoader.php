@@ -13,7 +13,7 @@
 
 namespace Lightning\Translator\MessageLoader;
 
-use Psr\SimpleCache\CacheInterface;
+use RuntimeException;
 use Lightning\Translator\MessageLoaderInterface;
 use Lightning\Translator\Exception\MessageFileNotFound;
 
@@ -24,20 +24,23 @@ use Lightning\Translator\Exception\MessageFileNotFound;
 class PoMessageLoader implements MessageLoaderInterface
 {
     private string $path;
-    private ?CacheInterface $cache = null;
+    private string $cachedPath;
 
     /**
      * Constructor
      *
-     * @param CacheInterface|null $cache
+     * @param string $path
+     * @param string $cachedPath
      */
-    public function __construct(string $path, ?CacheInterface $cache = null)
+    public function __construct(string $path, string $cachedPath)
     {
         $this->path = $path;
-        $this->cache = $cache;
+        $this->cachedPath = $cachedPath;
     }
 
     /**
+     * Loads the Translations for the domain and locale
+     *
      * @see http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html
      *
      * @param string $domain
@@ -52,19 +55,25 @@ class PoMessageLoader implements MessageLoaderInterface
             throw new MessageFileNotFound(sprintf('Message file `%s` not found', $path));
         }
 
-        $key = md5($path);
+        return unserialize(file_get_contents($this->cache($path)));
+    }
 
-        if ($this->cache && $this->cache->has($key)) {
-            return $this->cache->get($key);
+    /**
+     * Creates a cached version of the translations and returns the cached name
+     *
+     * @param string $path
+     * @return string
+     */
+    private function cache(string $path): string
+    {
+        $cachedPath = $this->cachedPath . '/' . md5($path) . '.cached';
+
+        $isCached = file_exists($cachedPath) && filemtime($cachedPath) > filemtime($path);
+        if (! $isCached && file_put_contents($cachedPath, serialize($this->parse($path))) === false) {
+            throw new RuntimeException('Error caching translations');
         }
 
-        $data = $this->parse($path);
-
-        if ($this->cache) {
-            $this->cache->set($key, $data);
-        }
-
-        return $data;
+        return $cachedPath;
     }
 
     /**
@@ -84,8 +93,10 @@ class PoMessageLoader implements MessageLoaderInterface
         while ($line = fgets($stream)) {
             $line = trim($line);
 
+            $start = substr($line, 0, 7);
+
             // only parse valid lines, must include space to exclude
-            if (substr($line, 0, 6) === 'msgid ') {
+            if ($start === 'msgid "') {
                 if ($parsing === 'value') {
                     $data[$id] = $value;
                     $id = $value = '';
@@ -93,7 +104,7 @@ class PoMessageLoader implements MessageLoaderInterface
                 }
                 $parsing = 'id';
                 $id .= trim(substr($line, 6), '"');
-            } elseif (substr($line, 0, 7) === 'msgstr ') {
+            } elseif ($start === 'msgstr ') {
                 $parsing = 'value';
                 $value .= trim(substr($line, 7), '"');
             } elseif (substr($line, 0, 1) === '"') {
@@ -103,6 +114,8 @@ class PoMessageLoader implements MessageLoaderInterface
                 } elseif ($parsing === 'value') {
                     $value .= $line;
                 }
+            } elseif ($start === 'msgid_p' || $start === 'msgstr[') {
+                $id = null; // cancel msgid parsing if plural is used
             }
         }
         fclose($stream);

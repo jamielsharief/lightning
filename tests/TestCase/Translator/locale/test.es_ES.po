@@ -22,3 +22,11 @@ msgid "%d apple"
 msgid_plural "%d apples"
 msgstr[0] "Solo hay una manzana"
 msgstr[1] "%d manzanas"
+
+# String wrapping
+msgid ""
+"This is an example of a really long line of text,"
+" that will be translated into another language."
+msgstr ""
+"Este es un ejemplo de una línea de texto realmente larga,"
+" que será traducida a otro idioma."

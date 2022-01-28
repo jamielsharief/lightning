@@ -7,7 +7,7 @@ The translation component provides an object that can be passed around your appl
 Create the `Translator` object and add to your DI container and configure the object in your `Middleware` or `Controller`
 
 ```php
-$translator = new Translator(new PoMessageLoader('/var/www/resources/messages'),'en_US','default');
+$translator = new Translator(new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 'en_US', 'default');
 ```
 
 Usage
@@ -40,12 +40,20 @@ The `MessageLoader` object file naming is `domain.locale.extension` for example 
 
 ### PO Message Loader
 
-A simple `PO` file loader which only supports basic syntax `msgid`, `msgstr` and string wrapping. The message loader also supports `PSR-16` caching for parsing of files. This does not support pluralization, as this is designed to work with other message formatters which might have their own pluralization features such as ICU message syntax or our own `MessageFormatter`.
+A simple `PO` file loader which only supports basic syntax `msgid`, `msgstr` and string wrapping. This does not support pluralization, as this is designed to work with other message formatters which might have their own pluralization features such as ICU message syntax or our own `MessageFormatter`.
 
 ```php
 # Comments and empty lines are ignored.
 msgid "This is a translation test."
 msgstr "Esta es una prueba de traducción."
+
+# String wrapping
+msgid ""
+"This is an example of a really long line of text,"
+" that will be translated into another language."
+msgstr ""
+"Este es un ejemplo de una línea de texto realmente larga,"
+" que será traducida a otro idioma."
 ```
 
 ### PHP Message Loader

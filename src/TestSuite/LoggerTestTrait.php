@@ -68,7 +68,7 @@ trait LoggerTestTrait
     public function assertLogContains(string $string, string $level, bool $interpolated = true): void
     {
         $this->assertTrue(
-            $this->getLogger()->logContains($string, $level, $interpolated),
+            $this->getLogger()->hasMessage($string, $level, $interpolated),
             sprintf('Log messages for level `%s` do not contain `%s`', $level, $string)
         );
     }
@@ -84,7 +84,7 @@ trait LoggerTestTrait
     public function assertLogNotContains(string $string, string $level, bool $interpolated = true): void
     {
         $this->assertFalse(
-            $this->getLogger()->logContains($string, $level, $interpolated),
+            $this->getLogger()->hasMessage($string, $level, $interpolated),
             sprintf('Log messages for level `%s` contain `%s`', $level, $string)
         );
     }
@@ -100,7 +100,7 @@ trait LoggerTestTrait
     public function assertLogHas(string $message, string $level, bool $interpolated = true): void
     {
         $this->assertTrue(
-            $this->getLogger()->hasLogged($message, $level, $interpolated),
+            $this->getLogger()->hasMessage($message, $level, $interpolated),
             sprintf('Log messages for level `%s` does not have `%s`', $level, $message)
         );
     }
@@ -116,7 +116,7 @@ trait LoggerTestTrait
     public function assertLogDoesNotHave(string $message, string $level, bool $interpolated = true): void
     {
         $this->assertTrueFalse(
-            $this->getLogger()->hasLogged($message, $level, $interpolated),
+            $this->getLogger()->hasMessage($message, $level, $interpolated),
             sprintf('Log messages for level `%s` has `%s`', $level, $message)
         );
     }

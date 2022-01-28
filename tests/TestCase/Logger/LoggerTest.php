@@ -33,7 +33,7 @@ final class LoggerTest extends TestCase
         $logger = new Logger([$testLogger]);
 
         $logger->$level('testLog was run');
-        $this->assertTrue($testLogger->logContains('testLog was run', $level));
+        $this->assertTrue($testLogger->hasMessageThatContains('testLog was run', $level));
     }
 
     /**
@@ -47,6 +47,6 @@ final class LoggerTest extends TestCase
         $this->assertInstanceOf(Logger::class, $logger->pushLogger($testLogger));
 
         $logger->log(LogLevel::DEBUG, 'testLog was run');
-        $this->assertTrue($testLogger->logContains('testLog was run', LogLevel::DEBUG));
+        $this->assertTrue($testLogger->hasMessageThatContains('testLog was run', LogLevel::DEBUG));
     }
 }

@@ -164,11 +164,14 @@ It comes with two additional methods
 
 ```php
 // Checks an exact message is in the log
-$bool = $testLogger->hasLogged('Invoice #355 was printed', LogLevel::DEBUG);
+$bool = $testLogger->hasMessage('Invoice #355 was printed', LogLevel::DEBUG);
 // Checks the unrendered version
-$bool = $testLogger->hasLogged('Invoice #{number} was printed',LogLevel::DEBUG, false)
+$bool = $testLogger->hasMessage('Invoice #{number} was printed', LogLevel::DEBUG, false)
 // Check for a partial string in the log
-$bool = $testLogger->logContains('could not send email', LogLevel::ERROR);
+$bool = $testLogger->hasMessageThatContains('could not send email', LogLevel::ERROR);
+count($testLogger); // count the logged items
+// Check using regex
+$bool = $testLogger->hasMessageThatMatches('/could not send (sms|email)/', LogLevel::ERROR);
 count($testLogger); // count the logged items
 ```
 

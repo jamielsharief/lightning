@@ -22,7 +22,8 @@ use Psr\Log\InvalidArgumentException;
 /**
  * Test Logger
  *
- * @internal the PSR package does have its own test logger as well
+ * @internal The default for interpolated should be true since this is what is being rendered, wether in most cases there might be more
+ * complicated and lengthy data, it is irrelevant, disabling for those cases should be done manually.
  */
 class TestLogger implements Countable, LoggerInterface
 {
@@ -44,9 +45,7 @@ class TestLogger implements Countable, LoggerInterface
      *
      * @var array
      */
-    protected array $logged = [];
     protected array $messages = [];
-    protected array $interpolated = [];
 
     /**
     * Logs with an arbitrary level.
@@ -65,48 +64,69 @@ class TestLogger implements Countable, LoggerInterface
 
         $interpolated = $this->interpolate($message, $context);
 
-        $this->logged[] = [
+        $this->messages[] = [
             'level' => $level,
             'message' => $message,
             'context' => $context,
             'rendered' => $interpolated
         ];
-
-        $this->interpolated[$level][] = $interpolated;
-        $this->messages[$level][] = $message;
     }
 
     /**
      * Checks if a particular message was logged
      *
      * @param string $message
-     * @param string|null $level
+     * @param string $level
+     * @param boolean $interpolated
      * @return boolean
      */
-    public function hasLogged(string $message, string $level, bool $interpolated = true): bool
+    public function hasMessage(string $message, string $level, bool $interpolated = true): bool
     {
-        return $interpolated ?
-            in_array($message, $this->interpolated[$level] ?? []) : in_array($message, $this->messages[$level] ?? []);
+        $messages = $this->filter(function (array $logged) use ($message, $level, $interpolated) {
+            $loggedMessage = $interpolated ? $logged['rendered'] : $logged['message'];
+
+            return $loggedMessage === $message && $logged['level'] === $level;
+        });
+
+        return ! empty($messages);
     }
 
     /**
-     * Check that a log contains a string
+     * Check that a log message contains a string
      *
      * @param string $string
      * @param string $level
      * @param boolean $interpolated
      * @return boolean
      */
-    public function logContains(string $string, string $level, bool $interpolated = true): bool
+    public function hasMessageThatContains(string $string, string $level, bool $interpolated = true): bool
     {
-        foreach ($this->logged as $logged) {
+        $messages = $this->filter(function (array $logged) use ($string, $level, $interpolated) {
             $haystack = $interpolated ? $logged['rendered'] : $logged['message'];
-            if (strpos($haystack, $string) !== false && $logged['level'] === $level) {
-                return true;
-            }
-        }
 
-        return false;
+            return strpos($string, $haystack) !== false && $logged['level'] === $level;
+        });
+
+        return ! empty($messages);
+    }
+
+    /**
+     * Check that a log message matches a pattern
+     *
+     * @param string $pattern
+     * @param string $level
+     * @param boolean $interpolated
+     * @return boolean
+     */
+    public function hasMessageThatMatches(string $pattern, string $level, bool $interpolated = true): bool
+    {
+        $messages = $this->filter(function (array $logged) use ($pattern, $level, $interpolated) {
+            $haystack = $interpolated ? $logged['rendered'] : $logged['message'];
+
+            return (bool) preg_match($pattern, $haystack) && $logged['level'] === $level;
+        });
+
+        return ! empty($messages);
     }
 
     /**
@@ -114,7 +134,7 @@ class TestLogger implements Countable, LoggerInterface
      *
      * @return array
      */
-    public function getLogged(?string $level = null): array
+    public function getMessages(?string $level = null): array
     {
         if ($level) {
             return $this->filter(function (array $message) use ($level) {
@@ -122,7 +142,7 @@ class TestLogger implements Countable, LoggerInterface
             });
         }
 
-        return $this->logged;
+        return $this->messages;
     }
 
     /**
@@ -134,7 +154,7 @@ class TestLogger implements Countable, LoggerInterface
     public function filter(callable $callback): array
     {
         $messages = [];
-        foreach ($this->logged as $message) {
+        foreach ($this->messages as $message) {
             if ($callback($message) === true) {
                 $messages[] = $message;
             }
@@ -150,9 +170,7 @@ class TestLogger implements Countable, LoggerInterface
      */
     public function reset(): void
     {
-        $this->logged = [];
         $this->messages = [];
-        $this->interpolated = [];
     }
 
     /**
@@ -162,7 +180,7 @@ class TestLogger implements Countable, LoggerInterface
      */
     public function count(): int
     {
-        return count($this->logged);
+        return count($this->messages);
     }
 
     /**

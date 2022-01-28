@@ -29,7 +29,5 @@ final class PoMessageLoaderTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->loader->load('test', 'es_ES'));
-        $this->assertFileExists($this->tempPath . '/0cd5f955ec6bdefe873857ff44352f2a.cached');
-        $this->assertSame('1473906845a9e7ddcccdcbe3f2e9decfe7ae77b448350f868e6df71e86248ec9', hash_file('sha256', '/tmp/61f4129b1f65b/0cd5f955ec6bdefe873857ff44352f2a.cached'));
     }
 }

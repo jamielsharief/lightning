@@ -5,6 +5,7 @@ namespace Lightning\Test\Database;
 use PDO;
 use Exception;
 use PDOException;
+use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use Lightning\Cache\MemoryCache;
 use Lightning\Database\Statement;
@@ -95,8 +96,8 @@ final class ConnectionTest extends TestCase
         $this->assertTrue($connection->inTransaction());
         $this->assertFalse($connection->beginTransaction());
 
-        $this->assertLogDebugHas('BEGIN');
-        $this->assertLogCount(1);
+        $this->assertLogHasMessage('BEGIN', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(1);
 
         $connection->rollback();
     }
@@ -112,8 +113,8 @@ final class ConnectionTest extends TestCase
         $this->assertTrue($connection->commit());
         $this->assertFalse($connection->inTransaction());
 
-        $this->assertLogDebugHas('COMMIT');
-        $this->assertLogCount(2);
+        $this->assertLogHasMessage('COMMIT', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(2);
 
         $connection->rollback();
     }
@@ -127,8 +128,8 @@ final class ConnectionTest extends TestCase
 
         $this->assertTrue($connection->rollback());
 
-        $this->assertLogDebugHas('ROLLBACK');
-        $this->assertLogCount(2);
+        $this->assertLogHasMessage('ROLLBACK', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(2);
     }
 
     public function testExecute(): void
@@ -139,8 +140,8 @@ final class ConnectionTest extends TestCase
         $this->assertInstanceOf(Statement::class, $statement);
         $this->assertEquals('SELECT * FROM articles', $statement->getQueryString());
 
-        $this->assertLogDebugHas('SELECT * FROM articles');
-        $this->assertLogCount(1);
+        $this->assertLogHasMessage('SELECT * FROM articles', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(1);
     }
 
     public function testExecuteWithParams(): void
@@ -151,8 +152,8 @@ final class ConnectionTest extends TestCase
         $this->assertEquals('SELECT * FROM articles WHERE id = ?', $statement->getQueryString());
         $this->assertCount(1, $statement->fetchAll());
 
-        $this->assertLogDebugHas('SELECT * FROM articles WHERE id = 1000');
-        $this->assertLogCount(1);
+        $this->assertLogHasMessage('SELECT * FROM articles WHERE id = 1000', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(1);
     }
 
     public function testTransaction(): void
@@ -216,8 +217,8 @@ final class ConnectionTest extends TestCase
 
         $result = $connection->execute('SELECT * FROM articles');
 
-        $this->assertLogDebugHas('SELECT * FROM articles');
-        $this->assertLogCount(1);
+        $this->assertLogHasMessage('SELECT * FROM articles', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(1);
     }
 
     // public function testExecuteCache()

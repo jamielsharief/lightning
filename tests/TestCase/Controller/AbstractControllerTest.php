@@ -2,6 +2,7 @@
 
 namespace Lightning\Test\Controller;
 
+use Psr\Log\LogLevel;
 use Lightning\View\View;
 use Nyholm\Psr7\Response;
 use InvalidArgumentException;
@@ -315,8 +316,8 @@ final class AbstractControllerTest extends TestCase
         $controller->index();
 
         // check
-        $this->assertLogDebugContains('Lightning\Test\TestCase\Controller\TestApp\ArticlesController::index');
-        $this->assertLogCount(1);
+        $this->assertLogHasMessageThatContains('Lightning\Test\TestCase\Controller\TestApp\ArticlesController::index', LogLevel::DEBUG);
+        $this->assertLogMessagesCount(1);
     }
 
     public function testSetGetResponse(): void

@@ -3,6 +3,7 @@
 namespace Lightning\Test\Translator\MessageLoader;
 
 use PHPUnit\Framework\TestCase;
+use Lightning\Translator\Exception\MessageFileNotFound;
 use Lightning\Translator\MessageLoader\PoMessageLoader;
 
 final class PoMessageLoaderTest extends TestCase
@@ -29,5 +30,12 @@ final class PoMessageLoaderTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->loader->load('test', 'es_ES'));
+    }
+
+    public function testLoadException(): void
+    {
+        $this->expectException(MessageFileNotFound::class);
+        $this->expectExceptionMessage('Message file `foo.es_ES.po` not found');
+        $this->loader->load('foo', 'es_ES');
     }
 }

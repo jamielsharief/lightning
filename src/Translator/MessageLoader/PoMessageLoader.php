@@ -52,7 +52,7 @@ class PoMessageLoader implements MessageLoaderInterface
         $path = sprintf('%s/%s.%s.po', $this->path, $domain, $locale);
 
         if (! file_exists($path)) {
-            throw new MessageFileNotFound(sprintf('Message file `%s` not found', $path));
+            throw new MessageFileNotFound(sprintf('Message file `%s` not found', basename($path)));
         }
 
         return unserialize(file_get_contents($this->cache($path)));
@@ -66,7 +66,7 @@ class PoMessageLoader implements MessageLoaderInterface
      */
     private function cache(string $path): string
     {
-        $cachedPath = $this->cachedPath . '/' . md5($path) . '.cached';
+        $cachedPath = $this->cachedPath . '/' . md5($path);
 
         $isCached = file_exists($cachedPath) && filemtime($cachedPath) > filemtime($path);
         if (! $isCached && file_put_contents($cachedPath, serialize($this->parse($path))) === false) {

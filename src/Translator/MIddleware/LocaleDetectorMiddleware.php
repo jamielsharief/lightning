@@ -20,6 +20,9 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+/**
+ * LocaleDetectorMiddleware
+ */
 class LocaleDetectorMiddleware implements MiddlewareInterface
 {
     private string $defaultLocale;

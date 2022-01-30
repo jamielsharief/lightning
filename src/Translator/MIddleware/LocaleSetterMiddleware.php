@@ -20,6 +20,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Lightning\Translator\TranslatorInterface;
 
+/**
+ * LocaleSetterMiddleware
+ */
 class LocaleSetterMiddleware implements MiddlewareInterface
 {
     private TranslatorInterface $translator;

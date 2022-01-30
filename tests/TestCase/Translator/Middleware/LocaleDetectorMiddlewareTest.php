@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Lightning\TestSuite\TestRequestHandler;
 use Lightning\Translator\Middleware\LocaleDetectorMiddleware;
 
-final class TranslatorMiddlewareTest extends TestCase
+final class LocaleDetectorMiddlewareTest extends TestCase
 {
     public function testSetLocale(): void
     {

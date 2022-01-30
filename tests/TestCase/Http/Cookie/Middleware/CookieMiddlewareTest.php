@@ -19,7 +19,7 @@ final class CookieMiddlewareTest extends TestCase
         $request = new ServerRequest('GET', '/');
         $request = $request->withCookieParams(['foo' => 'bar']);
 
-        $middleware->process($request, new TestRequestHandler(new Response()));
+        $middleware->process($request, new TestRequestHandler($middleware, new Response()));
 
         $this->assertEquals('bar', $cookies->get('foo'));
     }
@@ -31,7 +31,7 @@ final class CookieMiddlewareTest extends TestCase
 
         $middleware = new CookieMiddleware($cookies);
 
-        $response = $middleware->process(new ServerRequest('GET', '/'), new TestRequestHandler(new Response()));
+        $response = $middleware->process(new ServerRequest('GET', '/'), new TestRequestHandler($middleware, new Response()));
 
         $this->assertEquals('foo=bar; path=/', $response->getHeaderLine('Set-Cookie'));
     }

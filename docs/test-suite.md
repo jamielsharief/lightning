@@ -218,9 +218,8 @@ The `TestRequestHandler` helps making it easy to test middleware in a consistent
 ```php
 public function testMiddleware(): void
 {
-    $fooMiddleware = new FooMiddleware();
-    $serverRequest = new ServerRequest('GET', '/');
-    $response = $middleware->process($serverRequest, new TestRequestHandler(new Response()));
+    $handler = new TestRequestHandler(new FooMiddleware(), new Response())
+    $response = $handler->dispatch( new ServerRequest('GET', '/'));
     // Do your checks
 }
 ```
@@ -228,8 +227,16 @@ public function testMiddleware(): void
 There is also a `beforeHandle` method which accepts a `callback`, here you can do prechecks
 
 ```php
-$handler = new TestRequestHandler(new Response())
+$handler = new TestRequestHandler(new FooMiddleware(), new Response())
 $handler->beforeHandle(function(ServerRequestInterface $request) use ($object){
     $this->assertTrue($object->wasCalled());
 });
+$handler->dispatch(new ServerRequest('GET', '/'));
+```
+
+You can also get the `ServerRequestInterface` object that was passed to the `handle` method, this is useful in situations where `Middleware` is modifying the request object.
+
+```php
+$handler->dispatch(new ServerRequest('GET', '/'));
+$this->assertEquals('bar',$handler->getRequest()->getAttribute('foo'));
 ```

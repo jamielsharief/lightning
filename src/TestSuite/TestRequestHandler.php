@@ -13,7 +13,9 @@
 
 namespace Lightning\TestSuite;
 
+use Laminas\Diactoros\Response;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -29,6 +31,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 class TestRequestHandler implements RequestHandlerInterface
 {
     private ResponseInterface $response;
+    private ?ServerRequestInterface $request = null;
+    private MiddlewareInterface $middleware;
 
     /**
      * @var callback
@@ -38,10 +42,12 @@ class TestRequestHandler implements RequestHandlerInterface
     /**
      * Constructor
      *
+     * @param MiddlewareInterface $middleware
      * @param ResponseInterface $response
      */
-    public function __construct(ResponseInterface $response)
+    public function __construct(MiddlewareInterface $middleware, ResponseInterface $response)
     {
+        $this->middleware = $middleware;
         $this->response = $response;
     }
 
@@ -59,6 +65,17 @@ class TestRequestHandler implements RequestHandlerInterface
     }
 
     /**
+     * Dispatches the request
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function dispatch(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->middleware->process($request, $this);
+    }
+
+    /**
      * Handles the ServerRequest and returns the response
      *
      * @param ServerRequestInterface $request
@@ -66,11 +83,23 @@ class TestRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $this->request = $request;
+
         $callback = $this->callback;
         if ($callback) {
             $callback($request);
         }
 
         return $this->response;
+    }
+
+    /**
+     * Gets the Server Request Object that was passed to handle method
+     *
+     * @return ServerRequestInterface|null
+     */
+    public function getRequest(): ?ServerRequestInterface
+    {
+        return $this->request;
     }
 }

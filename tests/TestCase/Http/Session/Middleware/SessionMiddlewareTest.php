@@ -16,13 +16,14 @@ final class SessionMiddlewareTest extends TestCase
     public function testStartAndStop(): void
     {
         $session = new PhpSession();
-        $requestHandler = new TestRequestHandler(new Response());
+        $middleware = new SessionMiddleware($session);
+        $handler = new TestRequestHandler($middleware, new Response());
 
-        $requestHandler->beforeHandle(function () use ($session) {
+        $handler->beforeHandle(function () use ($session) {
             $this->assertTrue($session->isStarted());
         });
 
-        $response = (new SessionMiddleware($session))->process(new ServerRequest('GET', '/'), $requestHandler);
+        $response = $handler->dispatch(new ServerRequest('GET', '/'));
 
         $this->assertFalse($session->isStarted());
     }
@@ -30,8 +31,11 @@ final class SessionMiddlewareTest extends TestCase
     public function testReadSessionFromCookie(): void
     {
         $session = new PhpSession();
+        $middleware = new SessionMiddleware($session);
+        $handler = new TestRequestHandler($middleware, new Response());
+
         $request = (new ServerRequest('GET', '/'))->withCookieParams(['id' => '123456789']);
-        $response = (new SessionMiddleware($session))->process($request, new TestRequestHandler(new Response()));
+        $response = $handler->dispatch($request);
 
         $this->assertEquals('123456789', $session->getId());
     }
@@ -39,22 +43,27 @@ final class SessionMiddlewareTest extends TestCase
     public function testAddCookie(): void
     {
         $session = new PhpSession();
+        $middleware = new SessionMiddleware($session);
+        $handler = new TestRequestHandler($middleware, new Response());
+
         $request = (new ServerRequest('GET', '/'))->withCookieParams(['id' => '123456789']);
-        $response = (new SessionMiddleware($session))->process($request, new TestRequestHandler(new Response()));
+        $response = $handler->dispatch($request);
         $this->assertEquals('id=123456789; max-age=900; path=/; samesite=Lax; httponly', $response->getHeaderLine('Set-Cookie'));
     }
 
     public function testDeleteCookie(): void
     {
         $session = new PhpSession();
-        $request = (new ServerRequest('GET', '/'))->withCookieParams(['id' => '123456789']);
-        $requestHandler = new TestRequestHandler(new Response());
+        $middleware = new SessionMiddleware($session);
+        $handler = new TestRequestHandler($middleware, new Response());
 
-        $requestHandler->beforeHandle(function () use ($session) {
+        $request = (new ServerRequest('GET', '/'))->withCookieParams(['id' => '123456789']);
+
+        $handler->beforeHandle(function () use ($session) {
             $session->destroy();
         });
 
-        $response = (new SessionMiddleware($session))->process($request, $requestHandler);
+        $response = $handler->dispatch($request);
         $this->assertEquals('id=deleted; max-age=-1; path=/; samesite=Lax; httponly', $response->getHeaderLine('Set-Cookie'));
     }
 }

@@ -19,31 +19,26 @@ use Psr\Http\Server\MiddlewareInterface;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Lightning\Translator\TranslatorInterface;
 
-class TranslatorMiddleware implements MiddlewareInterface
+class LocaleDetectorMiddleware implements MiddlewareInterface
 {
-    private TranslatorInterface $translator;
-
+    private string $defaultLocale;
     private array $locales = [];
 
     /**
      * Constructor
      *
-     * @param TranslatorInterface $translator
+     * @param string $defaultLocale
      * @param array $locales
      */
-    public function __construct(TranslatorInterface $translator, array $locales = [])
+    public function __construct(string $defaultLocale, array $locales = [])
     {
-        $this->translator = $translator;
+        $this->defaultLocale = $defaultLocale;
         $this->locales = $locales;
     }
 
     /**
-     * Processes the incoming request
-     *
-     * @internal This also checks for the `locale` attribute on the request, which can be parsed from the route URL. eg. /blog/en/something and
-     *           should only be used for available locales
+     * Detect the locale from the Request headers
      *
      * @see https://www.php.net/manual/en/locale.acceptfromhttp.php
      *
@@ -53,23 +48,12 @@ class TranslatorMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $defaultLocale = $this->translator->getLocale();
-        $locale = $request->getAttribute('locale') ?: Locale::acceptFromHttp($request->getHeaderLine('Accept-Language'));
+        $locale = Locale::acceptFromHttp($request->getHeaderLine('Accept-Language'));
 
-        // lookup
         if ($locale && $this->locales) {
             $locale = Locale::lookup($this->locales, $locale, false);
         }
 
-        if ($locale) {
-            $this->translator->setLocale($locale);
-        }
-
-        // Sets the final locale and language that will be used during this request
-        $request = $request
-            ->withAttribute('locale', $locale ?: $defaultLocale)
-            ->withAttribute('language', Locale::getPrimaryLanguage($locale ?: $defaultLocale));
-
-        return $handler->handle($request);
+        return $handler->handle($request->withAttribute('locale', $locale ?: $this->defaultLocale));
     }
 }

@@ -6,11 +6,11 @@ use Lightning\Http\Cookie\Cookies;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\PhpSession;
-use Lightning\Translation\TranslatorInterface;
+use Lightning\Translator\TranslatorInterface;
 use Lightning\Http\ExceptionHandler\ErrorRenderer;
 use Lightning\Http\Cookie\Middleware\CookieMiddleware;
 use Lightning\Http\Session\Middleware\SessionMiddleware;
-use Lightning\Translation\Middleware\TranslationMiddleware;
+use Lightning\Translator\Middleware\LocaleSetterMiddleware;
 use Lightning\Http\ExceptionHandler\ExceptionHandlerMiddleware;
 
 /**
@@ -28,5 +28,5 @@ return function (Router $router, ContainerInterface $container) {
     // );
     $router->middleware(new SessionMiddleware(new PhpSession()));
     $router->middleware(new CookieMiddleware($container->get(Cookies::class)));
-    //$router->middleware(new TranslationMiddleware($container->get(TranslatorInterface::class), ['en_GB']));
+    $router->middleware(new LocaleSetterMiddleware($container->get(TranslatorInterface::class)));
 };

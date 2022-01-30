@@ -62,7 +62,7 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
      TranslatorInterface::class => function (ContainerInterface $container) {
          $loader = new PhpMessageLoader(__DIR__ .'/../app/Locales');
 
-         return new Translator($loader, 'en_US', 'messages');
+         return new Translator($loader, 'en_US');
      },
      DataSourceInterface::class => DatabaseDataSource::class,
      ResponseFactoryInterface::class => Psr17Factory::class

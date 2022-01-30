@@ -67,17 +67,28 @@ return [
 ];
 ```
 
-## TranslationMiddleware
+## Translator Middlewares
 
-There is `TranslationMiddleware` which gets the `Accept-Language` from the request and configures the `Translator` object. You can also set the `locale` cookie and this will be used if found.
+## Locale Setter
+
+The `LocaleSetterMiddleware` quite simply sets the locale on the `Translator` using if the server request attribute `locale` is available. This
+allows you to use this routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe session.
 
 ```php
 $translator = $container->get(Translator::class);
-$middleware = new TranslationMiddleware($translator); 
+$middleware = new LocaleSetterMiddleware($translator); 
 ```
 
-If you want to restrict the locales that are available to the middleware
+## Locale Detector
+
+The `LocaleDetector` attempts to detect the locale from the request headers and will set the `locale` attribute on the `ServerRequestInterface` object.
 
 ```php
-$middleware = new TranslationMiddleware($translator, ['en_GB','nl_NL']); 
+$middleware = new LocaleDetectorMiddleware('en_US');  // provide a default locale
+```
+
+You can also supply a second argument of allowed locales
+
+```php
+$middleware = new LocaleDetectorMiddleware('en_US', ['en_US','en_GB','es_MX','es_ES']); 
 ```

@@ -19,6 +19,19 @@ final class TranslatorTest extends TestCase
         $this->assertEquals('Hello world!', $translator->translate('Hello world!'));
     }
 
+    public function testTranslateDoesNotExist(): void
+    {
+        $translator = new Translator(new PhpMessageLoader(__DIR__ . '/locale'), 'es_ES');
+
+        $this->assertEquals('<-o->', $translator->translate('<-o->'));
+    }
+
+    public function testTranslateNull(): void
+    {
+        $translator = new Translator(new PhpMessageLoader(__DIR__ . '/locale'), 'en_US');
+
+        $this->assertEquals('', $translator->translate(null));
+    }
     public function testTranslateLocale(): void
     {
         $translator = new Translator(new PhpMessageLoader(__DIR__ . '/locale'), 'es_ES');

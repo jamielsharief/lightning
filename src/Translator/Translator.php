@@ -35,12 +35,20 @@ class Translator implements TranslatorInterface
             throw new RuntimeException('Intl extension not installed');
         }
 
-        $this->loader = $loader;
-        $this->locale = $locale;
-        $this->defaultLocale = $locale;
+        $this->locale = $this->defaultLocale = $locale;
         $this->domain = $domain;
 
-        $this->loadMessages();
+        $this->setMessageLoader($loader);
+    }
+
+    /**
+     * Gets the message loader used by the translator
+     *
+     * @return MessageLoaderInterface
+     */
+    public function getMessageLoader(): MessageLoaderInterface
+    {
+        return $this->loader;
     }
 
     /**

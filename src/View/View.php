@@ -13,7 +13,7 @@
 
 namespace Lightning\View;
 
-use InvalidArgumentException;
+use BadMethodCallException;
 use Lightning\View\Exception\ViewException;
 
 class View
@@ -68,7 +68,7 @@ class View
             return $callback(...$arguments);
         }
 
-        throw new InvalidArgumentException(sprintf('Unkown method `%s`', $name));
+        throw new BadMethodCallException(sprintf('Unkown method `%s`', $name));
     }
 
     /**
@@ -82,7 +82,7 @@ class View
      */
     public function addExtension(ViewExtensionInterface $extension): self
     {
-        foreach ($extension->getMethods() as  $method) {
+        foreach ($extension->getMethods() as $method) {
             $this->extensionMethods[$method] = [$extension,$method];
         }
 
@@ -191,7 +191,7 @@ class View
     private function renderView(string $path, array $variables = []): string
     {
         if (! is_readable($path)) {
-            throw new ViewException(sprintf('`%s` not found', $path));
+            throw new ViewException(sprintf('File `%s` not found', ltrim(str_replace($this->viewPath, '', $path), '/')));
         }
 
         $output = $this->doRender($this->compiler->compile($path), $variables);

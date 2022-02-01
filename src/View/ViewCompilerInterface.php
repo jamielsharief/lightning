@@ -16,7 +16,7 @@ namespace Lightning\View;
  interface ViewCompilerInterface
  {
      /**
-      * Compiles a
+      * Compiles a View and returns the compiled filename
       *
       * @param string $path
       * @return string

@@ -43,11 +43,8 @@ class ViewCompiler implements ViewCompilerInterface
     {
         $compiledFilename = $this->cachedPath . '/' . md5($path) . '.php';
 
-        if (file_exists($compiledFilename) && filemtime($compiledFilename) > filemtime($path)) {
-            return $compiledFilename;
-        }
-
-        if (file_put_contents($compiledFilename, $this->compileView($path)) === false) {
+        $isCompiled = file_exists($compiledFilename) && filemtime($compiledFilename) > filemtime($path);
+        if (! $isCompiled && file_put_contents($compiledFilename, $this->compileView($path)) === false) {
             throw new ViewException('Error saving compiled view');
         }
 

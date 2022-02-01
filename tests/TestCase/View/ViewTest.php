@@ -50,7 +50,7 @@ final class ViewTest extends TestCase
         $path = sys_get_temp_dir() . '/' . uniqid();
         mkdir($path);
 
-        $compiler = new ViewCompiler(__DIR__ .'/views', $path);
+        $compiler = new ViewCompiler($path);
 
         return new View($compiler, __DIR__ .'/views');
     }

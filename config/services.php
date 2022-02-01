@@ -49,7 +49,7 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
      View::class => function (ContainerInterface $container) {
          $path = __DIR__ . '/../app/View';
 
-         return new ApplicationView(new ViewCompiler($path, __DIR__ . '/../tmp/cache'), $path);
+         return new ApplicationView(new ViewCompiler(__DIR__ . '/../tmp/cache'), $path);
      },
 
      PDO::class => function (ContainerInterface $container) {

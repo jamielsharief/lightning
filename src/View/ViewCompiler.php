@@ -17,18 +17,15 @@ use Lightning\View\Exception\ViewException;
 
 class ViewCompiler implements ViewCompilerInterface
 {
-    protected string $viewPath;
     protected string $cachedPath;
 
     /**
      * Constructor
      *
-     * @param string $viewPath
      * @param string $cachedPath
      */
-    public function __construct(string $viewPath, string $cachedPath)
+    public function __construct(string $cachedPath)
     {
-        $this->viewPath = $viewPath;
         $this->cachedPath = $cachedPath;
     }
 

@@ -45,13 +45,12 @@ class DateExtension implements ViewExtensionInterface
 
 final class ViewTest extends TestCase
 {
-    private string $path;
     private function createView(): View
     {
-        $this->path = sys_get_temp_dir() . '/' . uniqid();
-        mkdir($this->path);
+        $path = sys_get_temp_dir() . '/' . uniqid();
+        mkdir($path);
 
-        $compiler = new ViewCompiler(__DIR__ .'/views', $this->path);
+        $compiler = new ViewCompiler(__DIR__ .'/views', $path);
 
         return new View($compiler, __DIR__ .'/views');
     }

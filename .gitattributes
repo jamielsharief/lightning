@@ -10,13 +10,4 @@ phpunit.xml.dist export-ignore
 CHANGELOG.md export-ignore
 README.md export-ignore
 
-app export-ignore
-bin export-ignore
-config export-ignore
-database export-ignore
-docker export-ignore
-refactor export-ignore;
-logs export-ignore
-public export-ignore
 tests export-ignore
-tmp export-ignore

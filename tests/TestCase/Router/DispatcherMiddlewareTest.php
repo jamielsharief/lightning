@@ -57,23 +57,9 @@ final class DispatcherMiddlewareTest extends TestCase
         $route = new Route('get', '/articles/:id', [new PostsController(),'index']);
         $route->match('GET', '/articles/1234');
 
-        $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables());
+        $middleware = new DispatcherMiddleware($route->getCallable());
         $request = new ServerRequest('GET', '/not-relevant');
         $response = $middleware->process($request, new DummyRequestHandler($request));
         $this->assertEquals('ok', (string) $response->getBody());
-    }
-
-    public function testProcessAddedArgs(): void
-    {
-        $route = new Route('GET', '/articles/:id', function (ServerRequestInterface $request) {
-            $this->assertEquals('1234', $request->getAttribute('id'));
-
-            return new Response();
-        }, ['id' => '[0-9]+']);
-        $route->match('GET', '/articles/1234');
-
-        $middleware = new DispatcherMiddleware($route->getCallable(), $route->getVariables());
-        $request = new ServerRequest('GET', '/articles/1234');
-        $middleware->process($request, new DummyRequestHandler($request));
     }
 }

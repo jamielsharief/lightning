@@ -22,21 +22,17 @@ use Lightning\Router\Exception\RouterException;
 class DispatcherMiddleware implements MiddlewareInterface
 {
     private $callable;
-    private array $arguments;
-
     private ?ResponseInterface $response;
 
     /**
      * Constructor
      *
      * @param callable $callable
-     * @param array $arguments
      * @param ResponseInterface|null $response
      */
-    public function __construct(callable $callable, array $arguments, ?ResponseInterface $response = null)
+    public function __construct(callable $callable, ?ResponseInterface $response = null)
     {
         $this->callable = $callable;
-        $this->arguments = $arguments;
         $this->response = $response;
     }
 
@@ -49,22 +45,7 @@ class DispatcherMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        foreach ($this->arguments as $name => $value) {
-            $request = $request->withAttribute($name, $value);
-        }
-
-        return $this->dispatch($this->callable, $request);
-    }
-
-    /**
-     * Dispatch
-     *
-     * @param callable $callable
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
-    private function dispatch(callable $callable, ServerRequestInterface $request): ResponseInterface
-    {
+        $callable = $this->callable;
         $arguments = $this->response ? [$request, $this->response] : [$request];
 
         $response = $callable(...$arguments);

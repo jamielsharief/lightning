@@ -138,28 +138,39 @@ class Router implements RequestHandlerInterface, RoutesInterface
         }
 
         $route = $this->match($request);
-        $middleware = $route ? $route->getMiddlewares() : $this->middlewares; # Important: to add Router main middlewares
+
+        // Add vars to request
         $variables = $route ? $route->getVariables() : [];
-
-        if ($route) {
-            $callable = $this->autowire ? $this->createAutowireCallable($route->getCallable()) : $route->getCallable();
-        } else {
-            $message = 'The requested URL %s was not found';
-
-            $callable = function (ServerRequestInterface $request) use ($message) {
-                throw new NotFoundException(sprintf($message, $request->getRequestTarget()));
-            };
+        foreach ($variables as $name => $value) {
+            $request = $request->withAttribute($name, $value);
         }
 
-        array_push($middleware, new DispatcherMiddleware($callable, $variables, $this->emptyResponse));
-
-        $response = (new RequestHandler($middleware))->handle($request);
+        $response = (new RequestHandler($this->createMiddlewareStack($route, $this->createCallable($route))))->handle($request);
 
         if ($this->eventDispatcher) {
             $response = $this->eventDispatcher->dispatch(new AfterDispatchEvent($request, $response))->getResponse();
         }
 
         return $response;
+    }
+
+    private function createCallable(?Route $route): callable
+    {
+        if ($route) {
+            return $this->autowire ? $this->createAutowireCallable($route->getCallable()) : $route->getCallable();
+        }
+
+        return function (ServerRequestInterface $request) {
+            throw new NotFoundException(sprintf('The requested URL %s was not found', $request->getRequestTarget()));
+        };
+    }
+
+    private function createMiddlewareStack(?Route $route, callable $callable): array
+    {
+        $middleware = $route ? $route->getMiddlewares() : $this->middlewares; # Important: to add Router main middlewares
+        array_push($middleware, new DispatcherMiddleware($callable, $this->emptyResponse));
+
+        return $middleware;
     }
 
     /**

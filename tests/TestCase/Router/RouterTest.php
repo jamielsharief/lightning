@@ -92,6 +92,7 @@ class GreenAppleMiddleware extends BaseTestMiddleware
     }
 }
 
+// TODO: test attributes need to be added back
 final class RouterTest extends TestCase
 {
     public function methodProvider()
@@ -365,5 +366,18 @@ final class RouterTest extends TestCase
         $response = $router->dispatch(new ServerRequest('GET', '/articles'));
 
         $this->assertEquals('foo', (string) $response->getBody());
+    }
+
+    public function testVariablesWereAdded(): void
+    {
+        $router = new Router();
+        $router->get('/foo/:id', function (ServerRequestInterface $request) {
+            $this->assertEquals('1234', $request->getAttribute('id'));
+
+            return new Response();
+        }, ['id' => '[0-9]+']);
+
+        $response = $router->handle(new ServerRequest('GET', '/foo/1234'));
+        $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 }

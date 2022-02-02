@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /**
  * LightningPHP
- * Copyright 2021 Jamiel Sharief.
+ * Copyright 2021 - 2022 Jamiel Sharief.
  *
  * Licensed under The MIT License
  * The above copyright notice and this permission notice shall be included in all copies or substantial

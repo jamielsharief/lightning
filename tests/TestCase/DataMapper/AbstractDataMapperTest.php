@@ -333,6 +333,11 @@ final class AbstractDataMapperTest extends TestCase
         $this->assertInstanceOf(EntityInterface::class, $result[1]);
     }
 
+    public function testGetPrimaryKey(): void
+    {
+        $this->assertEquals(['id'], (new Article($this->storage))->getPrimaryKey());
+    }
+
     public function testGet(): void
     {
         $mapper = new Article($this->storage);

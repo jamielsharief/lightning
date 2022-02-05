@@ -48,6 +48,11 @@ abstract class AbstractDataMapper implements HookInterface
 
     protected DataSourceInterface $dataSource;
 
+    /**
+     * Primary Kaye
+     *
+     * @var array<string>|string
+     */
     protected $primaryKey = 'id';
     protected string $table = 'none';
     protected array $fields = [];
@@ -78,6 +83,16 @@ abstract class AbstractDataMapper implements HookInterface
      */
     protected function initialize(): void
     {
+    }
+
+    /**
+     * Gets primary key used by this Mapper
+     *
+     * @return array
+     */
+    public function getPrimaryKey(): array
+    {
+        return (array) $this->primaryKey;
     }
 
     /**
@@ -382,7 +397,7 @@ abstract class AbstractDataMapper implements HookInterface
             $entity->beforeUpdate();
         }
         $row = $this->mapEntityToData($entity);
-        $query = $this->createQueryObject($this->entityConditions($row));
+        $query = $this->createQueryObject($this->getConditionsFromState($row));
 
         $result = $this->dataSource->update($this->table, $query, $row) === 1;
 
@@ -489,7 +504,7 @@ abstract class AbstractDataMapper implements HookInterface
         }
 
         $row = $this->mapEntityToData($entity);
-        $query = $this->createQueryObject($this->entityConditions($row));
+        $query = $this->createQueryObject($this->getConditionsFromState($row));
 
         $result = $this->dataSource->delete($this->table, $query) === 1;
 
@@ -603,7 +618,7 @@ abstract class AbstractDataMapper implements HookInterface
      * @param array $state
      * @return array
      */
-    private function entityConditions(array $state): array
+    protected function getConditionsFromState(array $state): array
     {
         $conditions = [];
 

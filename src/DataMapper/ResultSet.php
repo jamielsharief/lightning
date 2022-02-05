@@ -26,16 +26,16 @@ use IteratorAggregate;
  */
 class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Stringable
 {
-    private array $data = [];
+    private array $rows = [];
 
     /**
      * Constructor
      *
      * @param array $data
      */
-    public function __construct(array $data)
+    final public function __construct(array $rows)
     {
-        $this->data = $data;
+        $this->rows = $rows;
     }
 
     /**
@@ -45,7 +45,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function count(): int
     {
-        return count($this->data);
+        return count($this->rows);
     }
 
     /**
@@ -56,7 +56,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
     public function first()
     {
         $result = null;
-        foreach ($this->data as $result) {
+        foreach ($this->rows as $result) {
             break;
         }
 
@@ -70,7 +70,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function isEmpty(): bool
     {
-        return empty($this->data);
+        return empty($this->rows);
     }
 
     /**
@@ -80,7 +80,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function toArray(): array
     {
-        return $this->data;
+        return $this->rows;
     }
 
     /**
@@ -110,7 +110,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->data);
+        return new ArrayIterator($this->rows);
     }
 
     /**
@@ -120,7 +120,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function jsonSerialize(): array
     {
-        return $this->data;
+        return $this->rows;
     }
 
     /**
@@ -131,7 +131,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->data);
+        return array_key_exists($key, $this->rows);
     }
 
     /**
@@ -142,7 +142,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function offsetGet($key)
     {
-        return $this->data[$key] ?? null;
+        return $this->rows[$key] ?? null;
     }
 
     /**
@@ -155,9 +155,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
     public function offsetSet($key, $value)
     {
         if (is_null($key)) {
-            $this->data[] = $value;
+            $this->rows[] = $value;
         } else {
-            $this->data[$key] = $value;
+            $this->rows[$key] = $value;
         }
     }
 
@@ -169,6 +169,72 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      */
     public function offsetUnset($key)
     {
-        unset($this->data[$key]);
+        unset($this->rows[$key]);
+    }
+
+    /**
+     * Applies the function to each row
+     *
+     * @param callable $callback
+     * @return self
+     */
+    public function map(callable $callback): self
+    {
+        $result = [];
+        foreach ($this->rows as $key => $value) {
+            $result[$key] = $callback($value, $key);
+        }
+
+        return new static($result);
+    }
+
+    /**
+     * Filters the result set
+     *
+     * @param callable $callback
+     * @return self
+     */
+    public function filter(callable $callback): self
+    {
+        $result = [];
+        foreach ($this->rows as $key => $value) {
+            if ($callback($value, $key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return new static($result);
+    }
+
+    /**
+     * Indexes the result
+     *
+     * @param callable $callback
+     * @return self
+     */
+    public function indexBy(callable $callback): self
+    {
+        $result = [];
+        foreach ($this->rows as $value) {
+            $result[$callback($value)] = $value;
+        }
+
+        return new static($result);
+    }
+
+    /**
+     * Groups by
+     *
+     * @param callable $callback
+     * @return self
+     */
+    public function groupBy(callable $callback): self
+    {
+        $result = [];
+        foreach ($this->rows as $value) {
+            $result[$callback($value)][] = $value;
+        }
+
+        return new static($result);
     }
 }

@@ -78,4 +78,103 @@ final class ResultSetTest extends TestCase
         $resultSet[] = 'foo';
         $this->assertEquals('foo', $resultSet->first());
     }
+
+    public function testMap(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived'],
+            ['id' => 300,'name' => 'Betty','status' => 'new'],
+        ]);
+
+        $resultSet = $resultSet->map(function ($row) {
+            $row['id'] += 1;
+
+            return $row;
+        });
+        $this->assertEquals([101,201,301], array_column($resultSet->toArray(), 'id'));
+    }
+
+    public function testFilter(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived'],
+            ['id' => 300,'name' => 'Betty','status' => 'new'],
+        ]);
+
+        $resultSet = $resultSet->filter(function ($row) {
+            return $row['status'] !== 'archived';
+        });
+        $this->assertEquals([100,300], array_column($resultSet->toArray(), 'id'));
+    }
+
+    public function testIndexBy(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived'],
+            ['id' => 300,'name' => 'Betty','status' => 'new'],
+        ]);
+
+        $resultSet = $resultSet->indexBy(function ($row) {
+            return $row['id'];
+        });
+        $expected = [
+            100 => [
+                'id' => 100,
+                'name' => 'Jon',
+                'status' => 'new'
+            ],
+            200 => [
+                'id' => 200,
+                'name' => 'Claire',
+                'status' => 'archived'
+            ],
+            300 => [
+                'id' => 300,
+                'name' => 'Betty',
+                'status' => 'new'
+            ]
+        ];
+
+        $this->assertEquals($expected, $resultSet->toArray());
+    }
+
+    public function testGroupBy(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived'],
+            ['id' => 300,'name' => 'Betty','status' => 'new'],
+        ]);
+
+        $resultSet = $resultSet->groupBy(function ($row) {
+            return $row['status'];
+        });
+
+        $expected = [
+            'new' => [
+                0 => [
+                    'id' => 100,
+                    'name' => 'Jon',
+                    'status' => 'new'
+                ],
+                1 => [
+                    'id' => 300,
+                    'name' => 'Betty',
+                    'status' => 'new'
+                ]
+            ],
+            'archived' => [
+                0 => [
+                    'id' => 200,
+                    'name' => 'Claire',
+                    'status' => 'archived'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $resultSet->toArray());
+    }
 }

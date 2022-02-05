@@ -73,8 +73,7 @@ $mapper->updateAll($query, ['status'=> 'approved']);
 
 ## ResultSet
 
-During the find query the results from the database query are in the `ResultSet` object, and this is passed around to `Events` and `Hooks` and make it easy
-for modification.
+During the find query the results from the database query are in the `ResultSet` object, and this is passed around to `Events` and `Hooks` and make it easy for modification.
 
 ```php
 function addFoo(ResultSet $resultSet) { 
@@ -91,6 +90,41 @@ $resultSet->isEmpty();
 $row = $resultSet->first();
 $array = $resultSet->toArray();
 $string = $resultSet->toString();
+```
+
+There are also collection like methods to help manipulate collections of records.
+
+### Map
+
+```php
+$mappedResultSet = $resultSet->map(function($row){
+    $row['status'] = 'active';
+    return $row;
+});
+```
+
+### Filter
+
+```php
+$filteredResultSet = $resultSet->filter(function($row){
+    return $row['status'] === 'active';
+});
+```
+
+### IndexBy
+
+```php
+$indexedResultSet = $resultSet->indexBy(function($row){
+    return $row['id'];
+});
+```
+
+### GroupBy
+
+```php
+$groupedResultSet = $resultSet->groupBy(function($row){
+    return $row['status'];
+});
 ```
 
 ## Hooks

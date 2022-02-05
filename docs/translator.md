@@ -1,6 +1,6 @@
-# Translation
+# Translator
 
-The translation component provides an object that can be passed around your application to translate messages into different languages.
+The `Translator` component provides an object that can be passed around your application to translate messages into different languages.
 
 ## Usage
 
@@ -72,7 +72,7 @@ return [
 ## Locale Setter
 
 The `LocaleSetterMiddleware` quite simply sets the locale on the `Translator` using if the server request attribute `locale` is available. This
-allows you to use this routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe session.
+allows you to use this when routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe the session.
 
 ```php
 $translator = $container->get(Translator::class);

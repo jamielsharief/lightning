@@ -26,7 +26,7 @@ class ArticleMapper extends AbstractDataMapper
     protected string $table = 'articles';
 }
 
-final class RepositoryTest extends TestCase
+final class AbstractRepositoryTest extends TestCase
 {
     protected PDO $pdo;
     protected FixtureManager $fixtureManager;

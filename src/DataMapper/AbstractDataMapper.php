@@ -14,13 +14,11 @@
 namespace Lightning\DataMapper;
 
 use ReflectionClass;
-use Lightning\Query\Query;
 use BadMethodCallException;
 use Lightning\Entity\Entity;
 use InvalidArgumentException;
 use Lightning\Hook\HookTrait;
 use Lightning\Hook\HookInterface;
-use Lightning\Collection\Collection;
 use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\Event\AfterFindEvent;
 use Lightning\DataMapper\Event\AfterSaveEvent;

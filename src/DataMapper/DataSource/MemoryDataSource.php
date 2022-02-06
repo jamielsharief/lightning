@@ -82,8 +82,7 @@ class MemoryDataSource implements DataSourceInterface
         $criteria = $query->getCriteria();
         $options = $query->getOptions();
 
-        $limit = $options['limit'] ?? null;
-        $offset = $options['offset'] ?? 0;
+        $options += ['limit' => null,'offset' => 0];
 
         $data = $this->data[$collection] ?? [];
 
@@ -97,7 +96,9 @@ class MemoryDataSource implements DataSourceInterface
         $i = 0;
         $found = 0;
         foreach ($data as $id => $row) {
-            if ($i >= $offset && $criteria->match($row)) {
+            if ($i >= $options['offset'] && $criteria->match($row)) {
+                $row = empty($options['fields']) ? $row : array_intersect_key($row, array_flip($options['fields']));
+
                 if ($preserveKeys) {
                     $result[$id] = $row;
                 } else {
@@ -106,7 +107,7 @@ class MemoryDataSource implements DataSourceInterface
 
                 $found++;
             }
-            if ($limit && $found === $limit) {
+            if ($options['limit'] && $found === $options['limit']) {
                 break;
             }
             $i++;

@@ -349,6 +349,24 @@ final class AbstractDataMapperTest extends TestCase
         $this->assertSame('Article #1', $article->getTitle());
     }
 
+    /**
+     * Test that only selected fields are used
+     *
+     * @return void
+     */
+    public function testGetFields(): void
+    {
+        $mapper = new Article($this->storage);
+        $mapper->setProperty('fields', [
+            'id', 'title','body','author_id'
+        ]);
+        /** @var ArticleEntity $article */
+        $article = $mapper->getBy(['id' => 1000]);
+
+        $this->assertNull($article->toArray()['created_at']);
+        $this->assertNull($article->toArray()['updated_at']);
+    }
+
     public function testGetNotFound(): void
     {
         $mapper = new Article($this->storage);

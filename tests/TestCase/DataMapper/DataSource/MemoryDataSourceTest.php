@@ -51,6 +51,19 @@ final class MemoryDataSourceTest extends TestCase
         $this->assertCount(2, $ds->read('test', new QueryObject(['id >' => 1000])));
     }
 
+    public function testReadFields(): void
+    {
+        $ds = new MemoryDataSource([
+            'test' => $this->sampleData
+        ]);
+
+        $result = $ds->read('test', new QueryObject(['id' => 1000]));
+        $this->assertEquals(['id','name'], array_keys($result->first()));
+
+        $result = $ds->read('test', new QueryObject(['id' => 1000], ['fields' => ['name']]));
+        $this->assertEquals(['name'], array_keys($result->first()));
+    }
+
     public function testReadOrder(): void
     {
         $ds = new MemoryDataSource([

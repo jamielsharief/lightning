@@ -55,6 +55,12 @@ abstract class AbstractDataMapper implements HookInterface
      */
     protected $primaryKey = 'id';
     protected string $table = 'none';
+
+    /**
+     * The default fields to select, if this is empty then a wildcard will be used
+     *
+     * @var array
+     */
     protected array $fields = [];
 
     /**
@@ -354,6 +360,10 @@ abstract class AbstractDataMapper implements HookInterface
         $this->dispatchEvent(new BeforeFindEvent($this, $query));
         if (! $this->triggerHook('beforeFind', [$query])) {
             return new ResultSet([]);
+        }
+
+        if ($this->fields && ! $query->getOption('fields')) {
+            $query->setOption('fields', $this->fields);
         }
 
         $resultSet = $this->dataSource->read($this->table, $query);

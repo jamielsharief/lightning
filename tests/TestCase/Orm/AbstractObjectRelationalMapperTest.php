@@ -246,7 +246,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals(0, $this->storage->count('articles', $query));
     }
 
-    public function testHasManyFoo(): void
+    public function testHasMany(): void
     {
         $this->storage->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 

@@ -34,7 +34,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
       *
       * @example
       *  'profile' => [
-      *       'className' => Profile::class
+      *       'class' => Profile::class
       *       'foreignKey' => 'user_id', // in other table
       *       'dependent' => false
       *   ]
@@ -46,7 +46,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     /**
      * @example
      *   'user' => [
-     *       'className' => User::class
+     *       'class' => User::class
      *       'foreignKey' => 'user_id' // in this table
      *   ]
      *
@@ -59,7 +59,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      * @example
      *
      *  'comments' => [
-     *      'className' => User::class
+     *      'class' => User::class
      *      'foreignKey' => 'user_id', // in other table,
      *      'dependent' => false
      *  ]
@@ -72,7 +72,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      * @example
      *
      *  'tags' => [
-     *      'className' => User::class
+     *      'class' => User::class
      *      'table' => 'tags_users',
      *      'foreignKey' => 'user_id',
      *      'localKey' => 'tag_id',
@@ -138,16 +138,31 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     {
         foreach ($this->associations as $assoc) {
             foreach ($this->$assoc as $property => &$config) {
+                $config += [
+                    'foreignKey' => null,
+                    'class' => null,
+                    'dependent' => false,
+                    'alias' => null,
+                    'fields' => [],
+                    'conditions' => [],
+                    'association' => $assoc
+                ];
+
+                if ($assoc === 'belongsTo') {
+                    unset($config['dependent']);
+                }
+
                 if (empty($config['foreignKey'])) {
                     throw new LogicException(sprintf('%s `%s` is missing foreignKey', $property, $assoc));
                 }
-                if (empty($config['className'])) {
+
+                if (empty($config['class'])) {
                     throw new LogicException(sprintf('%s `%s` is missing class', $property, $assoc));
                 }
 
                 // TODO:
                 if (empty($config['alias'])) {
-                    $config['alias'] = (new ReflectionClass($config['className']))->getShortName();
+                    $config['alias'] = (new ReflectionClass($config['class']))->getShortName();
                 }
 
                 if ($assoc === 'hasAndBelongsToMany') {
@@ -158,7 +173,6 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                         throw new LogicException(sprintf('hasAndBelongsToMany `%s` is missing localKey', $property));
                     }
                 }
-                $config['association'] = $assoc;
             }
         }
     }
@@ -429,7 +443,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
                 // TODO: This needs to be managed to prevent recursion
                 if (! isset($this->{$config['alias']})) {
-                    $this->{$config['alias']} = new $config['className']($this->dataSource);
+                    $this->{$config['alias']} = new $config['class']($this->dataSource);
                 }
             }
         }
@@ -459,7 +473,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             foreach ($this->$assoc as $config) {
                 $alias = $config['alias'];
                 if (! empty($config['dependent'])) {
-                    $this->loadMapper($config['className'], $config['alias']);
+                    $this->loadMapper($config['class'], $config['alias']);
                     foreach ($this->$alias->findAllBy([$config['foreignKey'] => $id]) as $entity) {
                         $this->$alias->delete($entity);
                     }

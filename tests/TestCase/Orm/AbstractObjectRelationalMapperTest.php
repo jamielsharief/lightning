@@ -31,7 +31,7 @@ class Article extends AbstractObjectRelationalMapper
 
     protected array $belongsTo = [
         'author' => [
-            'className' => Author::class,
+            'class' => Author::class,
             'foreignKey' => 'author_id'
         ]
     ];
@@ -47,7 +47,7 @@ class Author extends AbstractObjectRelationalMapper
 
     protected array $hasMany = [
         'articles' => [
-            'className' => Article::class,
+            'class' => Article::class,
             'foreignKey' => 'author_id', // in other table,
             'dependent' => true
         ]
@@ -65,7 +65,7 @@ class Profile extends AbstractObjectRelationalMapper
 
     protected array $belongsTo = [
         'user' => [
-            'className' => User::class,
+            'class' => User::class,
             'foreignKey' => 'user_id'
         ]
     ];
@@ -77,7 +77,7 @@ class User extends AbstractObjectRelationalMapper
 
     protected array $hasOne = [
         'profile' => [
-            'className' => Profile::class,
+            'class' => Profile::class,
             'foreignKey' => 'user_id', // other table
             'dependent' => true
         ]
@@ -100,7 +100,7 @@ class Post extends AbstractObjectRelationalMapper
 
     protected array $hasAndBelongsToMany = [
         'tags' => [
-            'className' => Tag::class,
+            'class' => Tag::class,
             'table' => 'posts_tags',
             'foreignKey' => 'post_id',
             'localKey' => 'tag_id',

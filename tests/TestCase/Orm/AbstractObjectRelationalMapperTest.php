@@ -3,7 +3,6 @@
 namespace Lightning\Test\Repository;
 
 use PDO;
-use Lightning\Orm\AbstractOrm;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
@@ -17,9 +16,10 @@ use Lightning\Test\Fixture\AuthorsFixture;
 use Lightning\Test\Fixture\ArticlesFixture;
 use Lightning\Test\Fixture\ProfilesFixture;
 use Lightning\Test\Fixture\PostsTagsFixture;
+use Lightning\Orm\AbstractObjectRelationalMapper;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
 
-class Article extends AbstractOrm
+class Article extends AbstractObjectRelationalMapper
 {
     protected $primaryKey = 'id';
 
@@ -37,9 +37,13 @@ class Article extends AbstractOrm
     ];
 }
 
-class Author extends AbstractOrm
+class Author extends AbstractObjectRelationalMapper
 {
     protected string $table = 'authors';
+
+    protected array $fields = [
+        'id', 'name', 'created_at','updated_at'
+    ];
 
     protected array $hasMany = [
         'articles' => [
@@ -55,7 +59,7 @@ class Author extends AbstractOrm
     }
 }
 
-class Profile extends AbstractOrm
+class Profile extends AbstractObjectRelationalMapper
 {
     protected string $table = 'profiles';
 
@@ -67,7 +71,7 @@ class Profile extends AbstractOrm
     ];
 }
 
-class User extends AbstractOrm
+class User extends AbstractObjectRelationalMapper
 {
     protected string $table = 'users';
 
@@ -85,12 +89,12 @@ class User extends AbstractOrm
     }
 }
 
-class Tag extends AbstractOrm
+class Tag extends AbstractObjectRelationalMapper
 {
     protected string $table = 'tags';
 }
 
-class Post extends AbstractOrm
+class Post extends AbstractObjectRelationalMapper
 {
     protected string $table = 'posts';
 
@@ -109,7 +113,7 @@ class Post extends AbstractOrm
     }
 }
 
-final class AbstractOrmTest extends TestCase
+final class AbstractObjectRelationalMapperTest extends TestCase
 {
     protected PDO $pdo;
     protected FixtureManager $fixtureManager;
@@ -242,14 +246,9 @@ final class AbstractOrmTest extends TestCase
         $this->assertEquals(0, $this->storage->count('articles', $query));
     }
 
-    public function testHasMany(): void
+    public function testHasManyFoo(): void
     {
-
-        // Create extra
-        $article = new Article($this->storage);
-        $record = $article->getBy(['id' => 1002]);
-        $record->author_id = 2000;
-        $article->save($record);
+        $this->storage->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
         $author = new Author($this->storage);
 

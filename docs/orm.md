@@ -1,15 +1,37 @@
 # ORM (Object Relational Mapper)
 
-The Object Relational Mapper extends the `DataMapper` to work with related data. No magic is used.
+The Object Relational Mapper extends the `DataMapper` to work with related data, this provides `hasOne`, `hasMany` and `hasAndBelongsToMany` relationships with the `belongsTo` which is for the other side.
 
 
-
+Lets create an `Author` model which has many `Articles`.
 
 ```php
-class Article extends AbstractOrm
+class Author extends AbstractObjectRelationalMapper
 {
     protected $primaryKey = 'id';
 
+    protected string $table = 'authors';
+
+    protected array $fields = [
+        'id', 'name', 'created_at','updated_at'
+    ];
+
+    protected array $hasMany = [
+        'articles' => [
+            'className' => Article::class,
+            'foreignKey' => 'author_id', // in other table,
+            'dependent' => true
+        ]
+    ];
+}
+
+```
+
+Now define the `Article` class
+
+```php
+class Article extends AbstractObjectRelationalMapper
+{
     protected string $table = 'articles';
 
     protected array $fields = [
@@ -23,23 +45,21 @@ class Article extends AbstractOrm
         ]
     ];
 }
+```
 
-
-class Author extends AbstractOrm
-{
-    protected string $table = 'authors';
-
-    protected array $hasMany = [
-        'articles' => [
-            'className' => Article::class,
-            'foreignKey' => 'author_id', // in other table,
-            'dependent' => true
-        ]
-    ];
-}
-
+```php
 $result = $article->find();
-/*
+```
+
+This will run the following 2 queries, no matter how many records you are retriving
+
+```sql
+SELECT authors.id, authors.name, authors.created_at, authors.updated_at FROM authors LIMIT 1
+SELECT articles.id, articles.title, articles.body, articles.author_id, articles.created_at, articles.updated_at FROM articles WHERE articles.author_id IN ( 2000 )
+```
+
+And the output is 
+```php
 ^ array:7 [
   "id" => 1000
   "title" => "Article #1"
@@ -54,7 +74,6 @@ $result = $article->find();
     "updated_at" => "2021-10-03 14:02:00"
   ]
 ]
-*/
 ```
 
 ## Resources

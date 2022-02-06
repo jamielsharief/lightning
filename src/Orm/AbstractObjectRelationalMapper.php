@@ -27,7 +27,7 @@ use Lightning\DataMapper\DataSourceInterface;
  * @internal Joins are not used since all queries should go through hooks and events, using joins would escape these and when going deep you will
  * have to do additional querieis anyway. Also by not using joins then not tying datasource to only relational databases.
  */
-abstract class AbstractOrm extends AbstractDataMapper
+abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 {
     /**
       * This also assumes $this->profile is the Profile model injected during construction
@@ -457,15 +457,20 @@ abstract class AbstractOrm extends AbstractDataMapper
         // User has one profile, user_id in other table
         foreach (['hasOne','hasMany'] as $assoc) {
             foreach ($this->$assoc as $config) {
-                $mapper = $this->loadMapper($config['className'], $config['alias']);
-                foreach ($mapper->findAllBy([$config['foreignKey'] => $id]) as $entity) {
-                    $mapper->delete($entity);
+                $alias = $config['alias'];
+                if (! empty($config['dependent'])) {
+                    $this->loadMapper($config['className'], $config['alias']);
+                    foreach ($this->$alias->findAllBy([$config['foreignKey'] => $id]) as $entity) {
+                        $this->$alias->delete($entity);
+                    }
                 }
             }
         }
 
         foreach ($this->hasAndBelongsToMany as $config) {
-            $this->dataSource->delete($config['table'], new QueryObject([$config['foreignKey'] => $id]));
+            if (! empty($config['dependent'])) {
+                $this->dataSource->delete($config['table'], new QueryObject([$config['foreignKey'] => $id]));
+            }
         }
     }
 }

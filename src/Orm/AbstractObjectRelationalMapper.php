@@ -145,7 +145,8 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                     'alias' => null,
                     'fields' => [],
                     'conditions' => [],
-                    'association' => $assoc
+                    'association' => $assoc,
+                    'order' => null
                 ];
 
                 if ($assoc === 'belongsTo') {
@@ -229,7 +230,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         foreach ($associations as $property => $config) {
             $ids = $load[$property];
 
-            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy([$this->primaryKey => $ids]));
+            $config['conditions'][$this->primaryKey] = $ids;
+            $options = ['fields' => $config['fields'],'order' => $config['order']];
+
+            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
+
             $records[$property] = $relatedRecord->indexBy(function ($entity) {
                 return $entity->id;
             });
@@ -279,7 +284,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         foreach ($associations as $property => $config) {
             $ids = $load[$property];
             $foreignKey = $config['foreignKey'];
-            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy([$foreignKey => $ids]));
+
+            $config['conditions'][$foreignKey] = $ids;
+            $options = ['fields' => $config['fields'],'order' => $config['order']];
+
+            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
             $records[$property] = $relatedRecord->indexBy(function ($entity) use ($foreignKey) {
                 return $entity->$foreignKey;
             });
@@ -332,7 +341,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         foreach ($associations as $property => $config) {
             $ids = $load[$property];
             $foreignKey = $config['foreignKey'];
-            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy([$foreignKey => $ids]));
+
+            $config['conditions'][$foreignKey] = $ids;
+            $options = ['fields' => $config['fields'],'order' => $config['order']];
+
+            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
 
             $records[$property] = $relatedRecords->groupBy(function ($entity) use ($foreignKey) {
                 return $entity->$foreignKey;
@@ -398,7 +411,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             }
 
             $primaryKey = $this->{$config['alias']}->getPrimaryKey()[0];
-            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy([$primaryKey => $ids]));
+
+            $config['conditions'][$primaryKey] = $ids;
+            $options = ['fields' => $config['fields'],'order' => $config['order']];
+
+            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
 
             $records[$property] = $relatedRecords->indexBy(function ($entity) use ($primaryKey, $recordMap) {
                 return $entity->$primaryKey;

@@ -94,7 +94,7 @@ class DatabaseDataSource implements DataSourceInterface
         $options = $query->getOptions();
 
         $builder = $this->builder
-            ->select($options['fields'] ?? $defaultFields ?? ['*'])
+            ->select(empty($options['fields']) ? ['*'] : $options['fields'])
             ->from($table);
         if ($criteria) {
             $builder->where($criteria);

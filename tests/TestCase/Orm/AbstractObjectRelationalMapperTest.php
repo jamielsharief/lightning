@@ -234,18 +234,6 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals(0, $this->storage->count('profiles', $query));
     }
 
-    public function testHasManyDependent(): void
-    {
-        $author = new Author($this->storage);
-        $author->setDependent(true);
-
-        $query = new QueryObject(['author_id' => 2000]);
-
-        $this->assertEquals(1, $this->storage->count('articles', $query));
-        $this->assertEquals(1, $author ->delete($author->get(new QueryObject(['id' => 2000]))));
-        $this->assertEquals(0, $this->storage->count('articles', $query));
-    }
-
     public function testHasMany(): void
     {
         $this->storage->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
@@ -280,6 +268,18 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         ];
 
         $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testHasManyDependent(): void
+    {
+        $author = new Author($this->storage);
+        $author->setDependent(true);
+
+        $query = new QueryObject(['author_id' => 2000]);
+
+        $this->assertEquals(1, $this->storage->count('articles', $query));
+        $this->assertEquals(1, $author ->delete($author->get(new QueryObject(['id' => 2000]))));
+        $this->assertEquals(0, $this->storage->count('articles', $query));
     }
 
     public function testHasManyNotFound(): void

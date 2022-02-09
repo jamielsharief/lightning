@@ -35,7 +35,7 @@ class TestRequestHandler implements RequestHandlerInterface
     private MiddlewareInterface $middleware;
 
     /**
-     * @var callback
+     * @var callable|null
      */
     private $callback = null;
 

@@ -131,7 +131,7 @@ class DateTimeFormatter
     /**
      * Factory method
      *
-     * @param DateTimeInterface|string|int $datetime
+     * @param DateTimeInterface|string|int|null $datetime
      * @return DateTime
      */
     private function createDateTime($datetime): DateTime

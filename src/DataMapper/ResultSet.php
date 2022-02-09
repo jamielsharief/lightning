@@ -31,7 +31,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
     /**
      * Constructor
      *
-     * @param array $data
+     * @param array $rows
      */
     final public function __construct(array $rows)
     {

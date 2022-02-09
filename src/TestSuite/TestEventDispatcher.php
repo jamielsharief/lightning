@@ -34,7 +34,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      * Dispatches an Event
      *
      * @param object $event
-     * @return void
+     * @return object
      */
     public function dispatch(object $event)
     {

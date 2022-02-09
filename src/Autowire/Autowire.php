@@ -135,7 +135,7 @@ class Autowire
     protected function resolveParameter(ReflectionParameter $parameter, array $vars = [])
     {
 
-        /** @var \ReflectionNamedType $parameterType */
+        /** @var \ReflectionNamedType|\ReflectionUnionType|null $parameterType */
         $parameterType = $parameter->getType();
 
         if (! $parameterType) {

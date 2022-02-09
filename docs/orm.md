@@ -2,6 +2,7 @@
 
 The Object Relational Mapper extends the `DataMapper` to work with related data, this provides `hasOne`, `hasMany` and `hasAndBelongsToMany` relationships with the `belongsTo` which is for the other side.
 
+## Usage
 
 Lets create an `Author` model which has many `Articles`.
 
@@ -48,7 +49,7 @@ class Article extends AbstractObjectRelationalMapper
 ```
 
 ```php
-$result = $article->find();
+$result = $article->findBy(['id'=>1000], ['with'=> [Author::class]]);
 ```
 
 This will run the following 2 queries, no matter how many records you are retriving
@@ -75,6 +76,34 @@ And the output is
   ]
 ]
 ```
+
+## MapperManager
+
+The DataMapper manager is responsible for managing the mapper instances and creating them when needed, ensuring that there is only one instance ever created.
+
+To create the Manager in your DI container
+
+```php
+$manager = new MapperManager($dataSource);
+```
+
+If you are adding additional depenendices to the constructor or using a different datasource with a particular mapper, then you will need to either configure how the `DataMapper` is created or add an already created one.
+
+To add an already created one
+
+```php
+$manager->add(new ArticleMapper(new MemoryDataSource()));
+```
+
+To create one when it is needed aka lazy load, you can use a factory callable.
+
+```php
+$manager->configure(ArticleMapper::class, function(DataSourceInterface $dataSource, MapperManager $manager){
+    return new ArticleMapper($dataSource, $manager, new SomeDependency());
+});
+```
+
+
 
 ## Resources
 

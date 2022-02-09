@@ -14,7 +14,6 @@
 namespace Lightning\Orm;
 
 use LogicException;
-use ReflectionClass;
 use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
@@ -29,6 +28,8 @@ use Lightning\DataMapper\DataSourceInterface;
  */
 abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 {
+    protected MapperManager $mapperManager;
+
     /**
       * This also assumes $this->profile is the Profile model injected during construction
       *
@@ -90,10 +91,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      * @param DataSourceInterface $dataSource
      */
-    public function __construct(DataSourceInterface $dataSource)
+    public function __construct(DataSourceInterface $dataSource, MapperManager $mapperManager)
     {
-        parent::__construct($dataSource);
+        $this->mapperManager = $mapperManager;
 
+        parent::__construct($dataSource);
         $this->checkAssociationDefinitions();
     }
 
@@ -161,10 +163,10 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                     throw new LogicException(sprintf('%s `%s` is missing class', $property, $assoc));
                 }
 
-                // TODO:
-                if (empty($config['alias'])) {
-                    $config['alias'] = (new ReflectionClass($config['class']))->getShortName();
-                }
+                // // TODO:
+                // if (empty($config['alias'])) {
+                //     $config['alias'] = (new ReflectionClass($config['class']))->getShortName();
+                // }
 
                 if ($assoc === 'hasAndBelongsToMany') {
                     if (empty($config['table'])) {
@@ -233,7 +235,9 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             $config['conditions'][$this->primaryKey] = $ids;
             $options = ['fields' => $config['fields'],'order' => $config['order']];
 
-            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
+            $relatedRecord = new ResultSet($this->mapperManager->get($config['class'])
+                ->findAllBy($config['conditions'], $options)
+            );
 
             $records[$property] = $relatedRecord->indexBy(function ($entity) {
                 return $entity->id;
@@ -243,15 +247,36 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
         // Add to records
         foreach ($resultSet as $row) {
-            $id = $row[$foreignKey];
             foreach ($associations as $property => $config) {
-                $foreignKey = $config['foreignKey'];
+                $id = $row[$config['foreignKey']];
                 $hasMatch = $id && isset($records[$property][$id]);
                 $row[$property] = $hasMatch ? $records[$property][$id] : null;
             }
         }
 
         unset($records);
+    }
+
+    /**
+     * Extracts the ID using the primary key (does not work for belongsTo since that uses foreignKey)
+     *
+     * @param ResultSet $resultSet
+     * @param array $associations
+     * @return array
+     */
+    private function extractIds(ResultSet $resultSet, array $associations): array
+    {
+        $load = array_fill_keys(array_keys($associations), []);
+
+        // Fetch IDS
+        foreach ($resultSet as $row) {
+            $id = $row[$this->primaryKey];
+            foreach ($associations as $property => $config) {
+                $load[$property][] = $id;
+            }
+        }
+
+        return $load;
     }
 
     /**
@@ -269,15 +294,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             return;
         }
 
-        $load = array_fill_keys(array_keys($associations), []);
-
-        // Fetch IDS
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $load[$property][] = $id;
-            }
-        }
+        $load = $this->extractIds($resultSet, $associations);
 
         // Load Records
         $records = array_fill_keys(array_keys($associations), []);
@@ -288,7 +305,10 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             $config['conditions'][$foreignKey] = $ids;
             $options = ['fields' => $config['fields'],'order' => $config['order']];
 
-            $relatedRecord = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
+            $relatedRecord = new ResultSet($this->mapperManager->get($config['class'])
+                ->findAllBy($config['conditions'], $options)
+            );
+
             $records[$property] = $relatedRecord->indexBy(function ($entity) use ($foreignKey) {
                 return $entity->$foreignKey;
             });
@@ -324,17 +344,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             return;
         }
 
-        $load = array_fill_keys(array_keys($associations), []);
-
-        // Fetch IDS
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $load[$property][] = $id;
-            }
-        }
-
-        // Author is loading articles,
+        $load = $this->extractIds($resultSet, $associations);
 
         // Load Records
         $records = array_fill_keys(array_keys($associations), []);
@@ -345,7 +355,9 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             $config['conditions'][$foreignKey] = $ids;
             $options = ['fields' => $config['fields'],'order' => $config['order']];
 
-            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
+            $relatedRecords = new ResultSet($this->mapperManager->get($config['class'])
+                ->findAllBy($config['conditions'], $options)
+            );
 
             $records[$property] = $relatedRecords->groupBy(function ($entity) use ($foreignKey) {
                 return $entity->$foreignKey;
@@ -381,18 +393,10 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             return;
         }
 
-        $keys = array_keys($associations);
-        $load = array_fill_keys($keys, []);
         $recordMap = array_fill_keys(array_keys($associations), []);
         $records = array_fill_keys(array_keys($associations), []);
 
-        // Fetch IDS
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $load[$property][] = $id;
-            }
-        }
+        $load = $this->extractIds($resultSet, $associations);
 
         // HOW TO QUERY // posts_tags
         // Load Records
@@ -410,17 +414,16 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                 $recordMap[$property][$id][] = $record[$localKey];
             }
 
-            $primaryKey = $this->{$config['alias']}->getPrimaryKey()[0];
+            $primaryKey = $this->mapperManager->get($config['class'])->getPrimaryKey()[0];
 
             $config['conditions'][$primaryKey] = $ids;
             $options = ['fields' => $config['fields'],'order' => $config['order']];
 
-            $relatedRecords = new ResultSet($this->{$config['alias']}->findAllBy($config['conditions'], $options));
+            $relatedRecords = new ResultSet($this->mapperManager->get($config['class'])->findAllBy($config['conditions'], $options));
 
-            $records[$property] = $relatedRecords->indexBy(function ($entity) use ($primaryKey, $recordMap) {
+            $records[$property] = $relatedRecords->indexBy(function ($entity) use ($primaryKey) {
                 return $entity->$primaryKey;
             });
-
             unset($ids,$load[$property],$relatedRecords);
         }
 
@@ -457,24 +460,10 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         foreach ($this->$type as $property => $config) {
             if (in_array($property, $options['with'])) {
                 $associations[$property] = $config;
-
-                // TODO: This needs to be managed to prevent recursion
-                if (! isset($this->{$config['alias']})) {
-                    $this->{$config['alias']} = new $config['class']($this->dataSource);
-                }
             }
         }
 
         return $associations;
-    }
-
-    private function loadMapper(string $class, string $alias): AbstractDataMapper
-    {
-        if (! isset($this->{$alias})) {
-            $this->{$alias} = new $class($this->dataSource);
-        }
-
-        return $this->{$alias};
     }
 
     /**
@@ -488,11 +477,10 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         // User has one profile, user_id in other table
         foreach (['hasOne','hasMany'] as $assoc) {
             foreach ($this->$assoc as $config) {
-                $alias = $config['alias'];
                 if (! empty($config['dependent'])) {
-                    $this->loadMapper($config['class'], $config['alias']);
-                    foreach ($this->$alias->findAllBy([$config['foreignKey'] => $id]) as $entity) {
-                        $this->$alias->delete($entity);
+                    $mapper = $this->mapperManager->get($config['class']);
+                    foreach ($mapper->findAllBy([$config['foreignKey'] => $id]) as $entity) {
+                        $mapper->delete($entity);
                     }
                 }
             }

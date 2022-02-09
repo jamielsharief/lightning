@@ -4,6 +4,7 @@ namespace Lightning\Test\Repository;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Lightning\Orm\MapperManager;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\DataMapper\QueryObject;
@@ -117,14 +118,14 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 {
     protected PDO $pdo;
     protected FixtureManager $fixtureManager;
-    protected DatabaseDataSource $storage;
+    protected DatabaseDataSource $dataSource;
 
     public function setUp(): void
     {
         $pdoFactory = new PdoFactory();
         $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
-        $this->storage = new DatabaseDataSource($this->pdo, new QueryBuilder());
+        $this->dataSource = new DatabaseDataSource($this->pdo, new QueryBuilder());
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([
@@ -140,7 +141,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testBelongsTo(): void
     {
-        $article = new Article($this->storage);
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
 
@@ -164,9 +165,9 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testBelongsToNotFound(): void
     {
-        $this->storage->delete('authors', new QueryObject([]));
+        $this->dataSource->delete('authors', new QueryObject([]));
 
-        $article = new Article($this->storage);
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
         $expected = [
@@ -183,7 +184,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasOne(): void
     {
-        $user = new User($this->storage);
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
@@ -206,8 +207,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasOneNotFound(): void
     {
-        $this->storage->delete('profiles', new QueryObject([]));
-        $user = new User($this->storage);
+        $this->dataSource->delete('profiles', new QueryObject([]));
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
@@ -224,21 +225,21 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasOneDepenent(): void
     {
-        $user = new User($this->storage);
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
         $user->setDependent(true);
 
         $query = new QueryObject(['user_id' => 1000]);
 
-        $this->assertEquals(1, $this->storage->count('profiles', $query));
+        $this->assertEquals(1, $this->dataSource->count('profiles', $query));
         $this->assertEquals(1, $user->delete($user->get(new QueryObject(['id' => 1000]))));
-        $this->assertEquals(0, $this->storage->count('profiles', $query));
+        $this->assertEquals(0, $this->dataSource->count('profiles', $query));
     }
 
     public function testHasMany(): void
     {
-        $this->storage->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
-        $author = new Author($this->storage);
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
@@ -272,21 +273,21 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasManyDependent(): void
     {
-        $author = new Author($this->storage);
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
         $author->setDependent(true);
 
         $query = new QueryObject(['author_id' => 2000]);
 
-        $this->assertEquals(1, $this->storage->count('articles', $query));
+        $this->assertEquals(1, $this->dataSource->count('articles', $query));
         $this->assertEquals(1, $author ->delete($author->get(new QueryObject(['id' => 2000]))));
-        $this->assertEquals(0, $this->storage->count('articles', $query));
+        $this->assertEquals(0, $this->dataSource->count('articles', $query));
     }
 
     public function testHasManyNotFound(): void
     {
-        $this->storage->delete('articles', new QueryObject([]));
+        $this->dataSource->delete('articles', new QueryObject([]));
 
-        $author = new Author($this->storage);
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
 
         $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
@@ -304,9 +305,9 @@ final class AbstractObjectRelationalMapperTest extends TestCase
     public function testHasAndBelongsToMany(): void
     {
         // Create extra
-        $this->storage->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-        $post = new Post($this->storage);
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
         $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
         $expected = [
@@ -335,12 +336,12 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasAndBelongsToManyNotFound(): void
     {
-        $this->storage->delete('tags', new QueryObject([]));
+        $this->dataSource->delete('tags', new QueryObject([]));
 
         // Create extra
-        $this->storage->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-        $post = new Post($this->storage);
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
         $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
         $expected = [
@@ -356,13 +357,13 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function testHasAndBelongsToDependent(): void
     {
-        $post = new Post($this->storage);
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
         $post->setDependent(true);
 
         $query = new QueryObject(['post_id' => 1000]);
 
-        $this->assertEquals(2, $this->storage->count('posts_tags', $query));
+        $this->assertEquals(2, $this->dataSource->count('posts_tags', $query));
         $this->assertEquals(1, $post ->delete($post->get(new QueryObject(['id' => 1000]))));
-        $this->assertEquals(0, $this->storage->count('posts_tags', $query));
+        $this->assertEquals(0, $this->dataSource->count('posts_tags', $query));
     }
 }

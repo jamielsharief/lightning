@@ -14,6 +14,7 @@
 namespace Lightning\Orm;
 
 use LogicException;
+use Lightning\Entity\Entity;
 use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
@@ -25,6 +26,7 @@ use Lightning\DataMapper\DataSourceInterface;
  *
  * @internal Joins are not used since all queries should go through hooks and events, using joins would escape these and when going deep you will
  * have to do additional querieis anyway. Also by not using joins then not tying datasource to only relational databases.
+ *
  */
 abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 {
@@ -61,8 +63,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      *  'comments' => [
      *      'class' => User::class
-     *      'foreignKey' => 'user_id', // in other table,
-     *      'dependent' => false
+     *      'foreignKey' => 'user_id', // in other table
      *  ]
      *
      * @var array
@@ -75,16 +76,16 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *  'tags' => [
      *      'class' => User::class
      *      'table' => 'tags_users',
-     *      'foreignKey' => 'user_id',
-     *      'localKey' => 'tag_id',
+     *      'foreignKey' => 'tag_id',
+     *      'associatedForeignKey' => 'user_id', // the foreignKey for the associated model
      *      'dependent' => true
      * ]
      *
      * @var array
      */
-    protected array $hasAndBelongsToMany = [];
+    protected array $belongsToMany = [];
 
-    protected array $associations = ['belongsTo','hasMany','hasOne','hasAndBelongsToMany'];
+    protected array $associations = ['belongsTo','hasMany','hasOne','belongsToMany'];
 
     /**
      * Constructor
@@ -140,16 +141,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     {
         foreach ($this->associations as $assoc) {
             foreach ($this->$assoc as $property => &$config) {
-                $config += [
-                    'foreignKey' => null,
-                    'class' => null,
-                    'dependent' => false,
-                    'alias' => null,
-                    'fields' => [],
-                    'conditions' => [],
-                    'association' => $assoc,
-                    'order' => null
-                ];
+                $config += ['foreignKey' => null,'class' => null, 'dependent' => false, 'alias' => null, 'fields' => [], 'conditions' => [],'association' => $assoc, 'order' => null];
 
                 if ($assoc === 'belongsTo') {
                     unset($config['dependent']);
@@ -163,20 +155,25 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                     throw new LogicException(sprintf('%s `%s` is missing class', $property, $assoc));
                 }
 
-                // // TODO:
-                // if (empty($config['alias'])) {
-                //     $config['alias'] = (new ReflectionClass($config['class']))->getShortName();
-                // }
-
-                if ($assoc === 'hasAndBelongsToMany') {
+                if ($assoc === 'belongsToMany') {
                     if (empty($config['table'])) {
-                        throw new LogicException(sprintf('hasAndBelongsToMany `%s` requires a table key', $property));
+                        throw new LogicException(sprintf('belongsToMany `%s` requires a table key', $property));
                     }
-                    if (empty($config['localKey'])) {
-                        throw new LogicException(sprintf('hasAndBelongsToMany `%s` is missing localKey', $property));
+                    if (empty($config['associatedForeignKey'])) {
+                        throw new LogicException(sprintf('belongsToMany `%s` is missing associatedForeignKey', $property));
                     }
                 }
             }
+        }
+    }
+
+    private function setEntityValue(EntityInterface $entity, string $property, $value): void
+    {
+        if ($entity instanceof Entity) {
+            $entity[$property] = $value;
+        } else {
+            $setter = 'set' . ucfirst($property);
+            $entity->$setter($value);
         }
     }
 
@@ -191,283 +188,86 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     {
         $options = $query->getOptions();
 
-        if (isset($options['with'])) {
-            $this->loadRelatedBelongsTo($resultSet, $options);
-            $this->loadRelatedHasOne($resultSet, $options);
-            $this->loadRelatedHasMany($resultSet, $options);
-            $this->loadRelatedHasAndBelongsToMany($resultSet, $options);
+        // Preload associations for performance
+        if (! isset($options['with'])) {
+            return $resultSet;
+        }
+
+        foreach ($this->associations as $assoc) {
+            foreach ($this->$assoc as $property => $config) {
+                if (in_array($property, $options['with'])) {
+                    $associations[$assoc][$property] = $config;
+                }
+            }
+        }
+
+        foreach ($resultSet as &$entity) {
+            $row = $entity->toArray();
+            foreach ($associations as $type => $association) {
+                foreach ($association as $property => $config) {
+                    $mapper = $this->mapperManager->get($config['class']);
+
+                    switch ($type) {
+                            case 'belongsTo':
+                                $primaryKey = $mapper->getPrimaryKey()[0];
+
+                                $result = $mapper->findAllBy([
+                                    $primaryKey => $row[$config['foreignKey']]
+                                ]);
+
+                                $this->setEntityValue($entity, $property, $result ? $result[0] : null);
+
+                            break;
+                            case 'hasOne':
+                                $primaryKey = $this->getPrimaryKey()[0];
+
+                                $result = $mapper->findAllBy([
+                                    $config['foreignKey'] => $row[$primaryKey]
+                                ]);
+
+                                $this->setEntityValue($entity, $property, $result ? $result[0] : null);
+
+                            break;
+                            case 'hasMany':
+                                $primaryKey = $mapper->getPrimaryKey()[0];
+
+                                $result = $mapper->findAllBy(
+                                    [$config['foreignKey'] => $row[$primaryKey]]
+                                );
+
+                                $this->setEntityValue($entity, $property, $result);
+
+                            break;
+                            case 'belongsToMany':
+                                $primaryKey = $this->getPrimaryKey()[0];
+                                $associationForeignKey = $config['associatedForeignKey'];
+
+                                $result = $this->dataSource->read(
+                                    $config['table'], new QueryObject([$config['foreignKey'] => $row[$primaryKey]])
+                                );
+
+                                $ids = array_map(function ($record) use ($associationForeignKey) {
+                                    return $record[$associationForeignKey]; // extract tag_id
+                                }, $result->toArray());
+
+                                $result = $mapper->findAllBy([
+                                    $primaryKey => $ids
+                                ]);
+
+                                $this->setEntityValue($entity, $property, $result);
+
+                            break;
+
+                    }
+                }
+            }
         }
 
         return $resultSet;
     }
 
     /**
-     * Load BelongsTo data
-     *
-     * @param ResultSet $resultSet
-     * @param array $options
-     * @return void
-     */
-    private function loadRelatedBelongsTo(ResultSet $resultSet, array $options): void
-    {
-
-        // Preload associations
-        $associations = $this->loadAssociations('belongsTo', $options);
-        if (! $associations) {
-            return;
-        }
-
-        $load = array_fill_keys(array_keys($associations), []);
-
-        // Fetch IDS
-        foreach ($resultSet as $row) {
-            foreach ($associations as $property => $config) {
-                $foreignKey = $config['foreignKey'];
-                $load[$property][] = $row[$foreignKey];
-            }
-        }
-
-        // Load Records
-        $records = array_fill_keys(array_keys($associations), []);
-        foreach ($associations as $property => $config) {
-            $ids = $load[$property];
-
-            $config['conditions'][$this->primaryKey] = $ids;
-            $options = ['fields' => $config['fields'],'order' => $config['order']];
-
-            $relatedRecord = new ResultSet($this->mapperManager->get($config['class'])
-                ->findAllBy($config['conditions'], $options)
-            );
-
-            $records[$property] = $relatedRecord->indexBy(function ($entity) {
-                return $entity->id;
-            });
-            unset($load[$property], $relatedRecord);
-        }
-
-        // Add to records
-        foreach ($resultSet as $row) {
-            foreach ($associations as $property => $config) {
-                $id = $row[$config['foreignKey']];
-                $hasMatch = $id && isset($records[$property][$id]);
-                $row[$property] = $hasMatch ? $records[$property][$id] : null;
-            }
-        }
-
-        unset($records);
-    }
-
-    /**
-     * Extracts the ID using the primary key (does not work for belongsTo since that uses foreignKey)
-     *
-     * @param ResultSet $resultSet
-     * @param array $associations
-     * @return array
-     */
-    private function extractIds(ResultSet $resultSet, array $associations): array
-    {
-        $load = array_fill_keys(array_keys($associations), []);
-
-        // Fetch IDS
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $load[$property][] = $id;
-            }
-        }
-
-        return $load;
-    }
-
-    /**
-     * Load HasOne data
-     *
-     * @param ResultSet $resultSet
-     * @param array $options
-     * @return void
-     */
-    private function loadRelatedHasOne(ResultSet $resultSet, array $options): void
-    {
-        // Preload associations
-        $associations = $this->loadAssociations('hasOne', $options);
-        if (! $associations) {
-            return;
-        }
-
-        $load = $this->extractIds($resultSet, $associations);
-
-        // Load Records
-        $records = array_fill_keys(array_keys($associations), []);
-        foreach ($associations as $property => $config) {
-            $ids = $load[$property];
-            $foreignKey = $config['foreignKey'];
-
-            $config['conditions'][$foreignKey] = $ids;
-            $options = ['fields' => $config['fields'],'order' => $config['order']];
-
-            $relatedRecord = new ResultSet($this->mapperManager->get($config['class'])
-                ->findAllBy($config['conditions'], $options)
-            );
-
-            $records[$property] = $relatedRecord->indexBy(function ($entity) use ($foreignKey) {
-                return $entity->$foreignKey;
-            });
-
-            unset($ids,$load[$property],$relatedRecord);
-        }
-
-        // Add to records
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $hasMatch = $id && isset($records[$property][$id]);
-                $row[$property] = $hasMatch ? $records[$property][$id] : null;
-            }
-        }
-
-        unset($records);
-    }
-
-    /**
-     * Fetches the hasManyData
-     *
-     * @param ResultSet $resultSet
-     * @param array $options
-     * @return void
-     */
-    private function loadRelatedHasMany(ResultSet $resultSet, array $options): void
-    {
-
-        // Preload associations
-        $associations = $this->loadAssociations('hasMany', $options);
-        if (! $associations) {
-            return;
-        }
-
-        $load = $this->extractIds($resultSet, $associations);
-
-        // Load Records
-        $records = array_fill_keys(array_keys($associations), []);
-        foreach ($associations as $property => $config) {
-            $ids = $load[$property];
-            $foreignKey = $config['foreignKey'];
-
-            $config['conditions'][$foreignKey] = $ids;
-            $options = ['fields' => $config['fields'],'order' => $config['order']];
-
-            $relatedRecords = new ResultSet($this->mapperManager->get($config['class'])
-                ->findAllBy($config['conditions'], $options)
-            );
-
-            $records[$property] = $relatedRecords->groupBy(function ($entity) use ($foreignKey) {
-                return $entity->$foreignKey;
-            })->toArray();
-
-            unset($ids,$load[$property], $relatedRecords);
-        }
-
-        // Add to records
-        foreach ($resultSet as $row) {
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $hasMatch = isset($records[$property][$id]);
-                $row[$property] = $hasMatch ? $records[$property][$id] : [];
-            }
-        }
-        unset($records);
-    }
-
-    /**
-    * Fetches the hasAndBelongsToMany
-    *
-    * @param ResultSet $resultSet
-    * @param array $options
-    * @return void
-    */
-    private function loadRelatedHasAndBelongsToMany(ResultSet $resultSet, array $options): void
-    {
-
-        // Preload associations
-        $associations = $this->loadAssociations('hasAndBelongsToMany', $options);
-        if (! $associations) {
-            return;
-        }
-
-        $recordMap = array_fill_keys(array_keys($associations), []);
-        $records = array_fill_keys(array_keys($associations), []);
-
-        $load = $this->extractIds($resultSet, $associations);
-
-        // HOW TO QUERY // posts_tags
-        // Load Records
-        foreach ($associations as $property => $config) {
-            $ids = $load[$property];
-            $foreignKey = $config['foreignKey'];
-
-            $result = $this->dataSource->read($config['table'], new QueryObject([$foreignKey => $ids]));
-
-            $localKey = $config['localKey'];
-
-            foreach ($result as $record) {
-                $ids[] = $record[$localKey];
-                $id = $record[$foreignKey];
-                $recordMap[$property][$id][] = $record[$localKey];
-            }
-
-            $primaryKey = $this->mapperManager->get($config['class'])->getPrimaryKey()[0];
-
-            $config['conditions'][$primaryKey] = $ids;
-            $options = ['fields' => $config['fields'],'order' => $config['order']];
-
-            $relatedRecords = new ResultSet($this->mapperManager->get($config['class'])->findAllBy($config['conditions'], $options));
-
-            $records[$property] = $relatedRecords->indexBy(function ($entity) use ($primaryKey) {
-                return $entity->$primaryKey;
-            });
-            unset($ids,$load[$property],$relatedRecords);
-        }
-
-        foreach ($resultSet as $row) {
-            $row[$property] = [];
-            $id = $row[$this->primaryKey];
-            foreach ($associations as $property => $config) {
-                $matched = [];
-                if (isset($recordMap[$property][$id])) {
-                    foreach ($recordMap[$property][$id] as $relatedId) {
-                        if (isset($records[$property][$relatedId])) {
-                            $matched[] = $records[$property][$relatedId];
-                        }
-                    }
-                }
-                $row[$property] = $matched;
-            }
-        }
-
-        unset($records);
-    }
-
-    /**
-     * Loads the request type of associations that are being requested
-     *
-     * @param string $type
-     * @param array $options
-     * @return array
-     */
-    private function loadAssociations(string $type, array $options): array
-    {
-        $associations = [];
-
-        foreach ($this->$type as $property => $config) {
-            if (in_array($property, $options['with'])) {
-                $associations[$property] = $config;
-            }
-        }
-
-        return $associations;
-    }
-
-    /**
-     * Deletes dependent records for the hasOne, hasMany and hasAndBelongsToMany associations
+     * Deletes dependent records for the hasOne, hasMany and belongsToMany associations
      *
      * @param string|integer $id
      * @return void
@@ -486,7 +286,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             }
         }
 
-        foreach ($this->hasAndBelongsToMany as $config) {
+        foreach ($this->belongsToMany as $config) {
             if (! empty($config['dependent'])) {
                 $this->dataSource->delete($config['table'], new QueryObject([$config['foreignKey'] => $id]));
             }

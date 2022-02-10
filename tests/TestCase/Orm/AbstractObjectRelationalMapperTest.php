@@ -99,18 +99,18 @@ class Post extends AbstractObjectRelationalMapper
 {
     protected string $table = 'posts';
 
-    protected array $hasAndBelongsToMany = [
+    protected array $belongsToMany = [
         'tags' => [
             'class' => Tag::class,
             'table' => 'posts_tags',
             'foreignKey' => 'post_id',
-            'localKey' => 'tag_id',
+            'associatedForeignKey' => 'tag_id',
         ]
     ];
 
     public function setDependent(bool $dependent): void
     {
-        $this->hasAndBelongsToMany['tags']['dependent'] = $dependent;
+        $this->belongsToMany['tags']['dependent'] = $dependent;
     }
 }
 

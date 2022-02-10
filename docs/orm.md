@@ -52,14 +52,6 @@ class Article extends AbstractObjectRelationalMapper
 $result = $article->findBy(['id'=>1000], ['with'=> [Author::class]]);
 ```
 
-
-This will run the following 2 queries, no matter how many records you are retriving
-
-```sql
-SELECT authors.id, authors.name, authors.created_at, authors.updated_at FROM authors LIMIT 1
-SELECT articles.id, articles.title, articles.body, articles.author_id, articles.created_at, articles.updated_at FROM articles WHERE articles.author_id IN ( 2000 )
-```
-
 The related `Author` is added to the `Article`
 
 ```php

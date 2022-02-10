@@ -112,7 +112,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     {
         $resultSet = parent::read($query, $mapResult);
 
-        return $resultSet->isEmpty() ? $resultSet : $this->loadRelatedData($resultSet, $query);
+        return $query->getOption('with') && $resultSet->isEmpty() === false ? $this->loadRelatedData($resultSet, $query) : $resultSet;
     }
 
     /**
@@ -168,16 +168,6 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         }
     }
 
-    private function setEntityValue(EntityInterface $entity, string $property, $value): void
-    {
-        if ($entity instanceof Entity) {
-            $entity[$property] = $value;
-        } else {
-            $setter = 'set' . ucfirst($property);
-            $entity->$setter($value);
-        }
-    }
-
     /**
      * Loads the related data
      *
@@ -185,7 +175,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      * @param QueryObject $query
      * @return ResultSet
      */
-    private function loadRelatedData(ResultSet $resultSet, QueryObject $query): ResultSet
+    protected function loadRelatedData(ResultSet $resultSet, QueryObject $query): ResultSet
     {
         $options = $query->getOptions();
 
@@ -202,26 +192,26 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             }
         }
 
+        $primaryKey = $this->getPrimaryKey()[0];
+
         foreach ($resultSet as &$entity) {
             $row = $entity->toArray();
+
             foreach ($associations as $type => $association) {
                 foreach ($association as $property => $config) {
                     $mapper = $this->mapperManager->get($config['class']);
+                    $bindingKey = $mapper->getPrimaryKey()[0];
 
                     switch ($type) {
                             case 'belongsTo':
-                                $primaryKey = $mapper->getPrimaryKey()[0];
-
                                 $result = $mapper->findAllBy([
-                                    $primaryKey => $row[$config['foreignKey']]
+                                    $bindingKey => $row[$config['foreignKey']]
                                 ]);
 
                                 $this->setEntityValue($entity, $property, $result ? $result[0] : null);
 
                             break;
                             case 'hasOne':
-                                $primaryKey = $this->getPrimaryKey()[0];
-
                                 $result = $mapper->findAllBy([
                                     $config['foreignKey'] => $row[$primaryKey]
                                 ]);
@@ -230,25 +220,21 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
                             break;
                             case 'hasMany':
-                                $primaryKey = $mapper->getPrimaryKey()[0];
-
                                 $result = $mapper->findAllBy(
-                                    [$config['foreignKey'] => $row[$primaryKey]]
+                                    [$config['foreignKey'] => $row[$bindingKey]]
                                 );
 
                                 $this->setEntityValue($entity, $property, $result);
 
                             break;
                             case 'belongsToMany':
-                                $primaryKey = $this->getPrimaryKey()[0];
-                                $associationForeignKey = $config['associatedForeignKey'];
-
                                 $result = $this->dataSource->read(
                                     $config['joinTable'], new QueryObject([$config['foreignKey'] => $row[$primaryKey]])
                                 );
 
-                                $ids = array_map(function ($record) use ($associationForeignKey) {
-                                    return $record[$associationForeignKey]; // extract tag_id
+                                $associatedForeignKey = $config['associatedForeignKey'];
+                                $ids = array_map(function ($record) use ($associatedForeignKey) {
+                                    return $record[$associatedForeignKey]; // extract tag_id
                                 }, $result->toArray());
 
                                 $result = $mapper->findAllBy([
@@ -265,6 +251,18 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         }
 
         return $resultSet;
+    }
+
+    private function setEntityValue(EntityInterface $entity, string $property, $value): void
+    {
+        if ($entity instanceof Entity) {
+            $entity[$property] = $value;
+
+            return;
+        }
+
+        $setter = 'set' . ucfirst($property);
+        $entity->$setter($value);
     }
 
     /**

@@ -1,6 +1,6 @@
 # ORM (Object Relational Mapper)
 
-The Object Relational Mapper extends the `DataMapper` to work with related data, this provides `hasOne`, `hasMany` and `belongsToMany` relationships with the `belongsTo` which is for the other side.
+The Object Relational Mapper extends the `DataMapper` to work with related data, this provides `hasOne`, `hasMany`, `belongsTo` and `belongsToMany` associations.
 
 ## Usage
 

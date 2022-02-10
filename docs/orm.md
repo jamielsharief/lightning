@@ -52,6 +52,7 @@ class Article extends AbstractObjectRelationalMapper
 $result = $article->findBy(['id'=>1000], ['with'=> [Author::class]]);
 ```
 
+
 This will run the following 2 queries, no matter how many records you are retriving
 
 ```sql
@@ -77,6 +78,54 @@ The related `Author` is added to the `Article`
   ]
 ]
 ```
+
+## Associations
+
+### Has One (one-to-one)
+
+The `hasOne` association is a `one-to-one` relationship, for example: a user has one profile. The foreign key is in the other table, so the profiles table has the column `user_id`.
+
+The following options are supported:
+- class: class for the Object Relational Mapper 
+- foreignKey: the name of the foreign key in the other table
+- dependent: When set to true associated records will also be deleted
+
+
+## Has Many (one-to-many)
+
+The  `hasMany`  association is `one-to-many` relationship, for example: a user has many contacts.  The foreign key is in the other table, so the contacts table has the column `user_id`.
+
+The following options are supported:
+- class: class for the Object Relational Mapper 
+- foreignKey: the name of the foreign key in the other table
+- dependent: When set to true associated records will also be deleted
+
+## BelongsTo (many-to-one)
+
+The `belongsTo` association is a `many-to-one` relationship, for example: many contacts belong to a user. The foreign key is in the current table, so the contacts table has the column `user_id`.
+
+- class: class for the Object Relational Mapper 
+- foreignKey: the name of the foreign key in the current table
+
+## BelongsToMany (many-to-many)
+
+The `belongsToMany` association is a `many-to-many` relationship, for example: tags belongs to many articles, and articles belongs to many tags. This is handled by a special join table
+
+```sql
+CREATE TABLE `posts_tags` (
+  `post_id` int(11) NOT NULL,
+  `tag_id` int(11) NOT NULL,
+  PRIMARY KEY  (`post_id`,`tag_id`)
+);
+```
+
+The following options are supported:
+- class: class for the Object Relational Mapper
+- joinTable: the name of the join table
+- foreignKey: the name of the foreign key that references the current mapper
+- associatedForeignKey: the name of the foreign key that references the other mapper
+- dependent: When set to true when records are removed, related records from the join table will be deleted
+
 
 ## MapperManager
 

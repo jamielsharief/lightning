@@ -102,7 +102,7 @@ class Post extends AbstractObjectRelationalMapper
     protected array $belongsToMany = [
         'tags' => [
             'class' => Tag::class,
-            'table' => 'posts_tags',
+            'joinTable' => 'posts_tags',
             'foreignKey' => 'post_id',
             'associatedForeignKey' => 'tag_id',
         ]

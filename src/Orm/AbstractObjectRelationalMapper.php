@@ -64,6 +64,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *  'comments' => [
      *      'class' => User::class
      *      'foreignKey' => 'user_id', // in other table
+      *     'dependent' => false
      *  ]
      *
      * @var array
@@ -75,7 +76,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      *  'tags' => [
      *      'class' => User::class
-     *      'table' => 'tags_users',
+     *      'joinTable' => 'tags_users',
      *      'foreignKey' => 'tag_id',
      *      'associatedForeignKey' => 'user_id', // the foreignKey for the associated model
      *      'dependent' => true
@@ -156,8 +157,8 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                 }
 
                 if ($assoc === 'belongsToMany') {
-                    if (empty($config['table'])) {
-                        throw new LogicException(sprintf('belongsToMany `%s` requires a table key', $property));
+                    if (empty($config['joinTable'])) {
+                        throw new LogicException(sprintf('belongsToMany `%s` requires a joinTable key', $property));
                     }
                     if (empty($config['associatedForeignKey'])) {
                         throw new LogicException(sprintf('belongsToMany `%s` is missing associatedForeignKey', $property));
@@ -243,7 +244,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                                 $associationForeignKey = $config['associatedForeignKey'];
 
                                 $result = $this->dataSource->read(
-                                    $config['table'], new QueryObject([$config['foreignKey'] => $row[$primaryKey]])
+                                    $config['joinTable'], new QueryObject([$config['foreignKey'] => $row[$primaryKey]])
                                 );
 
                                 $ids = array_map(function ($record) use ($associationForeignKey) {
@@ -288,7 +289,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
         foreach ($this->belongsToMany as $config) {
             if (! empty($config['dependent'])) {
-                $this->dataSource->delete($config['table'], new QueryObject([$config['foreignKey'] => $id]));
+                $this->dataSource->delete($config['joinTable'], new QueryObject([$config['foreignKey'] => $id]));
             }
         }
     }

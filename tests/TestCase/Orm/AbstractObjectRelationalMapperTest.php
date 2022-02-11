@@ -104,7 +104,7 @@ class Post extends AbstractObjectRelationalMapper
             'class' => Tag::class,
             'joinTable' => 'posts_tags',
             'foreignKey' => 'post_id',
-            'associatedForeignKey' => 'tag_id',
+            'otherForeignKey' => 'tag_id',
         ]
     ];
 

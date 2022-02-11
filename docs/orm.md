@@ -79,7 +79,9 @@ The following options are supported:
 - class: class for the Object Relational Mapper 
 - foreignKey: the name of the foreign key in the other table
 - dependent: When set to true associated records will also be deleted
-
+- fields: An array of fields to select, if not provided it will use the Data Mapper default
+- conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
+- order: A setting for order e.g. `status DESC`
 
 ## Has Many (one-to-many)
 
@@ -89,6 +91,9 @@ The following options are supported:
 - class: class for the Object Relational Mapper 
 - foreignKey: the name of the foreign key in the other table
 - dependent: When set to true associated records will also be deleted
+- fields: An array of fields to select, if not provided it will use the Data Mapper default
+- conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
+- order: A setting for order e.g. `status DESC`
 
 ## BelongsTo (many-to-one)
 
@@ -96,6 +101,9 @@ The `belongsTo` association is a `many-to-one` relationship, for example: many c
 
 - class: class for the Object Relational Mapper 
 - foreignKey: the name of the foreign key in the current table
+- fields: An array of fields to select, if not provided it will use the Data Mapper default
+- conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
+- order: A setting for order e.g. `status DESC`
 
 ## BelongsToMany (many-to-many)
 
@@ -112,9 +120,12 @@ CREATE TABLE `posts_tags` (
 The following options are supported:
 - class: class for the Object Relational Mapper
 - joinTable: the name of the join table
-- foreignKey: the name of the foreign key that references the current mapper
-- associatedForeignKey: the name of the foreign key that references the other mapper
+- foreignKey: the name of the foreign key used by this Data Mapper
+- otherForeignKey: the name of the foreign key used by the other Data Mapper
 - dependent: When set to true related records from the join table will be deleted
+- fields: An array of fields to select, if not provided it will use the Data Mapper default
+- conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
+- order: A setting for order e.g. `status DESC`
 
 ## MapperManager
 

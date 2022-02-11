@@ -7,7 +7,9 @@ use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
+use Lightning\Entity\AbstractEntity;
 use Lightning\DataMapper\QueryObject;
+use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
@@ -45,6 +47,182 @@ class MockMapper extends AbstractObjectRelationalMapper
     }
 }
 
+class ArticleEntity extends AbstractEntity
+{
+    private ?int $id = null;
+    private string $title;
+    private string $body;
+    private ?int $author_id = null;
+    private ?string $created_at = null;
+    private ?string $updated_at = null;
+    private ?EntityInterface $author = null;
+
+    public static function fromState(array $state): self
+    {
+        $article = new static();
+
+        if (isset($state['id'])) {
+            $article->id = $state['id'];
+        }
+
+        foreach ($state as $key => $value) {
+            $article->$key = $value;
+        }
+
+        return $article;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'body' => $this->body,
+            'author_id' => $this->author_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'author' => $this->author ? $this->author->toArray() : null
+        ];
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get the value of body
+     *
+     * @return string
+     */
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+    /**
+     * Set the value of body
+     *
+     * @param string $body
+     *
+     * @return self
+     */
+    public function setBody(string $body): self
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of author_id
+     *
+     * @return int
+     */
+    public function getAuthorId(): int
+    {
+        return $this->author_id;
+    }
+
+    /**
+     * Set the value of author_id
+     *
+     * @param int $author_id
+     *
+     * @return self
+     */
+    public function setAuthorId(int $author_id): self
+    {
+        $this->author_id = $author_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of created_at
+     *
+     * @return ?string
+     */
+    public function getCreatedAt(): ?string
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * Set the value of created_at
+     *
+     * @param ?string $created_at
+     *
+     * @return self
+     */
+    public function setCreatedAt(?string $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of updated_at
+     *
+     * @return ?string
+     */
+    public function getUpdatedAt(): ?string
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * Set the value of updated_at
+     *
+     * @param ?string $updated_at
+     *
+     * @return self
+     */
+    public function setUpdatedAt(?string $updated_at): self
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of author
+     *
+     * @return ?EntityInterface
+     */
+    public function getAuthor(): ?EntityInterface
+    {
+        return $this->author;
+    }
+
+    /**
+     * Set the value of author
+     *
+     * @param ?EntityInterface $author
+     *
+     * @return self
+     */
+    public function setAuthor(?EntityInterface $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+}
+
 class Article extends MockMapper
 {
     protected $primaryKey = 'id';
@@ -61,6 +239,11 @@ class Article extends MockMapper
             'foreignKey' => 'author_id'
         ]
     ];
+
+    public function mapDataToEntity(array $data): EntityInterface
+    {
+        return ArticleEntity::fromState($data);
+    }
 }
 
 class Author extends MockMapper
@@ -325,7 +508,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #1',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:01:00',
-                    'updated_at' => '2021-10-03 09:02:00'
+                    'updated_at' => '2021-10-03 09:02:00',
+                    'author' => null
                 ],
                 1 => [
                     'id' => 1002,
@@ -333,7 +517,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #3',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:05:00',
-                    'updated_at' => '2021-10-03 09:06:00'
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
                 ]
             ]
         ];
@@ -362,7 +547,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #3',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:05:00',
-                    'updated_at' => '2021-10-03 09:06:00'
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
                 ],
                 1 => [
                     'id' => 1000,
@@ -370,7 +556,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #1',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:01:00',
-                    'updated_at' => '2021-10-03 09:02:00'
+                    'updated_at' => '2021-10-03 09:02:00',
+                    'author' => null
                 ]
             ]
         ];
@@ -387,6 +574,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
+        // This looks incorrect because of fields, but it means that the fields were not selected and hence why it is empty for this type of entity
+
         $expected = [
             'id' => 2000,
             'name' => 'Jon',
@@ -397,11 +586,19 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'id' => 1000,
                     'title' => 'Article #1',
                     'body' => 'A description for article #1',
+                    'author_id' => null,
+                    'created_at' => null,
+                    'updated_at' => null,
+                    'author' => null
                 ],
                 1 => [
                     'id' => 1002,
                     'title' => 'Article #3',
-                    'body' => 'A description for article #3'
+                    'body' => 'A description for article #3',
+                    'author_id' => null,
+                    'created_at' => null,
+                    'updated_at' => null,
+                    'author' => null
                 ]
             ]
         ];

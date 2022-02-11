@@ -179,11 +179,6 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     {
         $options = $query->getOptions();
 
-        // Preload associations for performance
-        if (! isset($options['with'])) {
-            return $resultSet;
-        }
-
         foreach ($this->associations as $assoc) {
             foreach ($this->$assoc as $property => $config) {
                 if (in_array($property, $options['with'])) {

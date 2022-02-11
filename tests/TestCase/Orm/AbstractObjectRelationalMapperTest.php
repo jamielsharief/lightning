@@ -20,7 +20,32 @@ use Lightning\Test\Fixture\PostsTagsFixture;
 use Lightning\Orm\AbstractObjectRelationalMapper;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
 
-class Article extends AbstractObjectRelationalMapper
+class MockMapper extends AbstractObjectRelationalMapper
+{
+    public function setAssociation(string $name, array $setting): self
+    {
+        $this->$name = $setting;
+
+        return $this;
+    }
+
+    public function setFields(string $association, string $name, array $fields)
+    {
+        $this->$association[$name]['fields'] = $fields;
+    }
+
+    public function setConditions(string $association, string $name, array $conditions)
+    {
+        $this->$association[$name]['conditions'] = $conditions;
+    }
+
+    public function setOrder(string $association, string $name, $order)
+    {
+        $this->$association[$name]['order'] = $order;
+    }
+}
+
+class Article extends MockMapper
 {
     protected $primaryKey = 'id';
 
@@ -38,7 +63,7 @@ class Article extends AbstractObjectRelationalMapper
     ];
 }
 
-class Author extends AbstractObjectRelationalMapper
+class Author extends MockMapper
 {
     protected string $table = 'authors';
 
@@ -60,7 +85,7 @@ class Author extends AbstractObjectRelationalMapper
     }
 }
 
-class Profile extends AbstractObjectRelationalMapper
+class Profile extends MockMapper
 {
     protected string $table = 'profiles';
 
@@ -72,7 +97,7 @@ class Profile extends AbstractObjectRelationalMapper
     ];
 }
 
-class User extends AbstractObjectRelationalMapper
+class User extends MockMapper
 {
     protected string $table = 'users';
 
@@ -90,12 +115,12 @@ class User extends AbstractObjectRelationalMapper
     }
 }
 
-class Tag extends AbstractObjectRelationalMapper
+class Tag extends MockMapper
 {
     protected string $table = 'tags';
 }
 
-class Post extends AbstractObjectRelationalMapper
+class Post extends MockMapper
 {
     protected string $table = 'posts';
 
@@ -163,6 +188,30 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testBelongsToFields(): void
+    {
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
+
+        $article->setFields('belongsTo', 'author', ['id','name']);
+
+        $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
+
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'author' => [
+                'id' => 2000,
+                'name' => 'Jon'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testBelongsToNotFound(): void
     {
         $this->dataSource->delete('authors', new QueryObject([]));
@@ -200,6 +249,27 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 'user_id' => 1000,
                 'created_at' => '2021-10-03 14:01:00',
                 'updated_at' => '2021-10-03 14:02:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testHasOneFields(): void
+    {
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
+        $user->setFields('hasOne', 'profile', ['id','name']);
+
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => [
+                'id' => 2000,
+                'name' => 'admin'
             ]
         ];
         $this->assertEquals($expected, $result->toArray());
@@ -271,6 +341,74 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testHasManyOrder(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author->setOrder('hasMany', 'articles', 'id DESC');
+
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ],
+                1 => [
+                    'id' => 1000,
+                    'title' => 'Article #1',
+                    'body' => 'A description for article #1',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:01:00',
+                    'updated_at' => '2021-10-03 09:02:00'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testHasManyFields(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author->setFields('hasMany', 'articles', ['id','title','body']);
+
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1000,
+                    'title' => 'Article #1',
+                    'body' => 'A description for article #1',
+                ],
+                1 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testHasManyDependent(): void
     {
         $author = new Author($this->dataSource, new MapperManager($this->dataSource));
@@ -302,7 +440,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    public function testHasAndBelongsToMany(): void
+    public function testBelongsToMany(): void
     {
         // Create extra
         $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
@@ -334,7 +472,80 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    public function testHasAndBelongsToManyNotFound(): void
+    public function testBelongsToManyFields(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post->setFields('belongsToMany', 'tags', ['id','name']);
+
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2000,
+                    'name' => 'Tag #1'
+                ],
+                1 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testBelongsToManyOrder(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $post->setAssociation('belongsToMany', ['tags' => [
+            'class' => Tag::class,
+            'joinTable' => 'posts_tags',
+            'foreignKey' => 'post_id',
+            'otherForeignKey' => 'tag_id',
+            'order' => 'id DESC',
+            'conditions' => [],
+            'fields' => [],
+        ]]);
+
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3',
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ],
+                1 => [
+                    'id' => 2000,
+                    'name' => 'Tag #1',
+                    'created_at' => '2021-10-03 09:01:00',
+                    'updated_at' => '2021-10-03 09:02:00',
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testBelongsToManyNotFound(): void
     {
         $this->dataSource->delete('tags', new QueryObject([]));
 

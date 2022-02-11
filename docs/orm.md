@@ -81,7 +81,6 @@ The following options are supported:
 - dependent: When set to true associated records will also be deleted
 - fields: An array of fields to select, if not provided it will use the Data Mapper default
 - conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
-- order: A setting for order e.g. `status DESC`
 
 ## Has Many (one-to-many)
 
@@ -103,7 +102,6 @@ The `belongsTo` association is a `many-to-one` relationship, for example: many c
 - foreignKey: the name of the foreign key in the current table
 - fields: An array of fields to select, if not provided it will use the Data Mapper default
 - conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
-- order: A setting for order e.g. `status DESC`
 
 ## BelongsToMany (many-to-many)
 

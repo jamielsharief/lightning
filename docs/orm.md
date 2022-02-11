@@ -9,8 +9,6 @@ Lets create an `Author` model which has many `Articles`.
 ```php
 class Author extends AbstractObjectRelationalMapper
 {
-    protected $primaryKey = 'id';
-
     protected string $table = 'authors';
 
     protected array $fields = [
@@ -49,7 +47,7 @@ class Article extends AbstractObjectRelationalMapper
 ```
 
 ```php
-$result = $article->findBy(['id'=>1000], ['with'=> [Author::class]]);
+$result = $article->findBy(['id'=>1000], ['with'=> ['author']]);
 ```
 
 The related `Author` is added to the `Article`
@@ -116,12 +114,11 @@ The following options are supported:
 - joinTable: the name of the join table
 - foreignKey: the name of the foreign key that references the current mapper
 - associatedForeignKey: the name of the foreign key that references the other mapper
-- dependent: When set to true when records are removed, related records from the join table will be deleted
-
+- dependent: When set to true related records from the join table will be deleted
 
 ## MapperManager
 
-The DataMapper manager is responsible for managing the mapper instances and creating them when needed, ensuring that there is only one instance ever created.
+The `MapperManager` is responsible for managing the data mapper instances and creating them when needed, ensuring that there is only one instance ever created and that mappers are available in any direction.
 
 To create the Manager in your DI container
 
@@ -144,8 +141,6 @@ $manager->configure(ArticleMapper::class, function(DataSourceInterface $dataSour
     return new ArticleMapper($dataSource, $manager, new SomeDependency());
 });
 ```
-
-
 
 ## Resources
 

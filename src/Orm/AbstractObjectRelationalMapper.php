@@ -37,7 +37,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
       *
       * @example
       *  'profile' => [
-      *       'class' => Profile::class
+      *       'className' => Profile::class
       *       'foreignKey' => 'user_id', // in other table
       *       'dependent' => false
       *   ]
@@ -49,7 +49,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     /**
      * @example
      *   'user' => [
-     *       'class' => User::class
+     *       'className' => User::class
      *       'foreignKey' => 'user_id' // in this table
      *   ]
      *
@@ -62,7 +62,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      * @example
      *
      *  'comments' => [
-     *      'class' => User::class
+     *      'className' => User::class
      *      'foreignKey' => 'user_id', // in other table
       *     'dependent' => false
      *  ]
@@ -75,7 +75,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      * @example
      *
      *  'tags' => [
-     *      'class' => User::class
+     *      'className' => User::class
      *      'joinTable' => 'tags_users',
      *      'foreignKey' => 'tag_id',
      *      'otherForeignKey' => 'user_id', // the foreignKey for the associated model
@@ -98,7 +98,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         $this->mapperManager = $mapperManager;
 
         parent::__construct($dataSource);
-        $this->checkAssociationDefinitions();
+        $this->initializeOrm();
     }
 
     /**
@@ -138,32 +138,57 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      * @return void
      */
-    private function checkAssociationDefinitions(): void
+    private function initializeOrm(): void
     {
         foreach ($this->associations as $assoc) {
             foreach ($this->$assoc as $property => &$config) {
-                $config += ['foreignKey' => null,'class' => null, 'dependent' => false, 'fields' => [], 'conditions' => [],'association' => $assoc, 'order' => null];
+                $config += [
+                    'foreignKey' => null,
+                    'className' => null,
+                    'dependent' => false,
+                    'fields' => [],
+                    'conditions' => [],
+                    'association' => $assoc,
+                    'order' => null,
+                    'propertyName' => $property
+                ];
 
                 if ($assoc === 'belongsTo') {
                     unset($config['dependent']);
                 }
 
-                if (empty($config['foreignKey'])) {
-                    throw new LogicException(sprintf('%s `%s` is missing foreignKey', $property, $assoc));
-                }
+                $this->validateAssociationDefinition($assoc, $config);
+            }
+        }
+    }
 
-                if (empty($config['class'])) {
-                    throw new LogicException(sprintf('%s `%s` is missing class', $property, $assoc));
-                }
+    /**
+     * Validates the defintion array has all the correct keys
+     *
+     * @param string $assoc
+     * @param array $config
+     * @return void
+     */
+    protected function validateAssociationDefinition(string $assoc, array $config): void
+    {
+        if (empty($config['propertyName'])) {
+            throw new LogicException(sprintf('%s is missing propertyName', $assoc));
+        }
 
-                if ($assoc === 'belongsToMany') {
-                    if (empty($config['joinTable'])) {
-                        throw new LogicException(sprintf('belongsToMany `%s` requires a joinTable key', $property));
-                    }
-                    if (empty($config['otherForeignKey'])) {
-                        throw new LogicException(sprintf('belongsToMany `%s` is missing otherForeignKey', $property));
-                    }
-                }
+        if (empty($config['foreignKey'])) {
+            throw new LogicException(sprintf('%s `%s` is missing foreignKey', $assoc, $config['propertyName']));
+        }
+
+        if (empty($config['className'])) {
+            throw new LogicException(sprintf('%s `%s` is missing className', $assoc, $config['propertyName']));
+        }
+
+        if ($assoc === 'belongsToMany') {
+            if (empty($config['joinTable'])) {
+                throw new LogicException(sprintf('belongsToMany `%s` is missing joinTable', $config['propertyName']));
+            }
+            if (empty($config['otherForeignKey'])) {
+                throw new LogicException(sprintf('belongsToMany `%s` is missing otherForeignKey', $config['propertyName']));
             }
         }
     }
@@ -193,32 +218,31 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             $row = $entity->toArray();
 
             foreach ($associations as $type => $association) {
-                foreach ($association as $property => $config) {
+                foreach ($association as $config) {
                     $conditions = $config['conditions'];
                     $options = [
-                        'fields' => $config['fields'],
-                        'order' => $config['order']
+                        'fields' => $config['fields'], 'order' => $config['order']
                     ];
 
-                    $mapper = $this->mapperManager->get($config['class']);
+                    $mapper = $this->mapperManager->get($config['className']);
                     $bindingKey = $mapper->getPrimaryKey()[0];
 
                     switch ($type) {
                             case 'belongsTo':
                                 $conditions[$bindingKey] = $row[$config['foreignKey']];
                                 $result = $mapper->findAllBy($conditions, $options);
-                                $this->setEntityValue($entity, $property, $result ? $result[0] : null);
+                                $this->setEntityValue($entity, $config['propertyName'], $result ? $result[0] : null);
 
                             break;
                             case 'hasOne':
                                 $conditions[$config['foreignKey']] = $row[$primaryKey];
                                 $result = $mapper->findAllBy($conditions, $options);
-                                $this->setEntityValue($entity, $property, $result ? $result[0] : null);
+                                $this->setEntityValue($entity, $config['propertyName'], $result ? $result[0] : null);
 
                             break;
                             case 'hasMany':
                                 $conditions[$config['foreignKey']] = $row[$bindingKey];
-                                $this->setEntityValue($entity, $property, $mapper->findAllBy($conditions, $options));
+                                $this->setEntityValue($entity, $config['propertyName'], $mapper->findAllBy($conditions, $options));
 
                             break;
                             case 'belongsToMany':
@@ -232,10 +256,9 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                                 }, $result->toArray());
 
                                 $conditions[$primaryKey] = $ids;
-                                $this->setEntityValue($entity, $property, $mapper->findAllBy($conditions, $options));
+                                $this->setEntityValue($entity, $config['propertyName'], $mapper->findAllBy($conditions, $options));
 
                             break;
-
                     }
                 }
             }
@@ -247,7 +270,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     private function setEntityValue(EntityInterface $entity, string $property, $value): void
     {
         if ($entity instanceof Entity) {
-            $entity[$property] = $value;
+            $entity->$property = $value;
 
             return;
         }
@@ -268,7 +291,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         foreach (['hasOne','hasMany'] as $assoc) {
             foreach ($this->$assoc as $config) {
                 if (! empty($config['dependent'])) {
-                    $mapper = $this->mapperManager->get($config['class']);
+                    $mapper = $this->mapperManager->get($config['className']);
                     foreach ($mapper->findAllBy([$config['foreignKey'] => $id]) as $entity) {
                         $mapper->delete($entity);
                     }

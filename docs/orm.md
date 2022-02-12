@@ -16,10 +16,11 @@ class Author extends AbstractObjectRelationalMapper
     ];
 
     protected array $hasMany = [
-        'articles' => [
-            'class' => Article::class,
+        [
+            'className' => Article::class,
             'foreignKey' => 'author_id', // in other table,
             'dependent' => true
+            'propertyName' => 'articles'
         ]
     ];
 }
@@ -38,9 +39,10 @@ class Article extends AbstractObjectRelationalMapper
     ];
 
     protected array $belongsTo = [
-        'author' => [
-            'class' => Author::class,
+        [
+            'className' => Author::class,
             'foreignKey' => 'author_id'
+            'propertyName' => 'author'
         ]
     ];
 }
@@ -76,7 +78,8 @@ The related `Author` is added to the `Article`
 The `hasOne` association is a `one-to-one` relationship, for example: a user has one profile. The foreign key is in the other table, so the profiles table has the column `user_id`.
 
 The following options are supported:
-- class: class for the Object Relational Mapper 
+- className: class for the Object Relational Mapper 
+- propertyName: the name of the property where the data will be set
 - foreignKey: the name of the foreign key in the other table
 - dependent: When set to true associated records will also be deleted
 - fields: An array of fields to select, if not provided it will use the Data Mapper default
@@ -87,7 +90,8 @@ The following options are supported:
 The  `hasMany`  association is `one-to-many` relationship, for example: a user has many contacts.  The foreign key is in the other table, so the contacts table has the column `user_id`.
 
 The following options are supported:
-- class: class for the Object Relational Mapper 
+- className: class for the Object Relational Mapper  
+- propertyName: the name of the property where the data will be set
 - foreignKey: the name of the foreign key in the other table
 - dependent: When set to true associated records will also be deleted
 - fields: An array of fields to select, if not provided it will use the Data Mapper default
@@ -98,7 +102,8 @@ The following options are supported:
 
 The `belongsTo` association is a `many-to-one` relationship, for example: many contacts belong to a user. The foreign key is in the current table, so the contacts table has the column `user_id`.
 
-- class: class for the Object Relational Mapper 
+- className: class for the Object Relational Mappe 
+- propertyName: the name of the property where the data will be set 
 - foreignKey: the name of the foreign key in the current table
 - fields: An array of fields to select, if not provided it will use the Data Mapper default
 - conditions: An array of additional criteria to use. e.g. `['tenant_id' => TENANT_ID]`
@@ -116,7 +121,8 @@ CREATE TABLE `posts_tags` (
 ```
 
 The following options are supported:
-- class: class for the Object Relational Mapper
+- className: class for the Object Relational Mapper 
+- propertyName: the name of the property where the data will be set
 - joinTable: the name of the join table
 - foreignKey: the name of the foreign key used by this Data Mapper
 - otherForeignKey: the name of the foreign key used by the other Data Mapper

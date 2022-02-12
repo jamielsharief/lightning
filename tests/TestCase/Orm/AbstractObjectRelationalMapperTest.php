@@ -3,6 +3,7 @@
 namespace Lightning\Test\Repository;
 
 use PDO;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
 use function Lightning\Dotenv\env;
@@ -24,6 +25,11 @@ use Lightning\DataMapper\DataSource\DatabaseDataSource;
 
 class MockMapper extends AbstractObjectRelationalMapper
 {
+    public function checkAssociationDefinition(string $assoc, array $config): void
+    {
+        $this->validateAssociationDefinition($assoc, $config);
+    }
+
     public function setAssociation(string $name, array $setting): self
     {
         $this->$name = $setting;
@@ -235,7 +241,7 @@ class Article extends MockMapper
 
     protected array $belongsTo = [
         'author' => [
-            'class' => Author::class,
+            'className' => Author::class,
             'foreignKey' => 'author_id'
         ]
     ];
@@ -256,7 +262,7 @@ class Author extends MockMapper
 
     protected array $hasMany = [
         'articles' => [
-            'class' => Article::class,
+            'className' => Article::class,
             'foreignKey' => 'author_id', // in other table,
             'dependent' => true
         ]
@@ -274,7 +280,7 @@ class Profile extends MockMapper
 
     protected array $belongsTo = [
         'user' => [
-            'class' => User::class,
+            'className' => User::class,
             'foreignKey' => 'user_id'
         ]
     ];
@@ -286,7 +292,7 @@ class User extends MockMapper
 
     protected array $hasOne = [
         'profile' => [
-            'class' => Profile::class,
+            'className' => Profile::class,
             'foreignKey' => 'user_id', // other table
             'dependent' => true
         ]
@@ -309,7 +315,7 @@ class Post extends MockMapper
 
     protected array $belongsToMany = [
         'tags' => [
-            'class' => Tag::class,
+            'className' => Tag::class,
             'joinTable' => 'posts_tags',
             'foreignKey' => 'post_id',
             'otherForeignKey' => 'tag_id',
@@ -367,6 +373,39 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 'created_at' => '2021-10-03 14:01:00',
                 'updated_at' => '2021-10-03 14:02:00'
             ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testBelongsToConditions(): void
+    {
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
+
+        $article->setAssociation('belongsTo', [
+            [
+                'className' => Author::class,
+                'foreignKey' => 'author_id',
+                'order' => null,
+                'fields' => [],
+                'conditions' => [
+                    'authors.id <>' => 2000
+                ],
+                'propertyName' => 'author'
+            ]
+
+        ]);
+        $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
+
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'author' => null
+
         ];
         $this->assertEquals($expected, $result->toArray());
     }
@@ -432,6 +471,50 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 'user_id' => 1000,
                 'created_at' => '2021-10-03 14:01:00',
                 'updated_at' => '2021-10-03 14:02:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testHasOneConditions(): void
+    {
+
+        // Create Extra Record
+        $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
+        $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
+
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
+
+        $user->setAssociation('hasOne', [
+            [
+                'className' => Profile::class,
+                'foreignKey' => 'user_id', // other table
+                'dependent' => true,
+                'propertyName' => 'profile',
+                'conditions' => [
+                    'profiles.id !=' => 2000
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'profile'
+
+            ]
+        ]);
+
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => [
+                'id' => 2001,
+                'name' => 'standard',
+                'user_id' => 1000,
+                'created_at' => '2021-10-03 14:03:00',
+                'updated_at' => '2021-10-03 14:04:00'
             ]
         ];
         $this->assertEquals($expected, $result->toArray());
@@ -512,6 +595,47 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'author' => null
                 ],
                 1 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result->toArray());
+    }
+
+    public function testHasManyConditions(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+
+        $author->setAssociation('hasMany', [
+            [
+                'className' => Article::class,
+                'foreignKey' => 'author_id', // in other table,
+                'dependent' => true,
+                'fields' => [],
+                'conditions' => ['id <>' => 1000],
+                'order' => null,
+                'propertyName' => 'articles'
+            ]
+        ]);
+
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
                     'id' => 1002,
                     'title' => 'Article #3',
                     'body' => 'A description for article #3',
@@ -669,6 +793,48 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    public function testBelongsToManyConditions(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $post->setAssociation('belongsToMany', [
+            [
+                'className' => Tag::class,
+                'joinTable' => 'posts_tags',
+                'foreignKey' => 'post_id',
+                'otherForeignKey' => 'tag_id',
+                'conditions' => [
+                    'id !=' => 2000,
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'tags'
+            ]
+        ]);
+
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3',
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
+
     public function testBelongsToManyFields(): void
     {
         // Create extra
@@ -706,15 +872,17 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-        $post->setAssociation('belongsToMany', ['tags' => [
-            'class' => Tag::class,
-            'joinTable' => 'posts_tags',
-            'foreignKey' => 'post_id',
-            'otherForeignKey' => 'tag_id',
-            'order' => 'id DESC',
-            'conditions' => [],
-            'fields' => [],
-        ]]);
+        $post->setAssociation('belongsToMany', [
+            [
+                'className' => Tag::class,
+                'joinTable' => 'posts_tags',
+                'foreignKey' => 'post_id',
+                'otherForeignKey' => 'tag_id',
+                'order' => 'id DESC',
+                'conditions' => [],
+                'fields' => [],
+                'propertyName' => 'tags'
+            ]]);
 
         $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
@@ -773,5 +941,93 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals(2, $this->dataSource->count('posts_tags', $query));
         $this->assertEquals(1, $post ->delete($post->get(new QueryObject(['id' => 1000]))));
         $this->assertEquals(0, $this->dataSource->count('posts_tags', $query));
+    }
+
+    public function testInvalidAssociationDefinitionPropertyName(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo is missing propertyName');
+
+        $post->checkAssociationDefinition('belongsTo', [
+            'className' => Profile::class,
+            'foreignKey' => 'user_id', // other table
+            'dependent' => true,
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
+
+    public function testInvalidAssociationDefinitionForeignKey(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo `foo` is missing foreignKey');
+
+        $post->checkAssociationDefinition('belongsTo', [
+            'className' => Profile::class,
+            'dependent' => true,
+            'propertyName' => 'foo',
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
+
+    public function testInvalidAssociationDefinitionClassName(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo `foo` is missing className');
+
+        $post->checkAssociationDefinition('belongsTo', [
+            // 'className' => Profile::class,
+            'foreignKey' => 'user_id', // other table
+            'dependent' => true,
+            'propertyName' => 'foo',
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
+
+    public function testInvalidAssociationDefinitionJoinTable(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsToMany `tags` is missing joinTable');
+
+        $post->checkAssociationDefinition('belongsToMany', [
+            'className' => Tag::class,
+            'foreignKey' => 'post_id',
+            'otherForeignKey' => 'tag_id',
+            'conditions' => [],
+            'order' => null,
+            'fields' => [],
+            'propertyName' => 'tags'
+        ]);
+    }
+
+    public function testInvalidAssociationDefinitionOtherForeignKey(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsToMany `tags` is missing otherForeignKey');
+
+        $post->checkAssociationDefinition('belongsToMany', [
+            'className' => Tag::class,
+            'joinTable' => 'posts_tags',
+            'foreignKey' => 'post_id',
+            'conditions' => [],
+            'order' => null,
+            'fields' => [],
+            'propertyName' => 'tags'
+        ]);
     }
 }

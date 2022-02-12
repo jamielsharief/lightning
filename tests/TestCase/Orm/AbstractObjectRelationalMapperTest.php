@@ -97,10 +97,10 @@ class ArticleEntity extends AbstractEntity
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->id ? (int) $this->id : null,
             'title' => $this->title,
             'body' => $this->body,
-            'author_id' => $this->author_id,
+            'author_id' => $this->author_id ? (int) $this->author_id : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'author' => $this->author ? $this->author->toArray() : null

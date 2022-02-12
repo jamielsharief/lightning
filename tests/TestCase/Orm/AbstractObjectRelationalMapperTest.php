@@ -68,7 +68,7 @@ class ArticleEntity extends AbstractEntity
         $article = new static();
 
         if (isset($state['id'])) {
-            $article->id = $state['id'];
+            $article->id = (int) $state['id'];
         }
 
         foreach ($state as $key => $value) {

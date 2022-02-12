@@ -71,8 +71,24 @@ class ArticleEntity extends AbstractEntity
             $article->id = (int) $state['id'];
         }
 
-        foreach ($state as $key => $value) {
-            $article->$key = $value;
+        if (! empty($state['title'])) {
+            $article->setTitle($state['title']);
+        }
+
+        if (! empty($state['body'])) {
+            $article->setBody($state['body']);
+        }
+
+        if (! empty($state['author_id'])) {
+            $article->setAuthorId((int ) $state['author_id']);
+        }
+
+        if (! empty($state['created_at'])) {
+            $article->setCreatedAt($state['created_at']);
+        }
+
+        if (! empty($state['updated_at'])) {
+            $article->setUpdatedAt($state['updated_at']);
         }
 
         return $article;

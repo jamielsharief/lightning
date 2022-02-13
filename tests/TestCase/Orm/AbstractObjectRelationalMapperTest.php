@@ -39,17 +39,28 @@ class MockMapper extends AbstractObjectRelationalMapper
 
     public function setFields(string $association, string $name, array $fields)
     {
-        $this->$association[$name]['fields'] = $fields;
+        $this->$association[$this->findIndex($association, $name)]['fields'] = $fields;
     }
 
     public function setConditions(string $association, string $name, array $conditions)
     {
-        $this->$association[$name]['conditions'] = $conditions;
+        $this->$association[$this->findIndex($association, $name)]['conditions'] = $conditions;
     }
 
     public function setOrder(string $association, string $name, $order)
     {
-        $this->$association[$name]['order'] = $order;
+        $this->$association[$this->findIndex($association, $name)]['order'] = $order;
+    }
+
+    private function findIndex(string $association, string $name): ?int
+    {
+        foreach ($this->$association as $key => $config) {
+            if ($config['propertyName'] === $name) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 }
 
@@ -256,9 +267,10 @@ class Article extends MockMapper
     ];
 
     protected array $belongsTo = [
-        'author' => [
+        [
             'className' => Author::class,
-            'foreignKey' => 'author_id'
+            'foreignKey' => 'author_id',
+            'propertyName' => 'author'
         ]
     ];
 
@@ -277,16 +289,17 @@ class Author extends MockMapper
     ];
 
     protected array $hasMany = [
-        'articles' => [
+        [
             'className' => Article::class,
             'foreignKey' => 'author_id', // in other table,
-            'dependent' => true
+            'dependent' => true,
+            'propertyName' => 'articles'
         ]
     ];
 
     public function setDependent(bool $dependent): void
     {
-        $this->hasMany['articles']['dependent'] = $dependent;
+        $this->hasMany[0]['dependent'] = $dependent;
     }
 }
 
@@ -295,9 +308,10 @@ class Profile extends MockMapper
     protected string $table = 'profiles';
 
     protected array $belongsTo = [
-        'user' => [
+        [
             'className' => User::class,
-            'foreignKey' => 'user_id'
+            'foreignKey' => 'user_id',
+            'propertyName' => 'user'
         ]
     ];
 }
@@ -307,16 +321,17 @@ class User extends MockMapper
     protected string $table = 'users';
 
     protected array $hasOne = [
-        'profile' => [
+        [
             'className' => Profile::class,
             'foreignKey' => 'user_id', // other table
-            'dependent' => true
+            'dependent' => true,
+            'propertyName' => 'profile'
         ]
     ];
 
     public function setDependent(bool $dependent): void
     {
-        $this->hasOne['profile']['dependent'] = $dependent;
+        $this->hasOne[0]['dependent'] = $dependent;
     }
 }
 
@@ -330,17 +345,18 @@ class Post extends MockMapper
     protected string $table = 'posts';
 
     protected array $belongsToMany = [
-        'tags' => [
+        [
             'className' => Tag::class,
             'joinTable' => 'posts_tags',
             'foreignKey' => 'post_id',
             'otherForeignKey' => 'tag_id',
+            'propertyName' => 'tags'
         ]
     ];
 
     public function setDependent(bool $dependent): void
     {
-        $this->belongsToMany['tags']['dependent'] = $dependent;
+        $this->belongsToMany[0]['dependent'] = $dependent;
     }
 }
 
@@ -521,7 +537,6 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-        dd($result->toArray());
         # Important check with array not toJson
         $expected = [
             'id' => 1000,

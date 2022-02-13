@@ -492,15 +492,18 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    /**
+     * TODO: This not passing on github actions
+     */
     public function testHasOneConditions(): void
     {
-
         // Create Extra Record
         $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
         $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
 
         $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
+        dump($user);
         $user->setAssociation('hasOne', [
             [
                 'className' => Profile::class,
@@ -519,6 +522,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
+        dump($result);
         # Important check with array not toJson
         $expected = [
             'id' => 1000,
@@ -625,6 +629,9 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    /**
+     * TODO: This not passing on github actions
+     */
     public function testHasManyConditions(): void
     {
         $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
@@ -809,6 +816,9 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    /**
+     * TODO: This not passing on github actions
+     */
     public function testBelongsToManyConditions(): void
     {
         // Create extra
@@ -881,6 +891,9 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
+    /**
+     * TODO: This not passing on github actions
+     */
     public function testBelongsToManyOrder(): void
     {
         // Create extra

@@ -503,7 +503,6 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
-        dump($user);
         $user->setAssociation('hasOne', [
             [
                 'className' => Profile::class,
@@ -511,7 +510,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 'dependent' => true,
                 'propertyName' => 'profile',
                 'conditions' => [
-                    'profiles.id !=' => 2000
+                    'profiles.id <>' => 2000
                 ],
                 'order' => null,
                 'fields' => [],
@@ -522,7 +521,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
         $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-        dump($result);
+        dd($result->toArray());
         # Important check with array not toJson
         $expected = [
             'id' => 1000,

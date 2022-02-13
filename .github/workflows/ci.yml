@@ -11,12 +11,12 @@ jobs:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-20.04"
     strategy:
-      max-parallel: 3
+#      max-parallel: 3
       matrix:
         php-version:
-          - "7.4"
+#          - "7.4"
           - "8.0"
-          - "8.1"
+#          - "8.1"
         database:
           - sqlite
           - mysql

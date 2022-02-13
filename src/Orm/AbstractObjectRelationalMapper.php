@@ -222,9 +222,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
             foreach ($associations as $type => $association) {
                 foreach ($association as $config) {
                     $conditions = $config['conditions'];
-                    $options = [
-                        'fields' => $config['fields'], 'order' => $config['order']
-                    ];
+                    $options = ['fields' => $config['fields'], 'order' => $config['order']];
 
                     $mapper = $this->mapperManager->get($config['className']);
                     $bindingKey = $mapper->getPrimaryKey()[0];

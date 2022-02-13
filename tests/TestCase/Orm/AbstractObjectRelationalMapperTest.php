@@ -412,81 +412,81 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    // public function testBelongsToConditions(): void
-    // {
-    //     $article = new Article($this->dataSource, new MapperManager($this->dataSource));
+    public function testBelongsToConditions(): void
+    {
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $article->setAssociation('belongsTo', [
-    //         [
-    //             'className' => Author::class,
-    //             'foreignKey' => 'author_id',
-    //             'order' => null,
-    //             'fields' => [],
-    //             'conditions' => [
-    //                 'authors.id <>' => 2000
-    //             ],
-    //             'propertyName' => 'author'
-    //         ]
+        $article->setAssociation('belongsTo', [
+            [
+                'className' => Author::class,
+                'foreignKey' => 'author_id',
+                'order' => null,
+                'fields' => [],
+                'conditions' => [
+                    'authors.id <>' => 2000
+                ],
+                'propertyName' => 'author'
+            ]
 
-    //     ]);
-    //     $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
+        ]);
+        $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Article #1',
-    //         'body' => 'A description for article #1',
-    //         'author_id' => 2000,
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'author' => null
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'author' => null
 
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testBelongsToFields(): void
-    // {
-    //     $article = new Article($this->dataSource, new MapperManager($this->dataSource));
+    public function testBelongsToFields(): void
+    {
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $article->setFields('belongsTo', 'author', ['id','name']);
+        $article->setFields('belongsTo', 'author', ['id','name']);
 
-    //     $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
+        $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Article #1',
-    //         'body' => 'A description for article #1',
-    //         'author_id' => 2000,
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'author' => [
-    //             'id' => 2000,
-    //             'name' => 'Jon'
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'author' => [
+                'id' => 2000,
+                'name' => 'Jon'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testBelongsToNotFound(): void
-    // {
-    //     $this->dataSource->delete('authors', new QueryObject([]));
+    public function testBelongsToNotFound(): void
+    {
+        $this->dataSource->delete('authors', new QueryObject([]));
 
-    //     $article = new Article($this->dataSource, new MapperManager($this->dataSource));
+        $article = new Article($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Article #1',
-    //         'body' => 'A description for article #1',
-    //         'author_id' => 2000,
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'author' => null
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $result = $article->getBy(['id' => 1000], ['with' => ['author']]);
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'author' => null
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
     public function testHasOne(): void
     {
@@ -511,102 +511,102 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    // /**
-    //  * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
-    //  */
-    // public function testHasOneConditions(): void
-    // {
-    //     // Create Extra Record
-    //     $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
-    //     $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
+    /**
+     * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
+     */
+    public function testHasOneConditions(): void
+    {
+        // Create Extra Record
+        $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
+        $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
 
-    //     $user = new User($this->dataSource, new MapperManager($this->dataSource));
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $user->setAssociation('hasOne', [
-    //         [
-    //             'className' => Profile::class,
-    //             'foreignKey' => 'user_id', // other table
-    //             'dependent' => true,
-    //             'propertyName' => 'profile',
-    //             'conditions' => [
-    //                 'profiles.id <>' => 2000
-    //             ],
-    //             'order' => null,
-    //             'fields' => [],
-    //             'propertyName' => 'profile'
+        $user->setAssociation('hasOne', [
+            [
+                'className' => Profile::class,
+                'foreignKey' => 'user_id', // other table
+                'dependent' => true,
+                'propertyName' => 'profile',
+                'conditions' => [
+                    'profiles.id <>' => 2000
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'profile'
 
-    //         ]
-    //     ]);
+            ]
+        ]);
 
-    //     $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'name' => 'User #1',
-    //         'created_at' => '2021-10-14 09:01:00',
-    //         'updated_at' => '2021-10-14 09:02:00',
-    //         'profile' => [
-    //             'id' => 2001,
-    //             'name' => 'standard',
-    //             'user_id' => 1000,
-    //             'created_at' => '2021-10-03 14:03:00',
-    //             'updated_at' => '2021-10-03 14:04:00'
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => [
+                'id' => 2001,
+                'name' => 'standard',
+                'user_id' => 1000,
+                'created_at' => '2021-10-03 14:03:00',
+                'updated_at' => '2021-10-03 14:04:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasOneFields(): void
-    // {
-    //     $user = new User($this->dataSource, new MapperManager($this->dataSource));
-    //     $user->setFields('hasOne', 'profile', ['id','name']);
+    public function testHasOneFields(): void
+    {
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
+        $user->setFields('hasOne', 'profile', ['id','name']);
 
-    //     $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'name' => 'User #1',
-    //         'created_at' => '2021-10-14 09:01:00',
-    //         'updated_at' => '2021-10-14 09:02:00',
-    //         'profile' => [
-    //             'id' => 2000,
-    //             'name' => 'admin'
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => [
+                'id' => 2000,
+                'name' => 'admin'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasOneNotFound(): void
-    // {
-    //     $this->dataSource->delete('profiles', new QueryObject([]));
-    //     $user = new User($this->dataSource, new MapperManager($this->dataSource));
+    public function testHasOneNotFound(): void
+    {
+        $this->dataSource->delete('profiles', new QueryObject([]));
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'name' => 'User #1',
-    //         'created_at' => '2021-10-14 09:01:00',
-    //         'updated_at' => '2021-10-14 09:02:00',
-    //         'profile' => null
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => null
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasOneDepenent(): void
-    // {
-    //     $user = new User($this->dataSource, new MapperManager($this->dataSource));
-    //     $user->setDependent(true);
+    public function testHasOneDepenent(): void
+    {
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
+        $user->setDependent(true);
 
-    //     $query = new QueryObject(['user_id' => 1000]);
+        $query = new QueryObject(['user_id' => 1000]);
 
-    //     $this->assertEquals(1, $this->dataSource->count('profiles', $query));
-    //     $this->assertEquals(1, $user->delete($user->get(new QueryObject(['id' => 1000]))));
-    //     $this->assertEquals(0, $this->dataSource->count('profiles', $query));
-    // }
+        $this->assertEquals(1, $this->dataSource->count('profiles', $query));
+        $this->assertEquals(1, $user->delete($user->get(new QueryObject(['id' => 1000]))));
+        $this->assertEquals(0, $this->dataSource->count('profiles', $query));
+    }
 
     public function testHasMany(): void
     {
@@ -646,160 +646,160 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    // /**
-    //  * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
-    //  */
-    // public function testHasManyConditions(): void
-    // {
-    //     $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+    /**
+     * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
+     */
+    public function testHasManyConditions(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $author->setAssociation('hasMany', [
-    //         [
-    //             'className' => Article::class,
-    //             'foreignKey' => 'author_id', // in other table,
-    //             'dependent' => true,
-    //             'fields' => [],
-    //             'conditions' => ['id <>' => 1000],
-    //             'order' => null,
-    //             'propertyName' => 'articles'
-    //         ]
-    //     ]);
+        $author->setAssociation('hasMany', [
+            [
+                'className' => Article::class,
+                'foreignKey' => 'author_id', // in other table,
+                'dependent' => true,
+                'fields' => [],
+                'conditions' => ['id <>' => 1000],
+                'order' => null,
+                'propertyName' => 'articles'
+            ]
+        ]);
 
-    //     $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
-    //     $expected = [
-    //         'id' => 2000,
-    //         'name' => 'Jon',
-    //         'created_at' => '2021-10-03 14:01:00',
-    //         'updated_at' => '2021-10-03 14:02:00',
-    //         'articles' => [
-    //             0 => [
-    //                 'id' => 1002,
-    //                 'title' => 'Article #3',
-    //                 'body' => 'A description for article #3',
-    //                 'author_id' => 2000,
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00',
-    //                 'author' => null
-    //             ]
-    //         ]
-    //     ];
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
+                ]
+            ]
+        ];
 
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasManyOrder(): void
-    // {
-    //     $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+    public function testHasManyOrder(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
-    //     $author->setOrder('hasMany', 'articles', 'id DESC');
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author->setOrder('hasMany', 'articles', 'id DESC');
 
-    //     $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
-    //     $expected = [
-    //         'id' => 2000,
-    //         'name' => 'Jon',
-    //         'created_at' => '2021-10-03 14:01:00',
-    //         'updated_at' => '2021-10-03 14:02:00',
-    //         'articles' => [
-    //             0 => [
-    //                 'id' => 1002,
-    //                 'title' => 'Article #3',
-    //                 'body' => 'A description for article #3',
-    //                 'author_id' => 2000,
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00',
-    //                 'author' => null
-    //             ],
-    //             1 => [
-    //                 'id' => 1000,
-    //                 'title' => 'Article #1',
-    //                 'body' => 'A description for article #1',
-    //                 'author_id' => 2000,
-    //                 'created_at' => '2021-10-03 09:01:00',
-    //                 'updated_at' => '2021-10-03 09:02:00',
-    //                 'author' => null
-    //             ]
-    //         ]
-    //     ];
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
+                ],
+                1 => [
+                    'id' => 1000,
+                    'title' => 'Article #1',
+                    'body' => 'A description for article #1',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:01:00',
+                    'updated_at' => '2021-10-03 09:02:00',
+                    'author' => null
+                ]
+            ]
+        ];
 
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasManyFields(): void
-    // {
-    //     $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+    public function testHasManyFields(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
-    //     $author->setFields('hasMany', 'articles', ['id','title','body']);
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author->setFields('hasMany', 'articles', ['id','title','body']);
 
-    //     $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
-    //     // This looks incorrect because of fields, but it means that the fields were not selected and hence why it is empty for this type of entity
+        // This looks incorrect because of fields, but it means that the fields were not selected and hence why it is empty for this type of entity
 
-    //     $expected = [
-    //         'id' => 2000,
-    //         'name' => 'Jon',
-    //         'created_at' => '2021-10-03 14:01:00',
-    //         'updated_at' => '2021-10-03 14:02:00',
-    //         'articles' => [
-    //             0 => [
-    //                 'id' => 1000,
-    //                 'title' => 'Article #1',
-    //                 'body' => 'A description for article #1',
-    //                 'author_id' => null,
-    //                 'created_at' => null,
-    //                 'updated_at' => null,
-    //                 'author' => null
-    //             ],
-    //             1 => [
-    //                 'id' => 1002,
-    //                 'title' => 'Article #3',
-    //                 'body' => 'A description for article #3',
-    //                 'author_id' => null,
-    //                 'created_at' => null,
-    //                 'updated_at' => null,
-    //                 'author' => null
-    //             ]
-    //         ]
-    //     ];
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1000,
+                    'title' => 'Article #1',
+                    'body' => 'A description for article #1',
+                    'author_id' => null,
+                    'created_at' => null,
+                    'updated_at' => null,
+                    'author' => null
+                ],
+                1 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => null,
+                    'created_at' => null,
+                    'updated_at' => null,
+                    'author' => null
+                ]
+            ]
+        ];
 
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasManyDependent(): void
-    // {
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
-    //     $author->setDependent(true);
+    public function testHasManyDependent(): void
+    {
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author->setDependent(true);
 
-    //     $query = new QueryObject(['author_id' => 2000]);
+        $query = new QueryObject(['author_id' => 2000]);
 
-    //     $this->assertEquals(1, $this->dataSource->count('articles', $query));
-    //     $this->assertEquals(1, $author ->delete($author->get(new QueryObject(['id' => 2000]))));
-    //     $this->assertEquals(0, $this->dataSource->count('articles', $query));
-    // }
+        $this->assertEquals(1, $this->dataSource->count('articles', $query));
+        $this->assertEquals(1, $author ->delete($author->get(new QueryObject(['id' => 2000]))));
+        $this->assertEquals(0, $this->dataSource->count('articles', $query));
+    }
 
-    // public function testHasManyNotFound(): void
-    // {
-    //     $this->dataSource->delete('articles', new QueryObject([]));
+    public function testHasManyNotFound(): void
+    {
+        $this->dataSource->delete('articles', new QueryObject([]));
 
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
-    //     $expected = [
-    //         'id' => 2000,
-    //         'name' => 'Jon',
-    //         'created_at' => '2021-10-03 14:01:00',
-    //         'updated_at' => '2021-10-03 14:02:00',
-    //         'articles' => []
-    //     ];
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => []
+        ];
 
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $this->assertEquals($expected, $result->toArray());
+    }
 
     public function testBelongsToMany(): void
     {
@@ -833,247 +833,247 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    // /**
-    //  * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
-    //  */
-    // public function testBelongsToManyConditions(): void
-    // {
-    //     // Create extra
-    //     $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+    /**
+     * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
+     */
+    public function testBelongsToManyConditions(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $post->setAssociation('belongsToMany', [
-    //         [
-    //             'className' => Tag::class,
-    //             'joinTable' => 'posts_tags',
-    //             'foreignKey' => 'post_id',
-    //             'otherForeignKey' => 'tag_id',
-    //             'conditions' => [
-    //                 'id !=' => 2000,
-    //             ],
-    //             'order' => null,
-    //             'fields' => [],
-    //             'propertyName' => 'tags'
-    //         ]
-    //     ]);
+        $post->setAssociation('belongsToMany', [
+            [
+                'className' => Tag::class,
+                'joinTable' => 'posts_tags',
+                'foreignKey' => 'post_id',
+                'otherForeignKey' => 'tag_id',
+                'conditions' => [
+                    'id !=' => 2000,
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'tags'
+            ]
+        ]);
 
-    //     $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Post #1',
-    //         'body' => 'A description for post #1',
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'tags' => [
-    //             0 => [
-    //                 'id' => 2002,
-    //                 'name' => 'Tag #3',
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00'
-    //             ]
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3',
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testBelongsToManyFields(): void
-    // {
-    //     // Create extra
-    //     $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+    public function testBelongsToManyFields(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
-    //     $post->setFields('belongsToMany', 'tags', ['id','name']);
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post->setFields('belongsToMany', 'tags', ['id','name']);
 
-    //     $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Post #1',
-    //         'body' => 'A description for post #1',
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'tags' => [
-    //             0 => [
-    //                 'id' => 2000,
-    //                 'name' => 'Tag #1'
-    //             ],
-    //             1 => [
-    //                 'id' => 2002,
-    //                 'name' => 'Tag #3'
-    //             ]
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2000,
+                    'name' => 'Tag #1'
+                ],
+                1 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // /**
-    //  * TODO: This not passing on github actions
-    //  */
-    // public function testBelongsToManyOrder(): void
-    // {
-    //     // Create extra
-    //     $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+    /**
+     * TODO: This not passing on github actions
+     */
+    public function testBelongsToManyOrder(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $post->setAssociation('belongsToMany', [
-    //         [
-    //             'className' => Tag::class,
-    //             'joinTable' => 'posts_tags',
-    //             'foreignKey' => 'post_id',
-    //             'otherForeignKey' => 'tag_id',
-    //             'order' => 'id DESC',
-    //             'conditions' => [],
-    //             'fields' => [],
-    //             'propertyName' => 'tags'
-    //         ]]);
+        $post->setAssociation('belongsToMany', [
+            [
+                'className' => Tag::class,
+                'joinTable' => 'posts_tags',
+                'foreignKey' => 'post_id',
+                'otherForeignKey' => 'tag_id',
+                'order' => 'id DESC',
+                'conditions' => [],
+                'fields' => [],
+                'propertyName' => 'tags'
+            ]]);
 
-    //     $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Post #1',
-    //         'body' => 'A description for post #1',
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'tags' => [
-    //             0 => [
-    //                 'id' => 2002,
-    //                 'name' => 'Tag #3',
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00'
-    //             ],
-    //             1 => [
-    //                 'id' => 2000,
-    //                 'name' => 'Tag #1',
-    //                 'created_at' => '2021-10-03 09:01:00',
-    //                 'updated_at' => '2021-10-03 09:02:00',
-    //             ]
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3',
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ],
+                1 => [
+                    'id' => 2000,
+                    'name' => 'Tag #1',
+                    'created_at' => '2021-10-03 09:01:00',
+                    'updated_at' => '2021-10-03 09:02:00',
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testBelongsToManyNotFound(): void
-    // {
-    //     $this->dataSource->delete('tags', new QueryObject([]));
+    public function testBelongsToManyNotFound(): void
+    {
+        $this->dataSource->delete('tags', new QueryObject([]));
 
-    //     // Create extra
-    //     $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
-    //     $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Post #1',
-    //         'body' => 'A description for post #1',
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'tags' => []
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => []
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
-    // public function testHasAndBelongsToDependent(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
-    //     $post->setDependent(true);
+    public function testHasAndBelongsToDependent(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post->setDependent(true);
 
-    //     $query = new QueryObject(['post_id' => 1000]);
+        $query = new QueryObject(['post_id' => 1000]);
 
-    //     $this->assertEquals(2, $this->dataSource->count('posts_tags', $query));
-    //     $this->assertEquals(1, $post ->delete($post->get(new QueryObject(['id' => 1000]))));
-    //     $this->assertEquals(0, $this->dataSource->count('posts_tags', $query));
-    // }
+        $this->assertEquals(2, $this->dataSource->count('posts_tags', $query));
+        $this->assertEquals(1, $post ->delete($post->get(new QueryObject(['id' => 1000]))));
+        $this->assertEquals(0, $this->dataSource->count('posts_tags', $query));
+    }
 
-    // public function testInvalidAssociationDefinitionPropertyName(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+    public function testInvalidAssociationDefinitionPropertyName(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $this->expectException(LogicException::class);
-    //     $this->expectExceptionMessage('belongsTo is missing propertyName');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo is missing propertyName');
 
-    //     $post->checkAssociationDefinition('belongsTo', [
-    //         'className' => Profile::class,
-    //         'foreignKey' => 'user_id', // other table
-    //         'dependent' => true,
-    //         'conditions' => [],
-    //         'order' => null,
-    //         'fields' => []
-    //     ]);
-    // }
+        $post->checkAssociationDefinition('belongsTo', [
+            'className' => Profile::class,
+            'foreignKey' => 'user_id', // other table
+            'dependent' => true,
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
 
-    // public function testInvalidAssociationDefinitionForeignKey(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+    public function testInvalidAssociationDefinitionForeignKey(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $this->expectException(LogicException::class);
-    //     $this->expectExceptionMessage('belongsTo `foo` is missing foreignKey');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo `foo` is missing foreignKey');
 
-    //     $post->checkAssociationDefinition('belongsTo', [
-    //         'className' => Profile::class,
-    //         'dependent' => true,
-    //         'propertyName' => 'foo',
-    //         'conditions' => [],
-    //         'order' => null,
-    //         'fields' => []
-    //     ]);
-    // }
+        $post->checkAssociationDefinition('belongsTo', [
+            'className' => Profile::class,
+            'dependent' => true,
+            'propertyName' => 'foo',
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
 
-    // public function testInvalidAssociationDefinitionClassName(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+    public function testInvalidAssociationDefinitionClassName(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $this->expectException(LogicException::class);
-    //     $this->expectExceptionMessage('belongsTo `foo` is missing className');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsTo `foo` is missing className');
 
-    //     $post->checkAssociationDefinition('belongsTo', [
-    //         // 'className' => Profile::class,
-    //         'foreignKey' => 'user_id', // other table
-    //         'dependent' => true,
-    //         'propertyName' => 'foo',
-    //         'conditions' => [],
-    //         'order' => null,
-    //         'fields' => []
-    //     ]);
-    // }
+        $post->checkAssociationDefinition('belongsTo', [
+            // 'className' => Profile::class,
+            'foreignKey' => 'user_id', // other table
+            'dependent' => true,
+            'propertyName' => 'foo',
+            'conditions' => [],
+            'order' => null,
+            'fields' => []
+        ]);
+    }
 
-    // public function testInvalidAssociationDefinitionJoinTable(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+    public function testInvalidAssociationDefinitionJoinTable(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $this->expectException(LogicException::class);
-    //     $this->expectExceptionMessage('belongsToMany `tags` is missing joinTable');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsToMany `tags` is missing joinTable');
 
-    //     $post->checkAssociationDefinition('belongsToMany', [
-    //         'className' => Tag::class,
-    //         'foreignKey' => 'post_id',
-    //         'otherForeignKey' => 'tag_id',
-    //         'conditions' => [],
-    //         'order' => null,
-    //         'fields' => [],
-    //         'propertyName' => 'tags'
-    //     ]);
-    // }
+        $post->checkAssociationDefinition('belongsToMany', [
+            'className' => Tag::class,
+            'foreignKey' => 'post_id',
+            'otherForeignKey' => 'tag_id',
+            'conditions' => [],
+            'order' => null,
+            'fields' => [],
+            'propertyName' => 'tags'
+        ]);
+    }
 
-    // public function testInvalidAssociationDefinitionOtherForeignKey(): void
-    // {
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+    public function testInvalidAssociationDefinitionOtherForeignKey(): void
+    {
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $this->expectException(LogicException::class);
-    //     $this->expectExceptionMessage('belongsToMany `tags` is missing otherForeignKey');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('belongsToMany `tags` is missing otherForeignKey');
 
-    //     $post->checkAssociationDefinition('belongsToMany', [
-    //         'className' => Tag::class,
-    //         'joinTable' => 'posts_tags',
-    //         'foreignKey' => 'post_id',
-    //         'conditions' => [],
-    //         'order' => null,
-    //         'fields' => [],
-    //         'propertyName' => 'tags'
-    //     ]);
-    // }
+        $post->checkAssociationDefinition('belongsToMany', [
+            'className' => Tag::class,
+            'joinTable' => 'posts_tags',
+            'foreignKey' => 'post_id',
+            'conditions' => [],
+            'order' => null,
+            'fields' => [],
+            'propertyName' => 'tags'
+        ]);
+    }
 }

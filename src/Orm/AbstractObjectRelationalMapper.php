@@ -207,7 +207,8 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         // Preload
         $associations = [];
         foreach ($this->associations as $assoc) {
-            foreach ($this->$assoc as $property => $config) {
+            foreach ($this->$assoc as $config) {
+                $property = $config['propertyName'];
                 if (in_array($property, $options['with'])) {
                     $associations[$assoc][$property] = $config;
                 }

@@ -514,48 +514,48 @@ final class AbstractObjectRelationalMapperTest extends TestCase
     /**
      * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
      */
-    // public function testHasOneConditions(): void
-    // {
-    //     // Create Extra Record
-    //     $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
-    //     $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
+    public function testHasOneConditions(): void
+    {
+        // Create Extra Record
+        $profile = new Profile($this->dataSource, new MapperManager($this->dataSource));
+        $result = $profile->getDataSource()->update('profiles', new QueryObject(), ['user_id' => 1000]);
 
-    //     $user = new User($this->dataSource, new MapperManager($this->dataSource));
+        $user = new User($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $user->setAssociation('hasOne', [
-    //         [
-    //             'className' => Profile::class,
-    //             'foreignKey' => 'user_id', // other table
-    //             'dependent' => true,
-    //             'propertyName' => 'profile',
-    //             'conditions' => [
-    //                 'profiles.id <>' => 2000
-    //             ],
-    //             'order' => null,
-    //             'fields' => [],
-    //             'propertyName' => 'profile'
+        $user->setAssociation('hasOne', [
+            [
+                'className' => Profile::class,
+                'foreignKey' => 'user_id', // other table
+                'dependent' => true,
+                'propertyName' => 'profile',
+                'conditions' => [
+                    'profiles.id <>' => 2000
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'profile'
 
-    //         ]
-    //     ]);
+            ]
+        ]);
 
-    //     $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
+        $result = $user->getBy(['id' => 1000], ['with' => ['profile']]);
 
-    //     # Important check with array not toJson
-    //     $expected = [
-    //         'id' => 1000,
-    //         'name' => 'User #1',
-    //         'created_at' => '2021-10-14 09:01:00',
-    //         'updated_at' => '2021-10-14 09:02:00',
-    //         'profile' => [
-    //             'id' => 2001,
-    //             'name' => 'standard',
-    //             'user_id' => 1000,
-    //             'created_at' => '2021-10-03 14:03:00',
-    //             'updated_at' => '2021-10-03 14:04:00'
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        # Important check with array not toJson
+        $expected = [
+            'id' => 1000,
+            'name' => 'User #1',
+            'created_at' => '2021-10-14 09:01:00',
+            'updated_at' => '2021-10-14 09:02:00',
+            'profile' => [
+                'id' => 2001,
+                'name' => 'standard',
+                'user_id' => 1000,
+                'created_at' => '2021-10-03 14:03:00',
+                'updated_at' => '2021-10-03 14:04:00'
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
     public function testHasOneFields(): void
     {
@@ -649,46 +649,46 @@ final class AbstractObjectRelationalMapperTest extends TestCase
     /**
      * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
      */
-    // public function testHasManyConditions(): void
-    // {
-    //     $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
+    public function testHasManyConditions(): void
+    {
+        $this->dataSource->update('articles', new QueryObject(['id' => 1002]), ['author_id' => 2000]);
 
-    //     $author = new Author($this->dataSource, new MapperManager($this->dataSource));
+        $author = new Author($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $author->setAssociation('hasMany', [
-    //         [
-    //             'className' => Article::class,
-    //             'foreignKey' => 'author_id', // in other table,
-    //             'dependent' => true,
-    //             'fields' => [],
-    //             'conditions' => ['id <>' => 1000],
-    //             'order' => null,
-    //             'propertyName' => 'articles'
-    //         ]
-    //     ]);
+        $author->setAssociation('hasMany', [
+            [
+                'className' => Article::class,
+                'foreignKey' => 'author_id', // in other table,
+                'dependent' => true,
+                'fields' => [],
+                'conditions' => ['id <>' => 1000],
+                'order' => null,
+                'propertyName' => 'articles'
+            ]
+        ]);
 
-    //     $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
+        $result = $author->getBy(['id' => 2000], ['with' => ['articles']]);
 
-    //     $expected = [
-    //         'id' => 2000,
-    //         'name' => 'Jon',
-    //         'created_at' => '2021-10-03 14:01:00',
-    //         'updated_at' => '2021-10-03 14:02:00',
-    //         'articles' => [
-    //             0 => [
-    //                 'id' => 1002,
-    //                 'title' => 'Article #3',
-    //                 'body' => 'A description for article #3',
-    //                 'author_id' => 2000,
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00',
-    //                 'author' => null
-    //             ]
-    //         ]
-    //     ];
+        $expected = [
+            'id' => 2000,
+            'name' => 'Jon',
+            'created_at' => '2021-10-03 14:01:00',
+            'updated_at' => '2021-10-03 14:02:00',
+            'articles' => [
+                0 => [
+                    'id' => 1002,
+                    'title' => 'Article #3',
+                    'body' => 'A description for article #3',
+                    'author_id' => 2000,
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00',
+                    'author' => null
+                ]
+            ]
+        ];
 
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $this->assertEquals($expected, $result->toArray());
+    }
 
     public function testHasManyOrder(): void
     {
@@ -836,47 +836,47 @@ final class AbstractObjectRelationalMapperTest extends TestCase
     /**
      * TOOD: rewrite test so its not modifying db since this causes for random errors in the CI matrix with other SQLITE and PHP versions
      */
-    // public function testBelongsToManyConditions(): void
-    // {
-    //     // Create extra
-    //     $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
+    public function testBelongsToManyConditions(): void
+    {
+        // Create extra
+        $this->dataSource->update('posts_tags', new QueryObject(['post_id' => 1002]), ['post_id' => 1000]);
 
-    //     $post = new Post($this->dataSource, new MapperManager($this->dataSource));
+        $post = new Post($this->dataSource, new MapperManager($this->dataSource));
 
-    //     $post->setAssociation('belongsToMany', [
-    //         [
-    //             'className' => Tag::class,
-    //             'joinTable' => 'posts_tags',
-    //             'foreignKey' => 'post_id',
-    //             'otherForeignKey' => 'tag_id',
-    //             'conditions' => [
-    //                 'id !=' => 2000,
-    //             ],
-    //             'order' => null,
-    //             'fields' => [],
-    //             'propertyName' => 'tags'
-    //         ]
-    //     ]);
+        $post->setAssociation('belongsToMany', [
+            [
+                'className' => Tag::class,
+                'joinTable' => 'posts_tags',
+                'foreignKey' => 'post_id',
+                'otherForeignKey' => 'tag_id',
+                'conditions' => [
+                    'id !=' => 2000,
+                ],
+                'order' => null,
+                'fields' => [],
+                'propertyName' => 'tags'
+            ]
+        ]);
 
-    //     $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
+        $result = $post->getBy(['id' => 1000], ['with' => ['tags']]);
 
-    //     $expected = [
-    //         'id' => 1000,
-    //         'title' => 'Post #1',
-    //         'body' => 'A description for post #1',
-    //         'created_at' => '2021-10-03 09:01:00',
-    //         'updated_at' => '2021-10-03 09:02:00',
-    //         'tags' => [
-    //             0 => [
-    //                 'id' => 2002,
-    //                 'name' => 'Tag #3',
-    //                 'created_at' => '2021-10-03 09:05:00',
-    //                 'updated_at' => '2021-10-03 09:06:00'
-    //             ]
-    //         ]
-    //     ];
-    //     $this->assertEquals($expected, $result->toArray());
-    // }
+        $expected = [
+            'id' => 1000,
+            'title' => 'Post #1',
+            'body' => 'A description for post #1',
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00',
+            'tags' => [
+                0 => [
+                    'id' => 2002,
+                    'name' => 'Tag #3',
+                    'created_at' => '2021-10-03 09:05:00',
+                    'updated_at' => '2021-10-03 09:06:00'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result->toArray());
+    }
 
     public function testBelongsToManyFields(): void
     {

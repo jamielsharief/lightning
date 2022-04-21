@@ -57,8 +57,6 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
 
          return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
      },
-
-     // TODO: I want to share this
      TranslatorInterface::class => function (ContainerInterface $container) {
          $loader = new PhpMessageLoader(__DIR__ .'/../app/Locales');
 

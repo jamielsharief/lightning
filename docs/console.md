@@ -2,7 +2,7 @@
 
 The console component is to make console utilities and applications, there is no plan for a command runner.
 
-## Command
+## Command
 
 Create a `Command` in your `app\Command` folder.
 

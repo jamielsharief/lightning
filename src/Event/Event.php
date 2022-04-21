@@ -149,4 +149,15 @@ class Event implements GenericEventInterface, StoppableEventInterface
     {
         return $this->data;
     }
+
+    /**
+     * Returns a new instance with this data
+     *
+     * @param array $data
+     * @return static
+     */
+    public function withData(array $data): self
+    {
+        return (clone $this)->setData($data);
+    }
 }

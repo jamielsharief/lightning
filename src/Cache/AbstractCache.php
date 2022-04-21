@@ -98,9 +98,9 @@ abstract class AbstractCache implements CacheInterface
      * @param mixed $key
      * @return string
      */
-    protected function createCacheKey($key): string
+    protected function addPrefix($key): string
     {
-        if (! is_string($key) || empty($key) || ! preg_match('/^[a-z0-9_-]+$/i', $key)) {
+        if (! is_string($key) || strlen($key) === 0 || ! preg_match('/^[a-z0-9_-]+$/i', $key)) {
             throw new InvalidArgumentException(sprintf('Invalid key `%s`', $key));
         }
 

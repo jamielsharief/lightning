@@ -15,7 +15,7 @@ $contactNames = $collection->map(function($contact){
 
 ## Reduce
 
-Iterate over each item in the `Collection`  and return a single value
+Iterate over each item in the `Collection` and return a single value
 
 ```php
 $collection = new Collection([1,2,3]);
@@ -71,8 +71,8 @@ Returns true if every item in the `Collection` returned `true`
 ```php
 $collection = new Collection(['a','b','c']);
 $result = $collection->every(function ($value) {
-            return is_string($value);
-        });
+    return is_string($value);
+});
 ```
 
 ## Some
@@ -82,13 +82,13 @@ Returns true if at least one item in the `Collection` returned `true`
 ```php
 $collection = new Collection(['a', 1]);
 $result = $collection->some(function ($value) {
-        return is_string($value);
-    });
+    return is_string($value);
+});
 ```
 
 ## Contains
 
-Returns true if the `Collection` contains a value
+Returns `true` if the `Collection` contains a value
 
 ```php
 $result = $collection->contains('b');

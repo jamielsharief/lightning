@@ -52,7 +52,7 @@ class FileCache extends AbstractCache
     public function get($key, $default = null)
     {
         $result = $default;
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $path = $this->getPath($key);
 
         if (file_exists($path)) {
@@ -82,7 +82,7 @@ class FileCache extends AbstractCache
      */
     public function set($key, $value, $ttl = null)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $ttl = $this->getDuration($ttl);
 
         $data = [
@@ -105,7 +105,7 @@ class FileCache extends AbstractCache
      */
     public function delete($key)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $path = $this->getPath($key);
 
         return is_file($path) && unlink($path);
@@ -152,6 +152,12 @@ class FileCache extends AbstractCache
         return $this->get($key) !== null;
     }
 
+    /**
+     * Builds the path
+     *
+     * @param string $key
+     * @return string
+     */
     private function getPath(string $key): string
     {
         return $this->path . '/' . $this->prefix . $key;

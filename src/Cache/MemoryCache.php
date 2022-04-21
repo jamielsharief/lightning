@@ -33,6 +33,7 @@ class MemoryCache extends AbstractCache
     {
         $this->container = $data;
     }
+
     /**
     * Fetches a value from the cache.
     *
@@ -46,7 +47,7 @@ class MemoryCache extends AbstractCache
     */
     public function get($key, $default = null)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
 
         return $this->container[$key] ?? $default;
     }
@@ -67,7 +68,7 @@ class MemoryCache extends AbstractCache
      */
     public function set($key, $value, $ttl = null)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $this->container[$key] = $value;
 
         return true;
@@ -90,7 +91,7 @@ class MemoryCache extends AbstractCache
      */
     public function has($key)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
 
         return array_key_exists($key, $this->container);
     }
@@ -107,7 +108,7 @@ class MemoryCache extends AbstractCache
      */
     public function delete($key)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
 
         $result = array_key_exists($key, $this->container);
         unset($this->container[$key]);
@@ -139,7 +140,7 @@ class MemoryCache extends AbstractCache
      */
     public function increment(string $key, $offset = 1, $ttl = null): int
     {
-        $this->createCacheKey($key);
+        $this->addPrefix($key);
 
         $result = $this->container[$key] ?? 0;
         $result = $result + $offset;
@@ -159,7 +160,7 @@ class MemoryCache extends AbstractCache
      */
     public function decrement(string $key, $offset = 1, $ttl = null): int
     {
-        $this->createCacheKey($key);
+        $this->addPrefix($key);
 
         $result = $this->container[$key] ?? 0;
         $result = $result - $offset;

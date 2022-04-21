@@ -70,7 +70,7 @@ $result->isError();
 // work with data
 $result->hasData();
 $result->getData();
-$result->getData('message');
+$result->get('message');
 $string = (string) $result;
 $result = $result->withSuccess(false);
 $result = $result->withData(['key' => 'value']);

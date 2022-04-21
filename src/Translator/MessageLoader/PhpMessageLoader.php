@@ -25,14 +25,21 @@ class PhpMessageLoader implements MessageLoaderInterface
         $this->path = $path;
     }
 
+    /**
+     * Loads the messages for the domain and locale
+     *
+     * @param string $domain
+     * @param string $locale
+     * @return array
+     */
     public function load(string $domain, string $locale): array
     {
         $path = sprintf('%s/%s.%s.php', $this->path, $domain, $locale);
 
-        if (file_exists($path)) {
-            return include $path;
+        if (! file_exists($path)) {
+            throw new MessageFileNotFound(sprintf('Message file `%s` not found', $path));
         }
 
-        throw new MessageFileNotFound(sprintf('Message file `%s` not found', $path));
+        return include $path;
     }
 }

@@ -120,12 +120,11 @@ class Autoloader
      */
     protected function requireFile(string $path): bool
     {
-        if (file_exists($path)) {
+        $fileExists = file_exists($path);
+        if ($fileExists) {
             require $path;
-
-            return true;
         }
 
-        return false;
+        return $fileExists;
     }
 }

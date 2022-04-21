@@ -100,17 +100,21 @@ class Result implements JsonSerializable, Stringable
     /**
      * Gets the data for this result or data from a specific property
      *
-     * @internal it is quite important to get a specific property to reduce code on the other side
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * Gets the data for this result or data from a specific property
      *
      * @param string|null $property
      * @return mixed
      */
-    public function getData(string $property = null)
+    public function get(string $property)
     {
-        if ($property === null) {
-            return $this->data;
-        }
-
         return $this->data[$property] ?? null;
     }
 

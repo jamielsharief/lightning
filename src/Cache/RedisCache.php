@@ -47,7 +47,7 @@ class RedisCache extends AbstractCache
     */
     public function get($key, $default = null)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $result = $this->redis->get($key);
         if ($result === false) {
             $result = $default;
@@ -72,7 +72,7 @@ class RedisCache extends AbstractCache
      */
     public function set($key, $value, $ttl = null)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $ttl = $this->getDuration($ttl);
 
         return $ttl === 0 ? $this->redis->set($key, $value) : $this->redis->setex($key, $ttl, $value);
@@ -95,7 +95,7 @@ class RedisCache extends AbstractCache
      */
     public function has($key)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
 
         return $this->redis->get($key) !== false;
     }
@@ -112,7 +112,7 @@ class RedisCache extends AbstractCache
      */
     public function delete($key)
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
 
         return $this->redis->del($key) > 0;
     }
@@ -126,12 +126,9 @@ class RedisCache extends AbstractCache
      */
     public function clear()
     {
-        $keys = $this->redis->keys($this->prefix . '*');
-
         $result = true;
-
-        foreach ($keys as $key) {
-            $result = $this->redis->del($key) > 0 && $result;
+        foreach ($this->redis->keys($this->prefix . '*') as $key) {
+            $result = $result && $this->redis->del($key);
         }
 
         return $result;
@@ -149,7 +146,7 @@ class RedisCache extends AbstractCache
      */
     public function increment(string $key, $offset = 1, $ttl = null): int
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $ttl = $this->getDuration($ttl);
 
         $result = $this->redis->incrBy($key, $offset);
@@ -173,7 +170,7 @@ class RedisCache extends AbstractCache
      */
     public function decrement(string $key, $offset = 1, $ttl = null): int
     {
-        $key = $this->createCacheKey($key);
+        $key = $this->addPrefix($key);
         $ttl = $this->getDuration($ttl);
 
         $result = $this->redis->decrBy($key, $offset);

@@ -33,9 +33,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @param iterable $items
      */
-    final public function __construct(iterable $items)
+    final public function __construct(iterable $items, bool $preserveKeys = true)
     {
-        $this->items = is_array($items) ? $items : iterator_to_array($items);
+        if (is_array($items)) {
+            $this->items = $preserveKeys ? $items : array_values($items);
+        } else {
+            $this->items = iterator_to_array($items, $preserveKeys);
+        }
     }
 
     /**
@@ -433,7 +437,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         $values = $this->extract($path)->toArray();
         $count = count($values);
 
-        if ($count) {
+        if ($count > 1) {
             sort($values);
             $middle = (int) ($count / 2);
 

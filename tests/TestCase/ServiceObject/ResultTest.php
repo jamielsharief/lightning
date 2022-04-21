@@ -51,10 +51,16 @@ final class ResultTest extends TestCase
     public function testGetData(): void
     {
         $result = new Result(true, ['foo' => 'bar']);
-        $this->assertEquals('bar', $result->getData('foo'));
-        $this->assertNull($result->getData('bar'));
+
         $this->assertEquals(['foo' => 'bar'], $result->getData());
         $this->assertEmpty((new Result(true))->getData());
+    }
+
+    public function testGet(): void
+    {
+        $result = new Result(true, ['foo' => 'bar']);
+        $this->assertEquals('bar', $result->get('foo'));
+        $this->assertNull($result->get('bar'));
     }
 
     public function testSetData(): void

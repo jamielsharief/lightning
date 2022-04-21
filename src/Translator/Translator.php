@@ -27,10 +27,15 @@ class Translator implements TranslatorInterface
     private array $messages = [];
 
     /**
-     * Constructor - only get instance can create this object
+     * Undocumented function
+     *
+     * @param MessageLoaderInterface $loader
+     * @param string $locale
+     * @param string $domain
      */
-    public function __construct(MessageLoaderInterface $loader, string $locale, string $domain = 'default')
-    {
+    public function __construct(
+        MessageLoaderInterface $loader, string $locale, string $domain = 'default'
+        ) {
         if (! extension_loaded('intl')) {
             throw new RuntimeException('Intl extension not installed');
         }

@@ -542,4 +542,35 @@ final class CollectionTest extends TestCase
            iterator_to_array($collection->getIterator())
         );
     }
+
+    public function testArrayPreserveKeys(): void
+    {
+        $collection = new Collection([1 => 'foo',2 => 'bar',3 => 'foobar'], false);
+        $this->assertEquals(
+            [0 => 'foo',1 => 'bar',2 => 'foobar'],
+            $collection->toArray()
+        );
+    }
+
+    public function testObjectDontPreserveKeys(): void
+    {
+        $collection = new Collection([1 => 'foo',2 => 'bar',3 => 'foobar']);
+
+        $collection = new Collection($collection, false);
+        $this->assertEquals(
+            [0 => 'foo',1 => 'bar',2 => 'foobar'],
+            $collection->toArray()
+        );
+    }
+
+    public function testObjectPreserveKeys(): void
+    {
+        $collection = new Collection([1 => 'foo',2 => 'bar',3 => 'foobar']);
+
+        $collection = new Collection($collection, true);
+        $this->assertEquals(
+            [1 => 'foo',2 => 'bar',3 => 'foobar'],
+            $collection->toArray()
+        );
+    }
 }

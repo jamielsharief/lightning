@@ -47,8 +47,7 @@ $cache = new RedisCache($connection);
 
 ## Apcu Cache
 
-To use Apcu you need to have the `Apcu extension` installed with `apc.enbabled` and `apc.enable_cli` in your `php.ini` files. 
-Then to create a `Apcu` cache object, you will need to have
+To use Apcu you need to have the `Apcu extension` installed with `apc.enbabled` and `apc.enable_cli` in your `php.ini` files. Then to create a `Apcu` cache object, you will need to have
 
 ```php
 $cache = new ApcuCache();
@@ -56,7 +55,7 @@ $cache = new ApcuCache();
 
 ## Memory Cache
 
-The memory cache is ideal for testing or to just cache during a particular request.
+The memory cache is ideal for testing or to just cache during during the request.
 
 ```php
 $cache = new MemoryCache();

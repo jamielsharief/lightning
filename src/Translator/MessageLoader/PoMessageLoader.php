@@ -55,7 +55,7 @@ class PoMessageLoader implements MessageLoaderInterface
             throw new MessageFileNotFound(sprintf('Message file `%s` not found', basename($path)));
         }
 
-        return unserialize(file_get_contents($this->cache($path)));
+        return unserialize(file_get_contents($this->cachedVersion($path)));
     }
 
     /**
@@ -64,7 +64,7 @@ class PoMessageLoader implements MessageLoaderInterface
      * @param string $path
      * @return string
      */
-    private function cache(string $path): string
+    private function cachedVersion(string $path): string
     {
         $cachedPath = $this->cachedPath . '/' . md5($path);
 

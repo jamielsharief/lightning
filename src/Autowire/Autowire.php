@@ -62,12 +62,12 @@ class Autowire
     public function class(string $class, array $parameters = []): object
     {
         if (! class_exists($class)) {
-            throw new AutowireException(sprintf('`%s` could not be found"', $class));
+            throw new AutowireException(sprintf('`%s` could not be found', $class));
         }
-        $reflection = new ReflectionClass($class);
 
+        $reflection = new ReflectionClass($class);
         if (! $reflection->isInstantiable()) {
-            throw new AutowireException(sprintf('Class `%s` is not instantiable', $reflection->getName()));
+            throw new AutowireException(sprintf('Class `%s` is not instantiable', $class));
         }
 
         $reflectionMethod = $reflection->getConstructor();
@@ -93,7 +93,7 @@ class Autowire
 
         $reflection = (new ReflectionClass($object))->getMethod($method);
 
-        $vars = $this->resolveParameters($reflection ->getParameters(), $parameters);
+        $vars = $this->resolveParameters($reflection->getParameters(), $parameters);
 
         return call_user_func_array([$object,$method], $vars);
     }
@@ -130,6 +130,7 @@ class Autowire
      * Resolves a paramater
      *
      * @param ReflectionParameter $parameter
+     * @param array $vars
      * @return mixed
      */
     protected function resolveParameter(ReflectionParameter $parameter, array $vars = [])

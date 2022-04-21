@@ -42,15 +42,9 @@ class ApcuCache extends AbstractCache
     */
     public function get($key, $default = null)
     {
-        $key = $this->createCacheKey($key);
+        $result = apcu_fetch($this->addPrefix($key));
 
-        $result = apcu_fetch($key);
-
-        if ($result === false) {
-            $result = $default;
-        }
-
-        return $result;
+        return $result === false ? $default : $result;
     }
 
     /**
@@ -69,9 +63,9 @@ class ApcuCache extends AbstractCache
      */
     public function set($key, $value, $ttl = null)
     {
-        $key = $this->createCacheKey($key);
-
-        return apcu_store($key, $value, $this->getDuration($ttl));
+        return apcu_store(
+            $this->addPrefix($key), $value, $this->getDuration($ttl)
+        );
     }
 
     /**
@@ -91,9 +85,7 @@ class ApcuCache extends AbstractCache
      */
     public function has($key)
     {
-        $key = $this->createCacheKey($key);
-
-        return apcu_exists($key);
+        return apcu_exists($this->addPrefix($key));
     }
 
     /**
@@ -108,9 +100,7 @@ class ApcuCache extends AbstractCache
      */
     public function delete($key)
     {
-        $key = $this->createCacheKey($key);
-
-        return apcu_delete($key);
+        return apcu_delete($this->addPrefix($key));
     }
 
     /**
@@ -120,12 +110,12 @@ class ApcuCache extends AbstractCache
      */
     public function clear()
     {
-        $result = true;
-
         $info = apcu_cache_info();
+
+        $result = true;
         foreach ($info['cache_list'] as $key) {
             if ($this->prefix === '' || strpos($key['info'], $this->prefix) === 0) {
-                $result = apcu_delete($key['info']) && $result;
+                $result = $result && apcu_delete($key['info']);
             }
         }
 
@@ -144,10 +134,7 @@ class ApcuCache extends AbstractCache
      */
     public function increment(string $key, $offset = 1, $ttl = null): int
     {
-        $key = $this->createCacheKey($key);
-        $success = false;
-
-        return apcu_inc($key, $offset, $success, $this->getDuration($ttl));
+        return apcu_inc($this->addPrefix($key), $offset, $success, $this->getDuration($ttl));
     }
 
     /**
@@ -162,10 +149,6 @@ class ApcuCache extends AbstractCache
      */
     public function decrement(string $key, $offset = 1, $ttl = null): int
     {
-        $key = $this->createCacheKey($key);
-
-        $success = false;
-
-        return apcu_dec($key, $offset, $success, $this->getDuration($ttl));
+        return apcu_dec($this->addPrefix($key), $offset, $success, $this->getDuration($ttl));
     }
 }

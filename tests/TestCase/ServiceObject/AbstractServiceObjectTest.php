@@ -33,7 +33,7 @@ final class AbstractServiceObjectTest extends TestCase
 
         $result = $service->run();
         $this->assertInstanceOf(Result::class, $result);
-        $this->assertTrue($result->getData('initialized'));
+        $this->assertTrue($result->get('initialized'));
     }
 
     public function testDispatchWithParams()
@@ -43,7 +43,7 @@ final class AbstractServiceObjectTest extends TestCase
         $params = new Params(['foo' => 'bar']);
         $this->assertEquals('bar', $service->withParams($params)
             ->run()
-            ->getData('params')
+            ->get('params')
             ->get('foo'));
     }
 

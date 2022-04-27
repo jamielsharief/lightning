@@ -15,14 +15,17 @@ use Lightning\Event\EventDispatcher;
 use Lightning\Translator\Translator;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
+use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
+use Lightning\Http\Session\SessionInterface;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Translator\TranslatorInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Lightning\Http\Auth\IdentityServiceInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
-
 use Lightning\Translator\MessageLoader\PhpMessageLoader;
+use Lightning\Http\Auth\IdentityService\PdoIdentityService;
 
 /**
  * Here you register the services. Each time a service is requested is recreated unless you use the share method or pass an existing object.
@@ -63,6 +66,9 @@ use Lightning\Translator\MessageLoader\PhpMessageLoader;
          return new Translator($loader, 'en_US');
      },
      DataSourceInterface::class => DatabaseDataSource::class,
-     ResponseFactoryInterface::class => Psr17Factory::class
-
+     ResponseFactoryInterface::class => Psr17Factory::class,
+     IdentityServiceInterface::class => function (ContainerInterface $container) {
+         return (new PdoIdentityService($container->get(PDO::class)))->setTable('identities')->setIdentifierName('username');
+     },
+     SessionInterface::class => PhpSession::class
  ];

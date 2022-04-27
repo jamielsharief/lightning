@@ -93,23 +93,23 @@ class Router implements RequestHandlerInterface, RoutesInterface
         $path = urldecode($request->getUri()->getPath());
 
         $routes = $this->routes->getRoutes();
-        $middlewares = $this->middlewares;
+        $middlewares = $this->middlewares; // First add middlewares to router
 
         foreach ($this->groups as $routeGroup) {
             if ($routeGroup->matchPrefix($path)) {
                 $routes = $routeGroup->getRoutes();
-                $middlewares = array_merge($middlewares, $routeGroup->getMiddlewares());
+                array_push($middlewares, ...$routeGroup->getMiddlewares()); // Now add group based middleware
 
                 break;
             }
         }
 
-        arsort($middlewares);
-
         foreach ($routes as $route) {
             if ($route->match($method, $path)) {
+                asort($middlewares); // sort so they end up in the same order
+
                 foreach ($middlewares as $middleware) {
-                    $route->prependMiddleware($middleware);
+                    $route->prependMiddleware($middleware); // Insert so route specific middleware are last
                 }
 
                 $route($this->container);

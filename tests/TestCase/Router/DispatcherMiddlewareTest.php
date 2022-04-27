@@ -4,7 +4,7 @@ namespace Lightning\Test\Router;
 
 use Nyholm\Psr7\Response;
 use Lightning\Router\Route;
-use Laminas\Diactoros\Request;
+
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

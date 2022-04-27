@@ -16,7 +16,7 @@ $identityService = (new PdoIdentityService($container->get(PDO::class)))
 
 We provide `Argon2` and `Bcrypt` password hashers, and the `PasswordHasherInterface` so you can create a custom passwoder hasher. 
 
-OWSAP recommend that Bcrypt should be second choice if Argon2 is not available.  See [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+OWSAP recommends to use Argon2 ,and if that is not available then Bcrypt. See [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
 
 ## Middlewares
 
@@ -99,7 +99,7 @@ By default if the resource is protected and user has not authenticated, it will 
 $autenticationMiddleware->disableChallenge();
 ```
 
- ## Middleware Settings
+ ## Authentication Middleware Settings
 
 All authentication middlewares have the following shared methods:
 
@@ -116,7 +116,7 @@ $middleware->setPublicPaths([
 
 ### Area specific path
 
-You can also tie the form authentication to a certain part of the website, so only urls that are part of that path will require authentication
+You can also lock down specific parts of your web application, such as an admin section.
 
 ```php
 $middleware->setPath('/admin');

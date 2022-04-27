@@ -80,7 +80,7 @@ To search for the token in the headers
 
 ```php
 (new TokenAuthenticationMiddleware($container->get(IdentityServiceInterface::class)))
-    ->setHeader('X-API-TOKEN)
+    ->setHeader('X-API-TOKEN')
 ```
 
 ### HTTP Basic Authentication (BA)

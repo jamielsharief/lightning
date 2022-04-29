@@ -8,7 +8,7 @@ Create the Middleware by passing a path to the error files , the ErrorRenderer o
 
 ```php
 $middleware = new ExceptionHandlerMiddleware(
-        __DIR__ . '/../app/View/error' , new ErrorRenderer(), new Psr17Factory(), new Logger()
+        __DIR__ . '/../app/View/error' , new ErrorRenderer(), new ResponseFactory(), new Logger()
     );
 ```
 

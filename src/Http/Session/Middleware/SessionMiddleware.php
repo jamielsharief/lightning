@@ -11,6 +11,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * PSR-7 Friendly Sessions
+ *
+ * @internal The sameSite setting is a security mehtod and also helps protect against CSRF attacks
  */
 class SessionMiddleware implements MiddlewareInterface
 {

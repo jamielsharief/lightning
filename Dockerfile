@@ -1,6 +1,6 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL maintainer="Jamiel Sharief"
-LABEL version="2.2.0"
+LABEL version="3.0.0"
 
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
@@ -56,7 +56,7 @@ RUN a2enmod rewrite ssl
 ADD docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Configure PHP
-RUN echo 'apc.enable_cli=1' >>  /etc/php/7.4/cli/php.ini
+RUN echo 'apc.enable_cli=1' >>  /etc/php/8.1/cli/php.ini
 
 WORKDIR /var/www
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

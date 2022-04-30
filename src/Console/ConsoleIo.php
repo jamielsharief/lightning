@@ -268,10 +268,10 @@ class ConsoleIo
     /**
      * Gets input from stdin
      *
-     * @param mixed $default value
-     * @return mixed
+     * @param string|null $default
+     * @return string|null
      */
-    public function in($default = null): mixed
+    public function in(?string $default = null): ?string
     {
         $input = rtrim($this->readStdin(), PHP_EOL);
 
@@ -306,10 +306,10 @@ class ConsoleIo
      * Asks for input
      *
      * @param string $message
-     * @param mixed $default
-     * @return mixed
+     * @param string|null $default
+     * @return string|null
      */
-    public function ask(string $message, $default = null): mixed
+    public function ask(string $message, ?string $default = null): ?string
     {
         if ($default) {
             $message = sprintf('%s [%s]', $message, (string) $default);
@@ -325,9 +325,9 @@ class ConsoleIo
      *
      * @param string $message
      * @param array $choices
-     * @return mixed
+     * @return string
      */
-    public function askChoice(string $message, array $choices): mixed
+    public function askChoice(string $message, array $choices): string
     {
         $result = $this->ask($message);
 

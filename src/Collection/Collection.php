@@ -569,7 +569,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator() : ArrayIterator
     {
         return new ArrayIterator($this->items);
     }
@@ -609,7 +609,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     * @param mixed $key
     * @return bool result
     */
-    public function offsetExists($key)
+    public function offsetExists($key) : bool
     {
         return array_key_exists($key, $this->items);
     }
@@ -632,7 +632,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value) : void
     {
         if (is_null($key)) {
             $this->items[] = $value;
@@ -647,7 +647,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key) : void
     {
         unset($this->items[$key]);
     }

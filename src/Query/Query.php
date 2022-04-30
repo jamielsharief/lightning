@@ -459,7 +459,7 @@ class Query implements IteratorAggregate
     /**
      * IteratorAggregate interface
      */
-    public function getIterator()
+    public function getIterator() : ArrayIterator
     {
         return new ArrayIterator($this->all());
     }

@@ -40,6 +40,15 @@ CREATE TABLE "users" (
     "updated_at" datetime NOT NULL
 );
 
+
+CREATE TABLE "identities" (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
+    "username" TEXT DEFAULT NULL,
+    "password" TEXT DEFAULT NULL,
+    "created_at" datetime NOT NULL,
+    "updated_at" datetime NOT NULL
+);
+
 CREATE TABLE "profiles" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
     "name" TEXT DEFAULT NULL,

@@ -29,6 +29,14 @@ CREATE TABLE users (
   updated_at timestamp(0) NOT NULL
 );
 
+CREATE TABLE identities (
+  id SERIAL PRIMARY KEY,
+  username varchar(255) DEFAULT NULL,
+  password varchar(72) DEFAULT NULL,
+  created_at timestamp(0) NOT NULL,
+  updated_at timestamp(0) NOT NULL
+);
+
 CREATE TABLE profiles (
   id SERIAL PRIMARY KEY,
   name varchar(80) DEFAULT NULL,

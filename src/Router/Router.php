@@ -225,7 +225,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function map(string $method, string $path, $handler, array $constraints = []): Route
+    public function map(string $method, string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->routes->map($method, $path, $handler, $constraints);
     }

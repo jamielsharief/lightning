@@ -65,7 +65,7 @@ class RouteCollection implements RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function map(string $method, string $path, $handler, array $constraints): Route
+    public function map(string $method, string $path, callable|array|string $handler, array $constraints): Route
     {
         return $this->routes[] = $this->createRoute(
             $method, sprintf('%s/%s', $this->prefix, trim($path, '/')), $handler, $constraints
@@ -77,11 +77,11 @@ class RouteCollection implements RoutesInterface
      *
      * @param string $method
      * @param string $path
-     * @param string|callable $handler
+     * @param callable|array|string $handler
      * @param array $constraints
      * @return Route
      */
-    private function createRoute(string $method, string $path, $handler, array $constraints = []): Route
+    private function createRoute(string $method, string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return new Route($method, $path, $handler, $constraints);
     }

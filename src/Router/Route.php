@@ -35,10 +35,10 @@ class Route
      *
      * @param string $method
      * @param string $path
-     * @param string|callable $handler
+     * @param callable|array|string $handler
      * @param array $constraints
      */
-    public function __construct(string $method, string $path, $handler, array $constraints = [])
+    public function __construct(string $method, string $path, callable|array|string $handler, array $constraints = [])
     {
         $this->method = $method;
         $this->path = $path;

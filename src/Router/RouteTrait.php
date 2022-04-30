@@ -23,7 +23,7 @@ trait RouteTrait
     * @param array $constraints
     * @return Route
     */
-    public function get(string $path, $handler, array $constraints = []): Route
+    public function get(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('GET', $path, $handler, $constraints);
     }
@@ -35,7 +35,7 @@ trait RouteTrait
      * @param array $constraints
      * @return Route
      */
-    public function post(string $path, $handler, array $constraints = []): Route
+    public function post(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('POST', $path, $handler, $constraints);
     }
@@ -48,7 +48,7 @@ trait RouteTrait
      * @param array $constraints
      * @return Route
      */
-    public function patch(string $path, $handler, array $constraints = []): Route
+    public function patch(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('PATCH', $path, $handler, $constraints);
     }
@@ -57,11 +57,11 @@ trait RouteTrait
      * Creates a PUT route
      *
      * @param string $path
-     * @param callable|array $handler
+     * @param callable|array|string $handler
      * @param array $constraints
      * @return Route
      */
-    public function put(string $path, $handler, array $constraints = []): Route
+    public function put(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('PUT', $path, $handler, $constraints);
     }
@@ -74,7 +74,7 @@ trait RouteTrait
      * @param array $constraints
      * @return Route
      */
-    public function delete(string $path, $handler, array $constraints = []): Route
+    public function delete(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('DELETE', $path, $handler, $constraints);
     }
@@ -87,7 +87,7 @@ trait RouteTrait
      * @param array $constraints
      * @return Route
      */
-    public function head(string $path, $handler, array $constraints = []): Route
+    public function head(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('HEAD', $path, $handler, $constraints);
     }
@@ -100,7 +100,7 @@ trait RouteTrait
      * @param array $constraints
      * @return Route
      */
-    public function options(string $path, $handler, array $constraints = []): Route
+    public function options(string $path, callable|array|string $handler, array $constraints = []): Route
     {
         return $this->map('OPTIONS', $path, $handler, $constraints);
     }

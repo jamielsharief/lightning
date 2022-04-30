@@ -25,7 +25,7 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function get(string $path, $handler, array $constraints = []): Route;
+    public function get(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a POST route
@@ -35,7 +35,7 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function post(string $path, $handler, array $constraints = []): Route;
+    public function post(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a PATCH route
@@ -45,17 +45,17 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function patch(string $path, $handler, array $constraints = []): Route;
+    public function patch(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a PUT route
      *
      * @param string $path
-     * @param callable|array $handler
+     * @param callable|array|string $handler
      * @param array $constraints
      * @return Route
      */
-    public function put(string $path, $handler, array $constraints = []): Route;
+    public function put(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a DELETE route
@@ -65,7 +65,7 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function delete(string $path, $handler, array $constraints = []): Route;
+    public function delete(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a HEAD route
@@ -75,7 +75,7 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function head(string $path, $handler, array $constraints = []): Route;
+    public function head(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Creates a OPTIONS route
@@ -85,7 +85,7 @@ interface RoutesInterface
      * @param array $constraints
      * @return Route
      */
-    public function options(string $path, $handler, array $constraints = []): Route;
+    public function options(string $path, callable|array|string $handler, array $constraints = []): Route;
 
     /**
      * Adds a middleware to the queue

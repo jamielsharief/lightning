@@ -9,7 +9,7 @@ env:
 jobs:
   tests:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     strategy:
 #      max-parallel: 3
       matrix:

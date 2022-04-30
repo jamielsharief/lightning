@@ -98,9 +98,9 @@ class Identity implements Stringable, JsonSerializable
     /**
      * Returns the data to be serialized to JSON
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->data;
     }

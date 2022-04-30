@@ -116,9 +116,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
     /**
      * Gets the data to be serialized
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): mixed
     {
         return $this->rows;
     }
@@ -140,7 +140,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->rows[$key] ?? null;
     }

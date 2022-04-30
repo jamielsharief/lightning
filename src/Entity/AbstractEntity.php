@@ -65,9 +65,9 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
     /**
      * Returns the data that needs to be serialized when converting to JSON, this is part of the JsonSerializable interface
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }

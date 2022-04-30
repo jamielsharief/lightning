@@ -274,7 +274,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->fields[$key] ?? null;
     }

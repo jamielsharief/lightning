@@ -557,9 +557,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * JsonSerializable Interface for json_encode($collection). Returns the properties that will be serialized as
      * json
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }

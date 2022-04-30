@@ -144,9 +144,9 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
     /**
      * JsonSerializable Interface
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
@@ -210,7 +210,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->data[$key] ?? null;
     }

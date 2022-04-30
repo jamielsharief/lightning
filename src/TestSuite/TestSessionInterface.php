@@ -15,7 +15,7 @@ namespace Lightning\TestSuite;
 
 interface TestSessionInterface
 {
-    public function set(string $key, $value): void;
+    public function set(string $key, mixed $value): void;
 
     public function has(string $key): bool;
 

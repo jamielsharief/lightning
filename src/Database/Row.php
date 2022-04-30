@@ -58,7 +58,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
      * @param mixed $value
      * @return static
      */
-    public function set($key, $value = null): static
+    public function set($key, mixed $value = null): static
     {
         if (is_array($key)) {
             $this->data = $key;

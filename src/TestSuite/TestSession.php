@@ -34,7 +34,7 @@ class TestSession implements TestSessionInterface
      * @param mixed $value
      * @return void
      */
-    public function set(string $key, $value): void
+    public function set(string $key,mixed $value): void
     {
         $_SESSION[$key] = $value;
     }

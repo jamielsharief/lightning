@@ -78,7 +78,7 @@ class Params
      * @param mixed $value
      * @return static
      */
-    public function set(string $name, $value): static
+    public function set(string $name, mixed $value): static
     {
         $this->data[$name] = $value;
 

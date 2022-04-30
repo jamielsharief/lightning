@@ -43,10 +43,10 @@ class Cookies implements Countable, IteratorAggregate
      * Gets a value of a cookie
      *
      * @param string $name
-     * @param mixed $default
-     * @return mixed
+     * @param string|null $default
+     * @return string|null
      */
-    public function get(string $name, $default = null)
+    public function get(string $name, ?string $default = null): string|null
     {
         return array_key_exists($name, $this->cookies) ? $this->cookies[$name] : $default;
     }

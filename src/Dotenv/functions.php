@@ -17,10 +17,10 @@ namespace Lightning\Dotenv;
  * Gets a value from the environment
  *
  * @param string $key
- * @param mixed $default
- * @return mixed
+ * @param string|null $default
+ * @return string|null
  */
-function env(string $key, $default = null)
+function env(string $key, ?string $default = null) : string|null
 {
     $value = $_SERVER[$key] ?? $_ENV[$key] ?? null;
 

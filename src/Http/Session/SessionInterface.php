@@ -22,7 +22,7 @@ interface SessionInterface
      * @param mixed $value
      * @return static
      */
-    public function set(string $key, mixed $value) : static;
+    public function set(string $key, mixed $value): static;
 
     /**
      * Gets a value from the session

@@ -33,7 +33,7 @@ abstract class AbstractSession implements SessionInterface
         }
     }
 
-    public function set(string $key,mixed $value): static
+    public function set(string $key, mixed $value): static
     {
         $this->checkIsStarted();
         $this->session[$key] = $value;
@@ -41,7 +41,7 @@ abstract class AbstractSession implements SessionInterface
         return $this;
     }
 
-    public function get(string $key, mixed $default = null) : mixed
+    public function get(string $key, mixed $default = null): mixed
     {
         $this->checkIsStarted();
 

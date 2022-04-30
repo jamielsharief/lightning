@@ -263,7 +263,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $key
      * @return bool result
      */
-    public function offsetExists($key) : bool
+    public function offsetExists($key): bool
     {
         return array_key_exists($key, $this->fields);
     }
@@ -286,7 +286,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value) : void
+    public function offsetSet($key, $value): void
     {
         if (is_null($key)) {
             throw new InvalidArgumentException('Field cannot be empty');
@@ -300,7 +300,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key) : void
+    public function offsetUnset($key): void
     {
         unset($this->fields[$key]);
     }

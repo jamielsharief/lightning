@@ -30,7 +30,7 @@ interface TranslatorInterface
      * @param string $locale
      * @return static
      */
-    public function setLocale(string $locale) : static;
+    public function setLocale(string $locale): static;
 
     /**
      * Set Domain
@@ -38,7 +38,7 @@ interface TranslatorInterface
      * @param string $domain
      * @return static
      */
-    public function setDomain(string $domain) : static;
+    public function setDomain(string $domain): static;
 
     /**
      * Gets the Domaing

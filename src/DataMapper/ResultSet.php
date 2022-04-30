@@ -129,7 +129,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * @param mixed $key
      * @return bool result
      */
-    public function offsetExists($key) : bool
+    public function offsetExists($key): bool
     {
         return array_key_exists($key, $this->rows);
     }
@@ -152,7 +152,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value) : void
+    public function offsetSet($key, $value): void
     {
         if (is_null($key)) {
             $this->rows[] = $value;
@@ -167,7 +167,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key) : void
+    public function offsetUnset($key): void
     {
         unset($this->rows[$key]);
     }

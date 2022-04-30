@@ -64,7 +64,7 @@ class QueryObject
      * @param mixed $value
      * @return static
      */
-    public function setOption(string $key, $value): static
+    public function setOption(string $key,mixed $value): static
     {
         $this->options[$key] = $value;
 

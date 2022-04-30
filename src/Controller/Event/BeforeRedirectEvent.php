@@ -49,9 +49,9 @@ class BeforeRedirectEvent extends AbstractControllerStoppableEvent
      *
      * @param string $url
      *
-     * @return self
+     * @return static
      */
-    public function setUrl(string $url): self
+    public function setUrl(string $url): static
     {
         $this->url = $url;
 

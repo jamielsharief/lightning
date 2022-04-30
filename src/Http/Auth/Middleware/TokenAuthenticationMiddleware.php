@@ -90,7 +90,7 @@ class TokenAuthenticationMiddleware extends AbstractAuthenticationMiddleware imp
      * @param string $queryParam
      * @return static
      */
-    public function setQueryParam(string $queryParam): self
+    public function setQueryParam(string $queryParam): static
     {
         $this->queryParam = $queryParam;
 
@@ -103,7 +103,7 @@ class TokenAuthenticationMiddleware extends AbstractAuthenticationMiddleware imp
      * @param string $header
      * @return static
      */
-    public function setHeader(string $header): self
+    public function setHeader(string $header): static
     {
         $this->header = $header;
 

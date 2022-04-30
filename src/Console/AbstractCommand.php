@@ -142,7 +142,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param array $options
      * @return static
      */
-    public function addOption(string $name, array $options = []): self
+    public function addOption(string $name, array $options = []): static
     {
         $this->parser->addOption($name, $options);
 
@@ -156,7 +156,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param array $options
      * @return static
      */
-    public function addArgument(string $name, array $options = []): self
+    public function addArgument(string $name, array $options = []): static
     {
         $this->parser->addArgument($name, $options);
 
@@ -225,7 +225,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param int $newLines
      * @return static
      */
-    public function out($message = '', int $newLines = 1): self
+    public function out($message = '', int $newLines = 1): static
     {
         $this->io->out($message, $newLines, ConsoleIo::NORMAL);
 
@@ -239,7 +239,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param int $newLines
      * @return static
      */
-    public function error($message = '', int $newLines = 1): self
+    public function error($message = '', int $newLines = 1): static
     {
         $this->io->err($message, $newLines);
 
@@ -253,7 +253,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param int $newLines
      * @return static
      */
-    public function verbose($message = '', int $newLines = 1): self
+    public function verbose($message = '', int $newLines = 1): static
     {
         $this->io->out($message, $newLines, ConsoleIo::VERBOSE);
 
@@ -267,7 +267,7 @@ abstract class AbstractCommand implements CommandInterface
      * @param int $newLines
      * @return static
      */
-    public function quiet($message = '', int $newLines = 1): self
+    public function quiet($message = '', int $newLines = 1): static
     {
         $this->io->out($message, $newLines, ConsoleIo::QUIET);
 

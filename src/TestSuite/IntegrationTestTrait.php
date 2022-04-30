@@ -594,9 +594,9 @@ trait IntegrationTestTrait
      * Sets headers which will be added to the ServerRequestInterface request object
      *
      * @param array $headers ['PHP_AUTH_USER' => 'somebody@example.com']
-     * @return self
+     * @return static
      */
-    public function setHeaders(array $headers): self
+    public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
 
@@ -609,9 +609,9 @@ trait IntegrationTestTrait
      * @internal naming should be similar to PSR request language
      *
      * @param array $cookies key - value pairs
-     * @return void
+     * @return static
      */
-    public function setCookieParams(array $cookies): self
+    public function setCookieParams(array $cookies): static
     {
         $this->cookies = $cookies;
 
@@ -622,9 +622,9 @@ trait IntegrationTestTrait
      * Sets the uploaded files which will be added to ServerRequestInterface request object
      *
      * @param array $files an array of UploadedFileInterface files
-     * @return self
+     * @return static
      */
-    public function setUploadedFiles(array $files): self
+    public function setUploadedFiles(array $files): static
     {
         // Check file types
         foreach ($files as $file) {
@@ -642,9 +642,9 @@ trait IntegrationTestTrait
      * Sets the data which will be added to the TestSession
      *
      * @param array $session key values pairs e.g. ['token' => 1234];
-     * @return self
+     * @return static
      */
-    public function setSession(array $session): self
+    public function setSession(array $session): static
     {
         $this->session = $session;
 
@@ -655,9 +655,9 @@ trait IntegrationTestTrait
      * Sets the Server Params for the ServerRequestInterface request object which are normally taken from $_SERVER envrionment
      *
      * @param array $serverParams
-     * @return self
+     * @return static
      */
-    public function setServerParams(array $serverParams): self
+    public function setServerParams(array $serverParams): static
     {
         $this->serverParams = $serverParams;
 
@@ -668,9 +668,9 @@ trait IntegrationTestTrait
      * Set $_ENV vars for testing (caution)
      *
      * @param array $env
-     * @return self
+     * @return static
      */
-    public function setEnvironment(array $env): self
+    public function setEnvironment(array $env): static
     {
         $this->env = $env;
 

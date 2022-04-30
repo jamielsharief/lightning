@@ -76,9 +76,9 @@ trait ConsoleIntegrationTestTrait
      * Sets the Console IO object to be used by the assertation methods
      *
      * @param TestConsoleIo $io
-     * @return self
+     * @return static
      */
-    public function setConsoleIo(TestConsoleIo $io): self
+    public function setConsoleIo(TestConsoleIo $io): static
     {
         $this->io = $io;
 

@@ -46,9 +46,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Iterates through the collection, return false to break.
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function each(callable $callback): self
+    public function each(callable $callback): static
     {
         foreach ($this->items as $key => $value) {
             if ($callback($value, $key) === false) {
@@ -63,9 +63,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Iterates through the collection and creates a new collection based upon the results returned.
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function map(callable $callback): self
+    public function map(callable $callback): static
     {
         $result = [];
         foreach ($this->items as $key => $value) {
@@ -119,9 +119,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Iterates through the collection and creates a new collection based upon the results returned.
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function filter(callable $callback): self
+    public function filter(callable $callback): static
     {
         $result = [];
         foreach ($this->items as $key => $value) {
@@ -141,9 +141,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *   });
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function reject(callable $callback): self
+    public function reject(callable $callback): static
     {
         $result = [];
         foreach ($this->items as $key => $value) {
@@ -219,9 +219,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * mapping.
      *
      * @param callable|string $path e.g. authors.name or callable
-     * @return self
+     * @return static
      */
-    public function extract($path): self
+    public function extract($path): static
     {
         if (is_string($path)) {
             $path = $this->createCallback($path);
@@ -234,9 +234,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Chunks the Collection
      *
      * @param integer $chunkSize
-     * @return self
+     * @return static
      */
-    public function chunk(int $chunkSize): self
+    public function chunk(int $chunkSize): static
     {
         return new static(array_chunk($this->toArray(), $chunkSize));
     }
@@ -246,9 +246,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @param int $direction
      * @param int $type
-     * @return self
+     * @return static
      */
-    public function sort(int $direction = SORT_ASC, int $type = SORT_REGULAR): self
+    public function sort(int $direction = SORT_ASC, int $type = SORT_REGULAR): static
     {
         $items = $this->toArray();
 
@@ -263,9 +263,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param string|callable $path e.g. id, user.postcode or callable
      * @param int $direction e.g. SORT_ASC
      * @param int $type e.g. SORT_NUMERIC
-     * @return self
+     * @return static
      */
-    public function sortBy($path, int $direction = SORT_ASC, int $type = SORT_REGULAR): self
+    public function sortBy($path, int $direction = SORT_ASC, int $type = SORT_REGULAR): static
     {
         if (is_string($path)) {
             $path = $this->createCallback($path);
@@ -297,9 +297,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *   })
      *
      * @param callable|string $path e.g. authors.name or callable
-     * @return self
+     * @return static
      */
-    public function groupBy($path): self
+    public function groupBy($path): static
     {
         if (is_string($path)) {
             $path = $this->createCallback($path);
@@ -320,9 +320,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * $collection->indexBy('id');
      * $collection->indexBy('user.id');
      * @param callable|string $path e.g. authors.name or callable
-     * @return self
+     * @return static
      */
-    public function indexBy($path): self
+    public function indexBy($path): static
     {
         if (is_string($path)) {
             $path = $this->createCallback($path);

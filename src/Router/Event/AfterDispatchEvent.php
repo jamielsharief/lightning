@@ -37,9 +37,9 @@ class AfterDispatchEvent
      * Set the Request object
      *
      * @param ServerRequestInterface $request
-     * @return self
+     * @return static
      */
-    public function setRequest(ServerRequestInterface $request): self
+    public function setRequest(ServerRequestInterface $request): static
     {
         $this->request = $request;
 
@@ -60,9 +60,9 @@ class AfterDispatchEvent
      * Sets the Response object
      *
      * @param ResponseInterface $response
-     * @return self
+     * @return static
      */
-    public function setResponse(ResponseInterface $response): self
+    public function setResponse(ResponseInterface $response): static
     {
         $this->response = $response;
 

@@ -67,9 +67,9 @@ class Query implements IteratorAggregate
      * Selects columns
      *
      * @param string|array $columns
-     * @return self
+     * @return static
      */
-    public function select($columns): self
+    public function select($columns): static
     {
         $this->selectColumns = (array) $columns;
         $this->selectIsWildcard = in_array('*', $this->selectColumns);
@@ -86,9 +86,9 @@ class Query implements IteratorAggregate
      *
      * @param string $table
      * @param string|null $alias
-     * @return self
+     * @return static
      */
-    public function from(string $table, string $alias = null): self
+    public function from(string $table, string $alias = null): static
     {
         $this->queryBuilder->from($table, $alias);
         $this->table = $alias ?: $table;
@@ -100,9 +100,9 @@ class Query implements IteratorAggregate
      * The WHERE clause, if you use multiple strings they will be joined together with an AND
      *
      * @param array|string $expression
-     * @return self
+     * @return static
      */
-    public function where($expression): self
+    public function where($expression): static
     {
         $this->queryBuilder->where($expression);
 
@@ -112,9 +112,9 @@ class Query implements IteratorAggregate
     /**
      * @param integer $limit
      * @param integer|null $offset
-     * @return self
+     * @return static
      */
-    public function limit(int $limit, int $offset = null): self
+    public function limit(int $limit, int $offset = null): static
     {
         $this->queryBuilder->limit($limit, $offset);
 
@@ -123,9 +123,9 @@ class Query implements IteratorAggregate
 
     /**
      * @param string|array $group field
-     * @return self
+     * @return static
      */
-    public function groupBy($group): self
+    public function groupBy($group): static
     {
         $this->queryBuilder->groupBy($group);
 
@@ -134,9 +134,9 @@ class Query implements IteratorAggregate
 
     /**
      * @param string|array $order 'id ASC' or ['id','name DESC']
-     * @return self
+     * @return static
      */
-    public function orderBy($order): self
+    public function orderBy($order): static
     {
         $this->queryBuilder->orderBy($order);
 
@@ -147,9 +147,9 @@ class Query implements IteratorAggregate
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $condition orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function innerJoin(string $table, ?string $alias = null, $condition = null): self
+    public function innerJoin(string $table, ?string $alias = null, $condition = null): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->innerJoin($table, $alias, $condition);
@@ -161,9 +161,9 @@ class Query implements IteratorAggregate
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $condition orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function leftJoin(string $table, ?string $alias = null, $condition): self
+    public function leftJoin(string $table, ?string $alias = null, $condition): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->leftJoin($table, $alias, $condition);
@@ -175,9 +175,9 @@ class Query implements IteratorAggregate
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $condition orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function rightJoin(string $table, ?string $alias = null, $condition): self
+    public function rightJoin(string $table, ?string $alias = null, $condition): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->rightJoin($table, $alias, $condition);
@@ -189,9 +189,9 @@ class Query implements IteratorAggregate
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $condition orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function fullJoin(string $table, ?string $alias = null, $condition): self
+    public function fullJoin(string $table, ?string $alias = null, $condition): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->fullJoin($table, $alias, $condition);
@@ -201,9 +201,9 @@ class Query implements IteratorAggregate
 
     /**
     * @param string|array $having e.g. COUNT(id) > 3
-    * @return self
+    * @return static
     */
-    public function having($having): self
+    public function having($having): static
     {
         $this->queryBuilder->having($having);
 
@@ -215,9 +215,9 @@ class Query implements IteratorAggregate
      *
      * @param integer $page
      * @param integer $items
-     * @return self
+     * @return static
      */
-    public function page(int $page, int $items = 20): self
+    public function page(int $page, int $items = 20): static
     {
         $this->queryBuilder->limit($items, ($page * $items) - $items);
 
@@ -307,9 +307,9 @@ class Query implements IteratorAggregate
      *
      * @param string $table
      * @param array $columns
-     * @return self
+     * @return static
      */
-    public function insertInto(string $table, array $columns = []): self
+    public function insertInto(string $table, array $columns = []): static
     {
         $this->insert = [$table,$columns];
 
@@ -320,9 +320,9 @@ class Query implements IteratorAggregate
      * Sets the values for an insert query
      *
      * @param array $data
-     * @return self
+     * @return static
      */
-    public function values(array $data): self
+    public function values(array $data): static
     {
         if (! $this->insert) {
             throw new BadMethodCallException('InsertInto must be called first');
@@ -348,9 +348,9 @@ class Query implements IteratorAggregate
      * Creates an Update query
      *
      * @param string $table
-     * @return self
+     * @return static
      */
-    public function update(string $table): self
+    public function update(string $table): static
     {
         $this->queryBuilder->update($table);
 
@@ -361,9 +361,9 @@ class Query implements IteratorAggregate
      * Sets the fields to be updated by the Update query
      *
      * @param array $data
-     * @return self
+     * @return static
      */
-    public function set(array $data): self
+    public function set(array $data): static
     {
         $this->queryBuilder->set($data);
 
@@ -373,9 +373,9 @@ class Query implements IteratorAggregate
     /**
      * Creates a Delete From query
      *
-     * @return self
+     * @return static
      */
-    public function deleteFrom(string $table): self
+    public function deleteFrom(string $table): static
     {
         $this->queryBuilder->delete()->from($table);
 

@@ -37,7 +37,7 @@ abstract class AbstractAuthenticationMiddleware
      * @param string $path e.g. /api
      * @return static
      */
-    public function setPath(string $path): self
+    public function setPath(string $path): static
     {
         $this->path = '/' . trim($path, '/');
 
@@ -60,7 +60,7 @@ abstract class AbstractAuthenticationMiddleware
      * @param array $paths
      * @return static
      */
-    public function setPublicPaths(array $paths): self
+    public function setPublicPaths(array $paths): static
     {
         $this->publicPaths = $paths;
 

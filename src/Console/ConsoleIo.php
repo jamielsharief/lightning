@@ -168,7 +168,7 @@ class ConsoleIo
      * @param integer $level self::QUIET, self::NORMAL, self::VERBOSE
      * @return static
      */
-    public function setOutputLevel(int $level): self
+    public function setOutputLevel(int $level): static
     {
         if (! in_array($level, [self::NORMAL,self::QUIET,self::VERBOSE])) {
             throw new InvalidArgumentException(sprintf('Invalid output level %d', $level));
@@ -185,7 +185,7 @@ class ConsoleIo
      * @param integer $mode
      * @return static
      */
-    public function setOutputMode(int $mode): self
+    public function setOutputMode(int $mode): static
     {
         if (! in_array($mode, [self::RAW,self::PLAIN,self::COLOR])) {
             throw new InvalidArgumentException(sprintf('Invalid output mode %d', $mode));
@@ -206,7 +206,7 @@ class ConsoleIo
      *  - bold: true
      * @return static
      */
-    public function setStyle(string $name, array $options): self
+    public function setStyle(string $name, array $options): static
     {
         $this->styles[$name] = $this->createAnsiStyle($options);
 
@@ -218,9 +218,9 @@ class ConsoleIo
      *
      * @param string $name
      * @param string $color
-     * @return self
+     * @return static
      */
-    public function setStatus(string $name, string $color): self
+    public function setStatus(string $name, string $color): static
     {
         $this->statuses[strtolower($name)] = $color;
 
@@ -235,7 +235,7 @@ class ConsoleIo
      * @param int $outputLevel
      * @return static
      */
-    public function out($message, int $newLines = 1, int $outputLevel = self::NORMAL): self
+    public function out($message, int $newLines = 1, int $outputLevel = self::NORMAL): static
     {
         if ($outputLevel <= $this->outputLevel) {
             if (is_array($message)) {
@@ -254,7 +254,7 @@ class ConsoleIo
      * @param int $newLines
      * @return static
      */
-    public function err($message, int $newLines = 1): self
+    public function err($message, int $newLines = 1): static
     {
         if (is_array($message)) {
             $message = implode(PHP_EOL, $message);
@@ -283,7 +283,7 @@ class ConsoleIo
      *
      * @return static
      */
-    public function nl(int $lines = 1): self
+    public function nl(int $lines = 1): static
     {
         $this->writeStdout(str_repeat(PHP_EOL, $lines));
 
@@ -295,7 +295,7 @@ class ConsoleIo
      *
      * @return static
      */
-    public function hr(): self
+    public function hr(): static
     {
         $this->out(str_repeat('-', 80));
 
@@ -345,7 +345,7 @@ class ConsoleIo
      * @param array $options
      * @return static
      */
-    public function info(string $text, ?string $secondary = null, array $options = []): self
+    public function info(string $text, ?string $secondary = null, array $options = []): static
     {
         $options += ['background' => 'blue', 'color' => 'white', 'bold' => true];
 
@@ -361,7 +361,7 @@ class ConsoleIo
      * @param array $options
      * @return static
      */
-    public function success(string $text, ?string $secondary = null, array $options = []): self
+    public function success(string $text, ?string $secondary = null, array $options = []): static
     {
         $options += ['background' => 'green', 'color' => 'white', 'bold' => true];
 
@@ -377,7 +377,7 @@ class ConsoleIo
      * @param array $options
      * @return static
     */
-    public function warning(string $text, ?string $secondary = null, array $options = []): self
+    public function warning(string $text, ?string $secondary = null, array $options = []): static
     {
         $options += ['background' => 'yellow', 'color' => 'white', 'bold' => true];
 
@@ -393,7 +393,7 @@ class ConsoleIo
      * @param array $options
      * @return static
      */
-    public function error(string $text, ?string $secondary = null, array $options = []): self
+    public function error(string $text, ?string $secondary = null, array $options = []): static
     {
         $options += ['background' => 'red', 'color' => 'white', 'bold' => true];
 
@@ -409,7 +409,7 @@ class ConsoleIo
      * @param string $message
      * @return static
      */
-    public function status(string $status, string $message): self
+    public function status(string $status, string $message): static
     {
         if (! isset($this->statuses[$status])) {
             throw new InvalidArgumentException(sprintf('Unkown status `%s`', $status));

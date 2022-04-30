@@ -28,17 +28,17 @@ interface TranslatorInterface
      * Sets the Locale
      *
      * @param string $locale
-     * @return self|void
+     * @return static
      */
-    public function setLocale(string $locale);
+    public function setLocale(string $locale) : static;
 
     /**
      * Set Domain
      *
      * @param string $domain
-     * @return self|void
+     * @return static
      */
-    public function setDomain(string $domain);
+    public function setDomain(string $domain) : static;
 
     /**
      * Gets the Domaing

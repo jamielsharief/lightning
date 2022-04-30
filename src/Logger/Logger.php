@@ -57,9 +57,9 @@ class Logger implements LoggerInterface
      * Pushes a logger onto the logging stack
      *
      * @param AbstractLogger $logger
-     * @return self
+     * @return static
      */
-    public function pushLogger(LoggerInterface $logger): self
+    public function pushLogger(LoggerInterface $logger): static
     {
         $this->loggers[] = $logger;
 

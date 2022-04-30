@@ -26,9 +26,9 @@ trait MiddlewareTrait
      * Adds middleware to queue
      *
      * @param MiddlewareInterface $middleware
-     * @return self
+     * @return static
      */
-    public function middleware(MiddlewareInterface $middleware): self
+    public function middleware(MiddlewareInterface $middleware): static
     {
         $this->middlewares[] = $middleware;
 
@@ -39,9 +39,9 @@ trait MiddlewareTrait
      * Adds middleware to the start of queue
      *
      * @param MiddlewareInterface $middleware
-     * @return self
+     * @return static
      */
-    public function prependMiddleware(MiddlewareInterface $middleware): self
+    public function prependMiddleware(MiddlewareInterface $middleware): static
     {
         array_unshift($this->middlewares, $middleware);
 

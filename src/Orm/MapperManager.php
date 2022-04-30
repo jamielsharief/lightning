@@ -50,9 +50,9 @@ class MapperManager
      *
      * @param string $class
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function configure(string $class, callable $callback): self
+    public function configure(string $class, callable $callback): static
     {
         $this->factoryCallables[$class] = $callback;
 
@@ -66,9 +66,9 @@ class MapperManager
      * are not used.
      *
      * @param AbstractObjectRelationalMapper $dataMapper
-     * @return self
+     * @return static
      */
-    public function add(AbstractObjectRelationalMapper $dataMapper): self
+    public function add(AbstractObjectRelationalMapper $dataMapper): static
     {
         $this->mappers[get_class($dataMapper)] = $dataMapper;
 

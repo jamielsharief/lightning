@@ -36,7 +36,7 @@ class Identity implements Stringable, JsonSerializable
      * @param array $data
      * @return static
      */
-    public function setData(array $data): self
+    public function setData(array $data): static
     {
         $this->data = $data;
 
@@ -49,7 +49,7 @@ class Identity implements Stringable, JsonSerializable
      * @param array $data
      * @return static
      */
-    public function withData(array $data): self
+    public function withData(array $data): static
     {
         return (clone $this)->setData($data);
     }

@@ -80,9 +80,9 @@ class NumberFormatter
      *
      * @param string $thousands
      * @param string $decimals
-     * @return self
+     * @return static
      */
-    public function setFormat(string $thousands, string $decimals): self
+    public function setFormat(string $thousands, string $decimals): static
     {
         $this->thousands = $thousands;
         $this->decimals = $decimals;
@@ -94,9 +94,9 @@ class NumberFormatter
      * Sets the default currency to use
      *
      * @param string $currency
-     * @return self
+     * @return static
      */
-    public function setDefaultCurrency(string $currency): self
+    public function setDefaultCurrency(string $currency): static
     {
         $this->defaultCurrency = $currency;
 
@@ -110,9 +110,9 @@ class NumberFormatter
      * @param string $before
      * @param string $after
      * @param integer $precision
-     * @return self
+     * @return static
      */
-    public function addCurrency(string $currencyCode, string $before, string $after, int $precision = 2): self
+    public function addCurrency(string $currencyCode, string $before, string $after, int $precision = 2): static
     {
         $this->currencies[$currencyCode] = ['before' => $before,'after' => $after,'precision' => $precision];
 

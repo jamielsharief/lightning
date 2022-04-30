@@ -50,7 +50,7 @@ abstract class AbstractBeforeWriteEvent implements StoppableEventInterface
         return $this->entity;
     }
 
-    public function stop(): self
+    public function stop(): static
     {
         $this->stopped = true;
 

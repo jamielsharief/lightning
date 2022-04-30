@@ -35,9 +35,9 @@ trait LoggerTestTrait
      * Sets the Logger
      *
      * @param TestLogger $testLogger
-     * @return self
+     * @return static
      */
-    public function setLogger(TestLogger $testLogger): self
+    public function setLogger(TestLogger $testLogger): static
     {
         $this->testLogger = $testLogger;
 

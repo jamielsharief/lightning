@@ -50,7 +50,7 @@ class PdoIdentityService implements IdentityServiceInterface
      * @param string $table
      * @return static
      */
-    public function setTable(string $table): self
+    public function setTable(string $table): static
     {
         $this->table = $table;
 
@@ -63,7 +63,7 @@ class PdoIdentityService implements IdentityServiceInterface
      * @param string $name
      * @return static
      */
-    public function setIdentifierName(string $name): self
+    public function setIdentifierName(string $name): static
     {
         $this->identifierName = $name;
 
@@ -76,7 +76,7 @@ class PdoIdentityService implements IdentityServiceInterface
      * @param string $name
      * @return static
      */
-    public function withIdentifierName(string $name): self
+    public function withIdentifierName(string $name): static
     {
         return (clone $this)->setIdentifierName($name);
     }

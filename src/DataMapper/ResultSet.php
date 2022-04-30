@@ -176,9 +176,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * Applies the function to each row
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function map(callable $callback): self
+    public function map(callable $callback): static
     {
         $result = [];
         foreach ($this->rows as $key => $value) {
@@ -192,9 +192,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * Filters the result set
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function filter(callable $callback): self
+    public function filter(callable $callback): static
     {
         $result = [];
         foreach ($this->rows as $key => $value) {
@@ -210,9 +210,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * Indexes the result
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function indexBy(callable $callback): self
+    public function indexBy(callable $callback): static
     {
         $result = [];
         foreach ($this->rows as $value) {
@@ -226,9 +226,9 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      * Groups by
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function groupBy(callable $callback): self
+    public function groupBy(callable $callback): static
     {
         $result = [];
         foreach ($this->rows as $value) {

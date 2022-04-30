@@ -41,9 +41,9 @@ class Autowire
      * Sets the PSR-11 Container to be used
      *
      * @param ContainerInterface $container
-     * @return self
+     * @return static
      */
-    public function setContainer(ContainerInterface $container): self
+    public function setContainer(ContainerInterface $container): static
     {
         $this->container = $container;
 

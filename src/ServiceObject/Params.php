@@ -76,9 +76,9 @@ class Params
      *
      * @param string $name
      * @param mixed $value
-     * @return self
+     * @return static
      */
-    public function set(string $name, $value): self
+    public function set(string $name, $value): static
     {
         $this->data[$name] = $value;
 
@@ -89,9 +89,9 @@ class Params
      * Unset a param
      *
      * @param string $name
-     * @return self
+     * @return static
      */
-    public function unset(string $name): self
+    public function unset(string $name): static
     {
         unset($this->data[$name]);
 

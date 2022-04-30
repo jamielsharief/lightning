@@ -95,9 +95,9 @@ class Event implements GenericEventInterface, StoppableEventInterface
     /**
      * Stops further propagation of the current Event
      *
-     * @return self
+     * @return static
      */
-    public function stop(): self
+    public function stop(): static
     {
         if ($this->cancelable === false) {
             throw new EventException('This event cannot be stopped');
@@ -131,9 +131,9 @@ class Event implements GenericEventInterface, StoppableEventInterface
      * Sets data for this Event
      *
      * @param array $data
-     * @return self
+     * @return static
      */
-    public function setData(array $data): self
+    public function setData(array $data): static
     {
         $this->data = $data;
 
@@ -156,7 +156,7 @@ class Event implements GenericEventInterface, StoppableEventInterface
      * @param array $data
      * @return static
      */
-    public function withData(array $data): self
+    public function withData(array $data): static
     {
         return (clone $this)->setData($data);
     }

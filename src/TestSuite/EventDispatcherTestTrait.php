@@ -36,9 +36,9 @@ trait EventDispatcherTestTrait
      * Sets the Event Dispatcher for testing
      *
      * @param TestEventDispatcher $testEventDispatcher
-     * @return self
+     * @return static
      */
-    public function setEventDispatcher(TestEventDispatcher $testEventDispatcher): self
+    public function setEventDispatcher(TestEventDispatcher $testEventDispatcher): static
     {
         $this->testEventDispatcher = $testEventDispatcher;
 

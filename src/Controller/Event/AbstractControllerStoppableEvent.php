@@ -22,9 +22,9 @@ abstract class AbstractControllerStoppableEvent extends AbstractControllerEvent 
     /**
      * Stops the Event
      *
-     * @return self
+     * @return static
      */
-    public function stop(): self
+    public function stop(): static
     {
         $this->stopped = true;
 

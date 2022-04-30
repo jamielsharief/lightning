@@ -61,9 +61,9 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      * Sets the unauthenticated redirect url
      *
      * @param string $url
-     * @return self
+     * @return static
      */
-    public function setUnauthenticatedRedirect(string $url): self
+    public function setUnauthenticatedRedirect(string $url): static
     {
         $this->unauthenticatedRedirect = $url;
 
@@ -86,7 +86,7 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      * @param string $field
      * @return static
      */
-    public function setUsernameField(string $field): self
+    public function setUsernameField(string $field): static
     {
         $this->usernameField = $field;
 
@@ -99,7 +99,7 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      * @param string $key
      * @return static
      */
-    public function setSessionKey(string $key): self
+    public function setSessionKey(string $key): static
     {
         $this->sessionKey = $key;
 
@@ -112,7 +112,7 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      * @param string $field
      * @return static
      */
-    public function setPasswordField(string $field): self
+    public function setPasswordField(string $field): static
     {
         $this->passwordField = $field;
 
@@ -250,9 +250,9 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      *
      * @param string $loginPath
      *
-     * @return self
+     * @return static
      */
-    public function setLoginPath(string $loginPath): self
+    public function setLoginPath(string $loginPath): static
     {
         $this->loginPath = $loginPath;
 

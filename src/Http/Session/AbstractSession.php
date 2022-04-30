@@ -33,7 +33,7 @@ abstract class AbstractSession implements SessionInterface
         }
     }
 
-    public function set(string $key, $value): self
+    public function set(string $key, $value): static
     {
         $this->checkIsStarted();
         $this->session[$key] = $value;

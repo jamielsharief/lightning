@@ -43,7 +43,7 @@ abstract class AbstractLogger implements LoggerInterface
      * @param string $channel e.g. LogLevel::ERROR
      * @return static
      */
-    public function withChannel(string $channel): self
+    public function withChannel(string $channel): static
     {
         $clone = clone $this;
         $clone->channel = $channel;
@@ -57,7 +57,7 @@ abstract class AbstractLogger implements LoggerInterface
      * @param string $level e.g. LogLevel::ERROR
      * @return static
      */
-    public function withLogLevel(string $level): self
+    public function withLogLevel(string $level): static
     {
         if (! in_array($level, $this->logLevels)) {
             throw new InvalidArgumentException(sprintf('Invalid log level `%s`', $level));

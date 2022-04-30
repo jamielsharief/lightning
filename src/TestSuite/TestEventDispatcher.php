@@ -56,9 +56,9 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      *
      * @param string $event
      * @param callable $callable
-     * @return self
+     * @return static
      */
-    public function on(string $event, callable $callable): self
+    public function on(string $event, callable $callable): static
     {
         $this->listeners[$event] = $callable;
 

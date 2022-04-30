@@ -59,7 +59,7 @@ class Result implements JsonSerializable, Stringable
      * @param boolean $success
      * @return static
      */
-    public function setSuccess(bool $success): self
+    public function setSuccess(bool $success): static
     {
         $this->success = $success;
 
@@ -72,7 +72,7 @@ class Result implements JsonSerializable, Stringable
      * @param boolean $success
      * @return static
      */
-    public function withSuccess(bool $success): self
+    public function withSuccess(bool $success): static
     {
         return (clone $this)->setSuccess($success);
     }
@@ -124,7 +124,7 @@ class Result implements JsonSerializable, Stringable
      * @param array $data
      * @return static
      */
-    public function setData(array $data): self
+    public function setData(array $data): static
     {
         $this->data = $data;
 
@@ -137,7 +137,7 @@ class Result implements JsonSerializable, Stringable
      * @param array $data
      * @return static
      */
-    public function withData(array $data): self
+    public function withData(array $data): static
     {
         return (clone $this)->setData($data);
     }

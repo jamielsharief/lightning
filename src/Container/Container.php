@@ -46,9 +46,9 @@ class Container implements ContainerInterface
     /**
      * Enables the Autowiring
      *
-     * @return self
+     * @return static
      */
-    public function enableAutowiring(): self
+    public function enableAutowiring(): static
     {
         $this->autowire = $this->createAutowire();
 
@@ -63,9 +63,9 @@ class Container implements ContainerInterface
     /**
      * Automatically configure services, if class exists it will try to resolve it.
      *
-     * @return self
+     * @return static
      */
-    public function enableAutoConfigure(): self
+    public function enableAutoConfigure(): static
     {
         $this->autoConfigure = true;
 
@@ -77,9 +77,9 @@ class Container implements ContainerInterface
      *
      * @param string $id e.g ServerRequest::class, Logger::class
      * @param string|closure|object $concrete
-     * @return self
+     * @return static
      */
-    public function register(string $id, $concrete = null): self
+    public function register(string $id, $concrete = null): static
     {
         $concrete = $concrete ?: $id;
 

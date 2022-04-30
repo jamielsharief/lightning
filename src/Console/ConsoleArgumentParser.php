@@ -34,9 +34,9 @@ class ConsoleArgumentParser
     *
     * @param string $name
     * @param array $options
-    * @return self
+    * @return static
     */
-    public function addOption(string $name, array $options = []): self
+    public function addOption(string $name, array $options = []): static
     {
         $options += [
             'name' => $name,
@@ -60,9 +60,9 @@ class ConsoleArgumentParser
      *
      * @param string $name
      * @param array $options
-     * @return self
+     * @return static
      */
-    public function addArgument(string $name, array $options = []): self
+    public function addArgument(string $name, array $options = []): static
     {
         $options += [
             'name' => $name,

@@ -20,7 +20,7 @@ namespace Lightning\ServiceObject;
  *
  * Idea for type hiting, create an extra method
  *
- * public function with(string $name, string $url): self
+ * public function with(string $name, string $url): static
  * {
  *     $params = new Params(['name' => $name,'url' => $url]);
  *
@@ -47,7 +47,7 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
      * @param Params $params
      * @return static
      */
-    public function withParams(Params $params): self
+    public function withParams(Params $params): static
     {
         $service = clone $this;
         $service->params = $params;

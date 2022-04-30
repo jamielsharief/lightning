@@ -87,9 +87,9 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      *
      * @param string|array $key
      * @param mixed $value
-     * @return self
+     * @return static
      */
-    public function set($key, $value = null): self
+    public function set($key, $value = null): static
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
@@ -310,9 +310,9 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      *
      * @param string $field
      * @param string $messages
-     * @return self
+     * @return static
      */
-    public function setError(string $field, $messages): self
+    public function setError(string $field, $messages): static
     {
         if (is_string($messages)) {
             $messages = [$messages];

@@ -64,9 +64,9 @@ class CsrfProtectionMiddleware implements MiddlewareInterface
      * Set maximum tokens to keep track off
      *
      * @param integer $tokens
-     * @return self
+     * @return static
      */
-    public function setMaxTokens(int $tokens): self
+    public function setMaxTokens(int $tokens): static
     {
         $this->maxTokens = $tokens;
 
@@ -106,7 +106,7 @@ class CsrfProtectionMiddleware implements MiddlewareInterface
      *
      * @return static
      */
-    public function disableSingleUseTokens(): self
+    public function disableSingleUseTokens(): static
     {
         $this->singleUseToken = false;
 
@@ -201,7 +201,7 @@ class CsrfProtectionMiddleware implements MiddlewareInterface
      * @param string $header
      * @return static
      */
-    public function setHeader(string $header): self
+    public function setHeader(string $header): static
     {
         $this->header = $header;
 
@@ -224,7 +224,7 @@ class CsrfProtectionMiddleware implements MiddlewareInterface
      * @param string $formField
      * @return static
      */
-    public function setFormField(string $formField): self
+    public function setFormField(string $formField): static
     {
         $this->formField = $formField;
 

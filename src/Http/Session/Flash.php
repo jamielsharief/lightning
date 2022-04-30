@@ -43,7 +43,7 @@ class Flash implements IteratorAggregate
      * @param string $message
      * @return static
      */
-    public function set(string $key, string $message): self
+    public function set(string $key, string $message): static
     {
         $flashed = $this->session->get('flash', []);
 

@@ -62,9 +62,9 @@ class QueryObject
      *
      * @param string $key
      * @param mixed $value
-     * @return self
+     * @return static
      */
-    public function setOption(string $key, $value): self
+    public function setOption(string $key, $value): static
     {
         $this->options[$key] = $value;
 
@@ -75,9 +75,9 @@ class QueryObject
      * Set the value of options
      *
      * @param array $options
-     * @return self
+     * @return static
      */
-    public function setOptions(array $options): self
+    public function setOptions(array $options): static
     {
         $this->options = $options;
 
@@ -98,9 +98,9 @@ class QueryObject
      * Set the value of criteria
      *
      * @param array $criteria
-     * @return self
+     * @return static
      */
-    public function setCriteria(array $criteria): self
+    public function setCriteria(array $criteria): static
     {
         $this->criteria = $criteria;
 

@@ -54,9 +54,9 @@ class TestRequestHandler implements RequestHandlerInterface
      * Registers a callback which will be called before the handle method is called to produce a Response
      *
      * @param callable $callback
-     * @return self
+     * @return static
      */
-    public function beforeHandle(callable $callback): self
+    public function beforeHandle(callable $callback): static
     {
         $this->callback = $callback;
 

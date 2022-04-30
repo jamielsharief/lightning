@@ -71,9 +71,9 @@ final class TestConsoleIo extends ConsoleIo
      * Sets the input
      *
      * @param array $input
-     * @return self
+     * @return static
      */
-    public function setInput(array $input): self
+    public function setInput(array $input): static
     {
         $this->stdinInput = $input;
 

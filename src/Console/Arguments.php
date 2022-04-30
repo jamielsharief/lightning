@@ -44,9 +44,9 @@ class Arguments
      * Set the value of arguments
      *
      * @param array $arguments
-     * @return self
+     * @return static
      */
-    public function setArguments(array $arguments): self
+    public function setArguments(array $arguments): static
     {
         $this->arguments = $arguments;
 
@@ -67,9 +67,9 @@ class Arguments
      * Set the value of options
      *
      * @param array $options
-     * @return self
+     * @return static
      */
-    public function setOptions(array $options): self
+    public function setOptions(array $options): static
     {
         $this->options = $options;
 

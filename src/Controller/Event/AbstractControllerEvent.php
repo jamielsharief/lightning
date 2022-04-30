@@ -61,9 +61,9 @@ abstract class AbstractControllerEvent
      * Sets the request
      *
      * @param ServerRequestInterface $request
-     * @return self
+     * @return static
      */
-    public function setRequest(ServerRequestInterface $request): self
+    public function setRequest(ServerRequestInterface $request): static
     {
         $this->request = $request;
 
@@ -74,9 +74,9 @@ abstract class AbstractControllerEvent
      * Sets the Response
      *
      * @param ResponseInterface $response
-     * @return self
+     * @return static
      */
-    public function setResponse(ResponseInterface  $response): self
+    public function setResponse(ResponseInterface  $response): static
     {
         $this->response = $response;
 

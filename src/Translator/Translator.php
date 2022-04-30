@@ -60,9 +60,9 @@ class Translator implements TranslatorInterface
      * Sets the Message Loader
      *
      * @param MessageLoaderInterface $loader
-     * @return self
+     * @return static
      */
-    public function setMessageLoader(MessageLoaderInterface $loader): self
+    public function setMessageLoader(MessageLoaderInterface $loader): static
     {
         $this->loader = $loader;
 
@@ -75,9 +75,9 @@ class Translator implements TranslatorInterface
      * Sets the Locale
      *
      * @param string $locale
-     * @return self
+     * @return static
      */
-    public function setLocale(string $locale): self
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
         $this->loadMessages();
@@ -99,9 +99,9 @@ class Translator implements TranslatorInterface
      * Sets the Locale
      *
      * @param string $locale
-     * @return self
+     * @return static
      */
-    public function setDefaultLocale(string $locale): self
+    public function setDefaultLocale(string $locale): static
     {
         $this->defaultLocale = $locale;
 
@@ -122,9 +122,9 @@ class Translator implements TranslatorInterface
      * Set Domain
      *
      * @param string $domain
-     * @return self
+     * @return static
      */
-    public function setDomain(string $domain): self
+    public function setDomain(string $domain): static
     {
         $this->domain = $domain;
         $this->loadMessages();

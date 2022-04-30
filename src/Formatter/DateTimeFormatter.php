@@ -35,9 +35,9 @@ class DateTimeFormatter
      * Sets the timezone for this object
      *
      * @param string $timezone
-     * @return self
+     * @return static
      */
-    public function setTimezone(string $timezone): self
+    public function setTimezone(string $timezone): static
     {
         $this->timezone = $timezone;
 
@@ -48,9 +48,9 @@ class DateTimeFormatter
      * Sets the format for datetime string
      *
      * @param string $format
-     * @return self
+     * @return static
      */
-    public function setDateTimeFormat(string $format): self
+    public function setDateTimeFormat(string $format): static
     {
         $this->datetimeFormat = $format;
 
@@ -61,9 +61,9 @@ class DateTimeFormatter
      * Sets the format for date string
      *
      * @param string $format
-     * @return self
+     * @return static
      */
-    public function setDateFormat(string $format): self
+    public function setDateFormat(string $format): static
     {
         $this->dateFormat = $format;
 
@@ -74,9 +74,9 @@ class DateTimeFormatter
      * Sets the format for time string
      *
      * @param string $format
-     * @return self
+     * @return static
      */
-    public function setTimeFormat(string $format): self
+    public function setTimeFormat(string $format): static
     {
         $this->timeFormat = $format;
 

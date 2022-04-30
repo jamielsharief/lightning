@@ -176,9 +176,9 @@ class ConsoleHelpFormatter
      * Adds the description part of help
      *
      * @param string|array $description
-     * @return self
+     * @return static
      */
-    public function setDescription($description): self
+    public function setDescription($description): static
     {
         $this->description = $this->toText($description) ;
 
@@ -189,9 +189,9 @@ class ConsoleHelpFormatter
      * Sets the usage
      *
      * @param string|array $usage
-     * @return self
+     * @return static
      */
-    public function setUsage($usage): self
+    public function setUsage($usage): static
     {
         $usage = $this->toText($usage, "\n  ");
         $this->usage = $this->wrapText($usage, 2) ;
@@ -202,9 +202,9 @@ class ConsoleHelpFormatter
      * Sets the commands to be used
      *
      * @param array $commands
-     * @return self
+     * @return static
      */
-    public function setCommands(array $commands): self
+    public function setCommands(array $commands): static
     {
         $this->commands = $commands;
 
@@ -215,9 +215,9 @@ class ConsoleHelpFormatter
      * Sets the options
      *
      * @param array $options
-     * @return self
+     * @return static
      */
-    public function setOptions(array $options): self
+    public function setOptions(array $options): static
     {
         $this->options = $options;
 
@@ -228,9 +228,9 @@ class ConsoleHelpFormatter
      * Sets the arguments
      *
      * @param array $arguments
-     * @return self
+     * @return static
      */
-    public function setArguments(array $arguments): self
+    public function setArguments(array $arguments): static
     {
         $this->arguments = $arguments;
 
@@ -241,9 +241,9 @@ class ConsoleHelpFormatter
      * Sets the epilog
      *
      * @param string|array $epilog
-     * @return self
+     * @return static
      */
-    public function setEpilog($epilog): self
+    public function setEpilog($epilog): static
     {
         $this->epilog = $this->toText($epilog);
 
@@ -254,9 +254,9 @@ class ConsoleHelpFormatter
      * Sets the help text
      *
      * @param string|array $help
-     * @return self
+     * @return static
      */
-    public function setHelp($help): self
+    public function setHelp($help): static
     {
         $help = $this->toText($help, "\n  ");
         $this->help = $this->wrapText($help, 2);

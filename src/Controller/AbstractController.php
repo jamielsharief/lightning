@@ -387,7 +387,7 @@ abstract class AbstractController implements HookInterface, ControllerInterface
      * @param ResponseInterface $response
      * @return static
      */
-    public function setResponse(ResponseInterface $response): self
+    public function setResponse(ResponseInterface $response): static
     {
         $this->response = $response;
 
@@ -410,7 +410,7 @@ abstract class AbstractController implements HookInterface, ControllerInterface
      * @param ServerRequestInterface $request
      * @return static
      */
-    public function setRequest(ServerRequestInterface $request): self
+    public function setRequest(ServerRequestInterface $request): static
     {
         $this->request = $request;
 

@@ -49,7 +49,7 @@ class HttpBasicAuthenticationMiddleware extends AbstractAuthenticationMiddleware
      *
      * @return static
      */
-    public function disableChallenge(): self
+    public function disableChallenge(): static
     {
         $this->challenge = false;
 
@@ -127,7 +127,7 @@ class HttpBasicAuthenticationMiddleware extends AbstractAuthenticationMiddleware
      * @param string $realm
      * @return static
      */
-    public function setRealm(string $realm): self
+    public function setRealm(string $realm): static
     {
         $this->realm = $realm;
 

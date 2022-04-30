@@ -30,9 +30,9 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      * @param string $eventType
      * @param callable $callable
      * @param integer $priority
-     * @return self
+     * @return static
      */
-    public function addListener(string $eventType, callable $callable, int $priority = self::DEFAULT_PRIORITY): self
+    public function addListener(string $eventType, callable $callable, int $priority = self::DEFAULT_PRIORITY): static
     {
         $this->listeners[$eventType][$priority][] = $callable;
         unset($this->sorted[$eventType]);
@@ -44,9 +44,9 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      * Adds a subscriber
      *
      * @param EventSubscriberInterface $subscriber
-     * @return self
+     * @return static
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): self
+    public function addSubscriber(EventSubscriberInterface $subscriber): static
     {
         foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
             foreach ($this->normalizeEvents($params) as $method) {
@@ -107,9 +107,9 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      *
      * @param string $eventType
      * @param callable $callable e.g. [$this,'method']
-     * @return self
+     * @return static
      */
-    public function removeListener(string $eventType, callable $callable): self
+    public function removeListener(string $eventType, callable $callable): static
     {
         foreach ($this->listeners[$eventType] ?? [] as $priority => $queue) {
             foreach ($queue as $index => $handler) {
@@ -126,9 +126,9 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      * Removes a subscriber
      *
      * @param EventSubscriberInterface $subscriber
-     * @return self
+     * @return static
      */
-    public function removeSubscriber(EventSubscriberInterface $subscriber): self
+    public function removeSubscriber(EventSubscriberInterface $subscriber): static
     {
         foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
             foreach ($this->normalizeEvents($params) as $method) {

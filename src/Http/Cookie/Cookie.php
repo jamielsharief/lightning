@@ -89,9 +89,9 @@ class Cookie implements Stringable
      * Sets the value of this cookie
      *
      * @param string $value
-     * @return self
+     * @return static
      */
-    public function setValue(string $value): self
+    public function setValue(string $value): static
     {
         $this->value = $value;
 
@@ -115,9 +115,9 @@ class Cookie implements Stringable
      *
      * @param bool $httpOnly
      *
-     * @return self
+     * @return static
      */
-    public function setHttpOnly(bool $httpOnly): self
+    public function setHttpOnly(bool $httpOnly): static
     {
         $this->httpOnly = $httpOnly;
 
@@ -139,9 +139,9 @@ class Cookie implements Stringable
      *
      * @param bool $secure
      *
-     * @return self
+     * @return static
      */
-    public function setSecure(bool $secure): self
+    public function setSecure(bool $secure): static
     {
         $this->secure = $secure;
 
@@ -163,9 +163,9 @@ class Cookie implements Stringable
      *
      * @param string $path
      *
-     * @return self
+     * @return static
      */
-    public function setPath(string $path): self
+    public function setPath(string $path): static
     {
         $this->path = $path;
 
@@ -187,9 +187,9 @@ class Cookie implements Stringable
      *
      * @param string $domain
      *
-     * @return self
+     * @return static
      */
-    public function setDomain(string $domain): self
+    public function setDomain(string $domain): static
     {
         $this->domain = $domain;
 
@@ -211,9 +211,9 @@ class Cookie implements Stringable
      *
      * @param int $maxAge
      *
-     * @return self
+     * @return static
      */
-    public function setMaxAge(int $maxAge): self
+    public function setMaxAge(int $maxAge): static
     {
         $this->maxAge = $maxAge;
 
@@ -237,9 +237,9 @@ class Cookie implements Stringable
      *
      * @param string $sameSite
      *
-     * @return self
+     * @return static
      */
-    public function setSameSite(string $sameSite): self
+    public function setSameSite(string $sameSite): static
     {
         $this->sameSite = $sameSite;
 

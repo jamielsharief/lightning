@@ -102,9 +102,9 @@ class ConsoleApplication implements CommandInterface
      * Sets the name
      *
      * @param string $name
-     * @return self
+     * @return static
      */
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -115,9 +115,9 @@ class ConsoleApplication implements CommandInterface
      * Sets the description
      *
      * @param string $description
-     * @return self
+     * @return static
      */
-    public function setDescription(string $description): self
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
@@ -128,9 +128,9 @@ class ConsoleApplication implements CommandInterface
      * Adds a command
      *
      * @param CommandInterface $command
-     * @return self
+     * @return static
      */
-    public function add(CommandInterface $command): self
+    public function add(CommandInterface $command): static
     {
         $names = explode(' ', $command->getName());
         $name = end($names);

@@ -77,9 +77,9 @@ class QueryBuilder implements Stringable
      * Creates an Insert query
      *
      * @param array $columns
-     * @return self
+     * @return static
      */
-    public function insert(array $columns): self
+    public function insert(array $columns): static
     {
         $this->reset('insert');
         $this->parts['insert'] = $columns;
@@ -91,9 +91,9 @@ class QueryBuilder implements Stringable
      * Sets the table name for the Insert query
      *
      * @param string $table
-     * @return self
+     * @return static
      */
-    public function into(string $table): self
+    public function into(string $table): static
     {
         $this->table = $table;
         $this->tableAlias = $table;
@@ -105,9 +105,9 @@ class QueryBuilder implements Stringable
      * Sets the values for the insert query
      *
      * @param array $values
-     * @return self
+     * @return static
      */
-    public function values(array $values): self
+    public function values(array $values): static
     {
         $this->parts['values'] = $values;
 
@@ -118,9 +118,9 @@ class QueryBuilder implements Stringable
      * Sets the columns to be to returned
      *
      * @param array $columns
-     * @return self
+     * @return static
      */
-    public function select(array $columns): self
+    public function select(array $columns): static
     {
         $this->reset('select');
         $this->parts['select'] = $columns;
@@ -133,9 +133,9 @@ class QueryBuilder implements Stringable
      *
      * @param string $table
      * @param string|null $alias
-     * @return self
+     * @return static
      */
-    public function from(string $table, ?string $alias = null): self
+    public function from(string $table, ?string $alias = null): static
     {
         $this->table = $table;
         $this->tableAlias = $alias ?: $table;
@@ -149,9 +149,9 @@ class QueryBuilder implements Stringable
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $conditions orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function leftJoin(string $table, ?string $alias = null, $conditions = []): self
+    public function leftJoin(string $table, ?string $alias = null, $conditions = []): static
     {
         $this->parts['joins'][] = ['type' => 'LEFT','table' => $table,'alias' => $alias,'conditions' => (array) $conditions];
 
@@ -162,9 +162,9 @@ class QueryBuilder implements Stringable
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $conditions orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function rightJoin(string $table, ?string $alias = null, $conditions = []): self
+    public function rightJoin(string $table, ?string $alias = null, $conditions = []): static
     {
         $this->parts['joins'][] = ['type' => 'RIGHT','table' => $table,'alias' => $alias,'conditions' => (array) $conditions];
 
@@ -175,9 +175,9 @@ class QueryBuilder implements Stringable
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $conditions orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function innerJoin(string $table, ?string $alias = null, $conditions = []): self
+    public function innerJoin(string $table, ?string $alias = null, $conditions = []): static
     {
         $this->parts['joins'][] = ['type' => 'INNER','table' => $table,'alias' => $alias,'conditions' => (array) $conditions];
 
@@ -188,9 +188,9 @@ class QueryBuilder implements Stringable
      * @param string $table e.g. customers
      * @param string|null $alias
      * @param string|array $conditions orders.customer_id = customers.id
-     * @return self
+     * @return static
      */
-    public function fullJoin(string $table, ?string $alias = null, $conditions = []): self
+    public function fullJoin(string $table, ?string $alias = null, $conditions = []): static
     {
         $this->parts['joins'][] = ['type' => 'FULL','table' => $table,'alias' => $alias,'conditions' => (array) $conditions];
 
@@ -201,9 +201,9 @@ class QueryBuilder implements Stringable
     * Creates a set of where conditions, overwriting previous.
     *
     * @param array $conditions
-    * @return self
+    * @return static
     */
-    public function where(array $conditions): self
+    public function where(array $conditions): static
     {
         $this->parts['where'] = [];
 
@@ -214,9 +214,9 @@ class QueryBuilder implements Stringable
      * Adds a condition or conditions after an OR
      *
      * @param array $conditions
-     * @return self
+     * @return static
      */
-    public function or(array $conditions): self
+    public function or(array $conditions): static
     {
         $this->parts['where'][] = ['operator' => 'OR', 'conditions' => $conditions];
 
@@ -227,9 +227,9 @@ class QueryBuilder implements Stringable
      * Adds a condition or conditions after an OR
      *
      * @param array $conditions
-     * @return self
+     * @return static
      */
-    public function and(array $conditions): self
+    public function and(array $conditions): static
     {
         $this->parts['where'][] = ['operator' => 'AND', 'conditions' => $conditions];
 
@@ -282,9 +282,9 @@ class QueryBuilder implements Stringable
      * Sets the group by clause
      *
      * @param string|array $group c1 or ['c1','c2']
-     * @return self
+     * @return static
      */
-    public function groupBy($group): self
+    public function groupBy($group): static
     {
         $this->parts['groupBy'] = (array) $group;
 
@@ -295,9 +295,9 @@ class QueryBuilder implements Stringable
      * Sets the having clause
      *
      * @param string|array $conditions
-     * @return self
+     * @return static
      */
-    public function having($conditions): self
+    public function having($conditions): static
     {
         $this->parts['having'] = (array) $conditions;
 
@@ -308,9 +308,9 @@ class QueryBuilder implements Stringable
      * Sets the order by clause
      *
      * @param string|array $sort  authors.country ASC, 'country' => 'ASC',['country, name ASC'],'country
-     * @return self
+     * @return static
      */
-    public function orderBy($sort): self
+    public function orderBy($sort): static
     {
         $this->parts['orderBy'] = (array) $sort;
 
@@ -322,9 +322,9 @@ class QueryBuilder implements Stringable
      *
      * @param integer $limit
      * @param integer|null $offset
-     * @return self
+     * @return static
      */
-    public function limit(int $limit, ?int $offset = null): self
+    public function limit(int $limit, ?int $offset = null): static
     {
         $this->parts['limit'] = [$limit,$offset];
 
@@ -335,9 +335,9 @@ class QueryBuilder implements Stringable
      * Creates an Update query
      *
      * @param string $table
-     * @return self
+     * @return static
      */
-    public function update(string $table): self
+    public function update(string $table): static
     {
         $this->reset('update');
         $this->from($table);
@@ -349,9 +349,9 @@ class QueryBuilder implements Stringable
      * Sets the field or fields and their values for an Update query
      *
      * @param array $data
-     * @return self
+     * @return static
      */
-    public function set(array $data): self
+    public function set(array $data): static
     {
         $this->parts['set'] = $data;
 
@@ -361,9 +361,9 @@ class QueryBuilder implements Stringable
     /**
      * Creates a Delete query
      *
-     * @return self
+     * @return static
      */
-    public function delete(): self
+    public function delete(): static
     {
         $this->reset('delete');
 
@@ -448,9 +448,9 @@ class QueryBuilder implements Stringable
      * @param int|string $key If you are using named placeholders, e.g. ':email' then pass 'email' if you are using question mark
      *                        placeholders, then the key will be an integer starting at 0 for the first item.
      * @param mixed $value
-     * @return self
+     * @return static
      */
-    public function setParameter($key, $value): self
+    public function setParameter($key, $value): static
     {
         $key = is_int($key) ? $key : ':' . $key; // set name to :name
         $this->values[$key] = $value;
@@ -463,9 +463,9 @@ class QueryBuilder implements Stringable
      *
      * @param array $parameters For question mark placeholders [0 => 'jon', 1 =>'smith'] or for named placholders e.g. :last_name, then use
      *              ['first_name' => 'jon' ,'last_name' => 'smith' ]
-     * @return self
+     * @return static
      */
-    public function setParameters(array $parameters): self
+    public function setParameters(array $parameters): static
     {
         array_walk($parameters, function ($value, $key) {
             $this->setParameter($key, $value);

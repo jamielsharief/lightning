@@ -78,9 +78,9 @@ class View
      * when using objects.
      *
      * @param ViewExtensionInterface $extension
-     * @return self
+     * @return static
      */
-    public function addExtension(ViewExtensionInterface $extension): self
+    public function addExtension(ViewExtensionInterface $extension): static
     {
         foreach ($extension->getMethods() as $method) {
             $this->extensionMethods[$method] = [$extension,$method];
@@ -93,9 +93,9 @@ class View
      * Adds a Helper to the View
      *
      * @param ViewHelperInterface $helper
-     * @return self
+     * @return static
      */
-    public function addHelper(ViewHelperInterface $helper): self
+    public function addHelper(ViewHelperInterface $helper): static
     {
         $name = $helper->getName();
         $this->$name = $helper;
@@ -109,7 +109,7 @@ class View
      * @param string|null $layout
      * @return static
      */
-    public function withLayout(?string $layout): self
+    public function withLayout(?string $layout): static
     {
         $view = clone $this;
         $view->layout = $layout;
@@ -124,7 +124,7 @@ class View
      * @param string $path
      * @return static
      */
-    public function withViewPath(string $path): self
+    public function withViewPath(string $path): static
     {
         $view = clone $this;
         $view->viewPath = $path;
@@ -138,7 +138,7 @@ class View
      * @param string $path
      * @return static
      */
-    public function withLayoutPath(string $path): self
+    public function withLayoutPath(string $path): static
     {
         $view = clone $this;
         $view->layoutPath = $path;

@@ -212,7 +212,7 @@ class Statement implements Countable, Stringable, IteratorAggregate
      * @param string|null $class
      * @return mixed
      */
-    public function fetchObject(?string $class = null)
+    public function fetchObject(?string $class = null): mixed
     {
         return $this->statement->fetchObject($class);
     }
@@ -282,7 +282,7 @@ class Statement implements Countable, Stringable, IteratorAggregate
      * @param integer $column
      * @return mixed
      */
-    public function fetchColumn(int $column = 0)
+    public function fetchColumn(int $column = 0): mixed
     {
         $result = $this->fetchNumeric();
         if ($result && isset($result[$column])) {

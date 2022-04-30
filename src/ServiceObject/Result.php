@@ -110,12 +110,13 @@ class Result implements JsonSerializable, Stringable
     /**
      * Gets the data for this result or data from a specific property
      *
-     * @param string|null $property
+     * @param string $property
+     * @param string|null $default
      * @return mixed
      */
-    public function get(string $property)
+    public function get(string $property, ?string $default = null): mixed
     {
-        return $this->data[$property] ?? null;
+        return $this->data[$property] ?? $default;
     }
 
     /**

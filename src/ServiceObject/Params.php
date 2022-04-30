@@ -62,7 +62,7 @@ class Params
      * @throws \Lightning\ServiceObject\Exception\UnknownParameterException
      * @return mixed
      */
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         if (! isset($this->data[$name])) {
             throw new UnknownParameterException(sprintf('Unkown parameter `%s`', $name));

@@ -56,7 +56,7 @@ class TestSession implements TestSessionInterface
      * @param string $key
      * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return $_SESSION[$key] ?? null;
     }

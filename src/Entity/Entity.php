@@ -109,7 +109,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $value
      * @return mixed
      */
-    private function mutate(string $key, $value)
+    private function mutate(string $key, $value): mixed
     {
         $method = $this->getAccessorMethod($key, 'set');
 
@@ -123,7 +123,7 @@ class Entity extends AbstractEntity implements EntityInterface, ArrayAccess
      * @param mixed $value
      * @return mixed
      */
-    private function access(string $key, $value)
+    private function access(string $key, $value): mixed
     {
         $method = $this->getAccessorMethod($key, 'get');
 

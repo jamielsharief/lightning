@@ -41,7 +41,7 @@ abstract class AbstractSession implements SessionInterface
         return $this;
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $key, $default = null) : mixed
     {
         $this->checkIsStarted();
 

@@ -31,7 +31,7 @@ interface SessionInterface
      * @param mixed $default
      * @return mixed
      */
-    public function get(string $key, $default = null);
+    public function get(string $key, $default = null): mixed;
 
     /**
      * Removes a value from the session

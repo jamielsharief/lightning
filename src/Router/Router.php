@@ -190,7 +190,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
      * @param callable $callable
      * @return mixed
      */
-    private function createAutowireCallable(callable $callable)
+    private function createAutowireCallable(callable $callable): mixed
     {
         return function (ServerRequestInterface $request, ?ResponseInterface $response = null) use ($callable) {
             $params = [ServerRequestInterface::class => $request];

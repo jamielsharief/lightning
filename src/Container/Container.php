@@ -94,7 +94,7 @@ class Container implements ContainerInterface
      * @param string $id
      * @return mixed
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         if (! $this->has($id)) {
             throw new NotFoundException(sprintf('No defintion found for `%s`', $id));
@@ -113,7 +113,7 @@ class Container implements ContainerInterface
      * @param string $id
      * @return mixed
      */
-    public function resolve(string $id)
+    public function resolve(string $id): mixed
     {
         if (! $this->has($id)) {
             throw new NotFoundException(sprintf('No defintion found for `%s`', $id));
@@ -129,7 +129,7 @@ class Container implements ContainerInterface
      * @param boolean $share
      * @return mixed
      */
-    private function resolveDefinition(string $id, bool $share = true)
+    private function resolveDefinition(string $id, bool $share = true): mixed
     {
         $concrete = $this->definitions[$id] ?? $id;
 

@@ -52,7 +52,7 @@ class QueryObject
      * @param mixed $default
      * @return mixed
      */
-    public function getOption(string $key, $default = null)
+    public function getOption(string $key, $default = null): mixed
     {
         return $this->options[$key] ?? $default;
     }

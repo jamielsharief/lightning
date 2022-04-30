@@ -75,7 +75,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
      * @param string $key
      * @return mixed
      */
-    public function &__get(string $key)
+    public function &__get(string $key): mixed
     {
         $value = null;
 
@@ -92,7 +92,7 @@ class Row implements ArrayAccess, JsonSerializable, Stringable
      * @param string $key
      * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return $this->__get($key);
     }

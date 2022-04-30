@@ -60,7 +60,7 @@ class Identity implements Stringable, JsonSerializable
      * @param string|null $property
      * @return mixed
      */
-    public function get(string $property)
+    public function get(string $property): mixed
     {
         return $this->data[$property] ?? null;
     }

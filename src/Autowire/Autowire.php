@@ -85,7 +85,7 @@ class Autowire
      * @param array $parameters
      * @return mixed
      */
-    public function method(object $object, string $method, array $parameters = [])
+    public function method(object $object, string $method, array $parameters = []) : mixed
     {
         if (! method_exists($object, $method)) {
             throw new AutowireException(sprintf('`%s` does not have the `%s` method', get_class($object), $method));
@@ -104,7 +104,7 @@ class Autowire
      * @param string|closure $function
      * @return mixed
      */
-    public function function($function, array $parameters = [])
+    public function function($function, array $parameters = []): mixed
     {
         $reflectionFunction = new ReflectionFunction($function);
 
@@ -133,7 +133,7 @@ class Autowire
      * @param array $vars
      * @return mixed
      */
-    protected function resolveParameter(ReflectionParameter $parameter, array $vars = [])
+    protected function resolveParameter(ReflectionParameter $parameter, array $vars = []): mixed
     {
 
         /** @var \ReflectionNamedType|\ReflectionUnionType|null $parameterType */

@@ -83,7 +83,7 @@ class Arguments
      * @param mixed $default
      * @return mixed
      */
-    public function getOption(string $option, $default = null)
+    public function getOption(string $option, $default = null): mixed
     {
         return $this->options[$option] ?? $default;
     }
@@ -95,7 +95,7 @@ class Arguments
      * @param mixed $default
      * @return mixed
      */
-    public function getArgument(string $argument, $default = null)
+    public function getArgument(string $argument, $default = null): mixed
     {
         return $this->arguments[$argument] ?? $default;
     }

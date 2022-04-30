@@ -53,7 +53,7 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
      *
      * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         $result = null;
         foreach ($this->rows as $result) {

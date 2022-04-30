@@ -81,7 +81,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param callable $callback
      * @return mixed
      */
-    public function reduce(callable $callback)
+    public function reduce(callable $callback): mixed
     {
         $called = false;
 
@@ -104,7 +104,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param callable $callback
      * @return mixed
      */
-    public function find(callable $callback)
+    public function find(callable $callback): mixed
     {
         foreach ($this->items as $key => $value) {
             if ($callback($value, $key) === true) {
@@ -349,7 +349,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     * @param string|callable $path
     * @return mixed
     */
-    public function min($path)
+    public function min($path): mixed
     {
         return $this->sortBy($path, SORT_ASC)->first();
     }
@@ -367,7 +367,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     * @param string|callable $path
     * @return mixed
     */
-    public function max($path)
+    public function max($path): mixed
     {
         return $this->sortBy($path, SORT_ASC)->last();
     }
@@ -385,7 +385,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     * @param string|callable $path
     * @return mixed
     */
-    public function sumOf($path)
+    public function sumOf($path): mixed
     {
         if (is_string($path)) {
             $path = $this->createCallback($path);
@@ -526,7 +526,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return mixed
      */
-    public function first()
+    public function first(): mixed
     {
         $result = null;
         if ($this->items) {
@@ -542,7 +542,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return mixed
      */
-    public function last()
+    public function last(): mixed
     {
         $result = null;
         if ($this->items) {
@@ -620,7 +620,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->items[$key] ?? null;
     }

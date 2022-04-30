@@ -19,7 +19,7 @@ interface TestSessionInterface
 
     public function has(string $key): bool;
 
-    public function get(string $key);
+    public function get(string $key): mixed;
 
     public function clear(): void;
 }

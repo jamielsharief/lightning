@@ -86,7 +86,7 @@ To `delete` a row or rows in the database, with the id values
 $db->delete('articles',['id' => 1234]);
 ```
 
-## Row
+## Row
 
 The `Row` object can be used with `PDO`, this is an object with array access, and some other handy features
 when working with a result from the database.

@@ -70,7 +70,7 @@ class MapperManager
      */
     public function add(AbstractObjectRelationalMapper $dataMapper): static
     {
-        $this->mappers[get_class($dataMapper)] = $dataMapper;
+        $this->mappers[$dataMapper::class] = $dataMapper;
 
         return $this;
     }

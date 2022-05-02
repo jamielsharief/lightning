@@ -88,7 +88,7 @@ class Autowire
     public function method(object $object, string $method, array $parameters = []): mixed
     {
         if (! method_exists($object, $method)) {
-            throw new AutowireException(sprintf('`%s` does not have the `%s` method', get_class($object), $method));
+            throw new AutowireException(sprintf('`%s` does not have the `%s` method', $object::class, $method));
         }
 
         $reflection = (new ReflectionClass($object))->getMethod($method);

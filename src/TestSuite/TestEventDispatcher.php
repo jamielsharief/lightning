@@ -40,7 +40,7 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
     {
         $this->dispatchedEvents[] = $event;
 
-        $callable = $this->listeners[get_class($event)] ?? null;
+        $callable = $this->listeners[$event::class] ?? null;
 
         if ($callable) {
             $callable($event);

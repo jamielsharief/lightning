@@ -88,7 +88,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      */
     public function getListenersForEvent(object $event): iterable
     {
-        $eventType = $event instanceof Event ? $event->getName() : get_class($event);
+        $eventType = $event instanceof Event ? $event->getName() : $event::class;
 
         if (empty($this->listeners[$eventType])) {
             return [];

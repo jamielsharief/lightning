@@ -13,7 +13,7 @@ class User extends AbstractEntity
     private string $name;
 
 
-    public static function fromState(array $state): Article
+    public static function fromState(array $state): User
     {
         // Check state
         $user = new static();

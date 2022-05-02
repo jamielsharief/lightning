@@ -14,6 +14,8 @@ A set of lightweight components that can be used together or seperatley.
 - [ ] Any learning should transportable
 - [ ] Linux based OS (sorry Windoz)
 
+Documentation can be found in the [Docs Folder](docs/) 
+
 ## Setup
 
 Create an `.env` file in the root directory, 

@@ -16,7 +16,7 @@ To translate a message using ICU message format:
 $message = $translator->translate('Hello {user}!', ['user'=> $user->name]); // Hallo Jim
 ```
 
-The translator also supports simple message formatting, by providing a `|` with the key `count`
+The translator also supports simple message formatting, by providing a `|` with the key `count`. When the string is split, if the index is found for the count it will use that, if not it will use the last index.
 
 ```php
 $message = $translator->translate('There are zero apples|There is 1 apple|There are {count} apples', ['count'=> count($apples)]); 

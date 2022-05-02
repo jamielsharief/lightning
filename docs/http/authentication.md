@@ -57,6 +57,14 @@ public function login(ServerRequestInterface $request): ResponseInterface
 
     return $this->render('/login');
 }
+
+public function logout(SessionInterface $session): ResponseInterface
+{
+    $session->clear();
+    $session->regenerateId();
+
+    return $this->redirect('/login');
+}
 ```
 
 By default an `UnauthorizedException` is thrown if the user tries to access a resource that requires authentication, however if you want them to redirect to another page, then you will need to set the unauthenticated redirect.

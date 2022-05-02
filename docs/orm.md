@@ -19,7 +19,7 @@ class Author extends AbstractObjectRelationalMapper
         [
             'className' => Article::class,
             'foreignKey' => 'author_id', // in other table,
-            'dependent' => true
+            'dependent' => true,
             'propertyName' => 'articles'
         ]
     ];
@@ -41,7 +41,7 @@ class Article extends AbstractObjectRelationalMapper
     protected array $belongsTo = [
         [
             'className' => Author::class,
-            'foreignKey' => 'author_id'
+            'foreignKey' => 'author_id',
             'propertyName' => 'author'
         ]
     ];

@@ -1,6 +1,6 @@
 # Translator
 
-The `Translator` component provides an object that can be passed around your application to translate messages into different languages.
+The `Translator` component provides an object that can be passed around your application to translate messages into different languages using the ICU message formatter. It also supports simple message formatting.
 
 ## Usage
 
@@ -10,11 +10,18 @@ Create the `Translator` object and add to your DI container and configure the ob
 $translator = new Translator(new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 'en_US', 'default');
 ```
 
-Usage
+To translate a message using ICU message format:
 
 ```php
 $message = $translator->translate('Hello {user}!', ['user'=> $user->name]); // Hallo Jim
 ```
+
+The translator also supports simple message formatting, by providing a `|` with the key `count`
+
+```php
+$message = $translator->translate('There are zero apples|There is 1 apple|There are {count} apples', ['count'=> count($apples)]); 
+```
+
 
 To change the locale run the folloing method, if you try to set a `locale` which does not exist, then it will use the `default` locale which was set when creating the `Translator` object.
 
@@ -69,19 +76,11 @@ return [
 
 ## Translator Middlewares
 
-## Locale Setter
-
-The `LocaleSetterMiddleware` quite simply sets the locale on the `Translator` using if the server request attribute `locale` is available. This
-allows you to use this when routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe the session.
-
-```php
-$translator = $container->get(Translator::class);
-$middleware = new LocaleSetterMiddleware($translator); 
-```
+The translator middlewares help configuring the `Translator` object per request.
 
 ## Locale Detector
 
-The `LocaleDetector` attempts to detect the locale from the request headers and will set the `locale` attribute on the `ServerRequestInterface` object.
+The `LocaleDetector` attempts to detect the locale from the request headers and will set the `locale` attribute on the PSR 7 server request object.
 
 ```php
 $middleware = new LocaleDetectorMiddleware('en_US');  // provide a default locale
@@ -91,4 +90,13 @@ You can also supply a second argument of allowed locales
 
 ```php
 $middleware = new LocaleDetectorMiddleware('en_US', ['en_US','en_GB','es_MX','es_ES']); 
+```
+
+## Locale Setter
+
+The `LocaleSetterMiddleware` quite simply sets the locale on the `Translator` using if the PSR 7 server request object has the  `locale` attribute  set. This allows you to use this when routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe the session.
+
+```php
+$translator = $container->get(Translator::class);
+$middleware = new LocaleSetterMiddleware($translator); 
 ```

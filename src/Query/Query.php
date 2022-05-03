@@ -149,7 +149,7 @@ class Query implements IteratorAggregate
      * @param string|array $condition orders.customer_id = customers.id
      * @return static
      */
-    public function innerJoin(string $table, ?string $alias = null, string|array $condition = null): static
+    public function innerJoin(string $table, ?string $alias = null, string|array $condition = []): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->innerJoin($table, $alias, $condition);
@@ -163,7 +163,7 @@ class Query implements IteratorAggregate
      * @param string|array $condition orders.customer_id = customers.id
      * @return static
      */
-    public function leftJoin(string $table, ?string $alias = null, string|array $condition): static
+    public function leftJoin(string $table, ?string $alias = null, string|array $condition = []): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->leftJoin($table, $alias, $condition);
@@ -177,7 +177,7 @@ class Query implements IteratorAggregate
      * @param string|array $condition orders.customer_id = customers.id
      * @return static
      */
-    public function rightJoin(string $table, ?string $alias = null, string|array $condition): static
+    public function rightJoin(string $table, ?string $alias = null, string|array $condition = []): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->rightJoin($table, $alias, $condition);
@@ -191,7 +191,7 @@ class Query implements IteratorAggregate
      * @param string|array $condition orders.customer_id = customers.id
      * @return static
      */
-    public function fullJoin(string $table, ?string $alias = null, string|array $condition): static
+    public function fullJoin(string $table, ?string $alias = null, string|array $condition = []): static
     {
         $this->checkDriverSupportsTableAliasMeta($alias);
         $this->queryBuilder->fullJoin($table, $alias, $condition);

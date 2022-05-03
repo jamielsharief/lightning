@@ -228,6 +228,16 @@ final class QueryTest extends TestCase
             ->first();
 
         $this->assertInstanceOf(Row::class, $entity);
+
+        $expected = [
+            'id' => 1000,
+            'title' => 'Article #1',
+            'body' => 'A description for article #1',
+            'author_id' => 2000,
+            'created_at' => '2021-10-03 09:01:00',
+            'updated_at' => '2021-10-03 09:02:00'
+        ];
+        $this->assertEquals($expected, $entity->toArray());
     }
 
     public function testFirstNull()

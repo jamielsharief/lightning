@@ -4,14 +4,13 @@ Provides Entity classes and interfaces. You can use custom entities (setters+get
 
 ## Usage
 
-Create your `Entity` class using a singular name. 
+Create your `Entity` class using a singular name, configure the `fromState` method and the `toArray` method, then create setters and getters for each property.
 
 ```php
 class User extends AbstractEntity
 {
     private ?int $id = null;
     private string $name;
-
 
     public static function fromState(array $state): User
     {
@@ -47,68 +46,16 @@ class User extends AbstractEntity
         return $this->name;
     }
 
-    public function getId() : int 
+     public function getId(): ?int
     {
         return $this->id;
     }
-}
-```
 
-```php
-class Article
-{
-    public function __construct(private PDO $pdo)
+    public function setId(?int $id): self
     {
+        $this->id = $id;
+
+        return $this;
     }
-
-    public function find(): ?EntityInterface
-    {
-        $result = $this->query('SELECT * FROM articles LIMIT 1');
-
-        return $result ? $this->mapRow($result) : null;
-    }
-
-    public function findById(int $id): ?EntityInterface
-    {
-        $result = $this->query('SELECT * FROM articles WHERE id = :id', ['id' => $id]);
-
-        return $result ? $this->mapRow($result) : null;
-    }
-
-    public function findAll(): iterable
-    {
-        return $this->mapRows(
-            $this->queryAll('SELECT * FROM articles')
-        );
-    }
-
-    public function mapRow(array $row) : Article
-    {
-         return Article::fromState($row);
-    }
-
-    public function mapRows(array $rows) : array 
-    {
-        return array_map(function($row){
-            return $this->mapRow($row);
-        },$rows);
-    }
-
-    protected function query(string $sql, array $params = []): ?array
-    {
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($params);
-
-        return $statement->fetch() ?: null;
-    }
-
-    protected function queryAll(string $sql, array $params = []): ?array
-    {
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($params);
-
-        return $statement->fetchAll() ?: [];
-    }
-    ....
 }
 ```

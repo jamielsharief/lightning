@@ -13,7 +13,6 @@
 
 namespace Lightning\DataMapper;
 
-use ReflectionClass;
 use BadMethodCallException;
 use Lightning\Entity\Entity;
 use InvalidArgumentException;
@@ -133,18 +132,14 @@ abstract class AbstractDataMapper implements HookInterface
         if ($result) {
             $entity->markPersisted(true);
 
-            // Add generated ID, ID property must be private
+            // Add generated ID
             $id = $this->dataSource->getGeneratedId();
             if ($id && is_string($this->primaryKey)) {
-                $reflection = new ReflectionClass(get_class($entity));
-
-                if ($reflection->hasProperty($this->primaryKey)) {
-                    $property = $reflection->getProperty($this->primaryKey);
-                    $property->setAccessible(true);
-                    $property->setValue($entity, $this->dataSource->getGeneratedId());
-                    $property->setAccessible(false);
+                $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $this->primaryKey))); // bridge_water -> Bridge Water
+                if (method_exists($entity, $method)) {
+                    $entity->$method($id); // $articles->setId($id);
                 } else {
-                    $entity->{$this->primaryKey} = $this->dataSource->getGeneratedId();
+                    $entity->{$this->primaryKey} = $id;
                 }
             }
 

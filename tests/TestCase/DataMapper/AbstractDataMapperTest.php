@@ -222,6 +222,20 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
     {
         return $this->id;
     }
+
+    /**
+     * Set the value of id
+     *
+     * @param ?int $id
+     *
+     * @return self
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 }
 
 class Tag extends AbstractDataMapper

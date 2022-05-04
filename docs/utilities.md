@@ -4,11 +4,12 @@ A collection of utility components
 
 ## RandomString
 
-A secure random string generator, with various characterset constants (hex,base36,base58, base62,base64,base64 url safe)
+A secure random string generator, with various character set constants such as hex, base36, base58, base62, base64,base64 url safe and numeri. Use this to securely generate tokens, passwords, keys, salts etc.
 
 ```php
 $randomString = new RandomString();
 
+// the default character set is set Base 62 
 $randomString->generate(12); // 7nH3XfBYZG5E
 
 $randomString

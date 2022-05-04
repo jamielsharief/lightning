@@ -24,7 +24,7 @@ $randomString
     ->generate(32); // 86^PY)f$T06x#KJO
 
 $randomString
-    ->withCharset(Randomstring::BASE_64_URL_SAFE)
+    ->withCharset(Randomstring::BASE_64_SAFE)
     ->generate(24); //Go6-dQapORAGBkmY1UQ0eT53
 ```
 

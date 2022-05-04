@@ -34,9 +34,9 @@ class RandomString
     /**
      * Constructor
      *
-     * @param string $characterSet
+     * @param string $charset
      */
-    public function __construct(private string $characterSet = self::BASE_62)
+    public function __construct(private string $charset = self::BASE_62)
     {
     }
 
@@ -48,35 +48,35 @@ class RandomString
      */
     public function generate(int $length): string
     {
-        $max = strlen($this->characterSet) - 1;
+        $max = strlen($this->charset) - 1;
 
         $out = '';
         for ($i = 0; $i < $length; $i++) {
-            $out .= $this->characterSet[random_int(0, $max)];
+            $out .= $this->charset[random_int(0, $max)];
         }
 
         return $out;
     }
 
     /**
-     * Get the value of characterSet
+     * Get the value of charset
      *
      * @return string
      */
-    public function getCharacterSet(): string
+    public function getCharset(): string
     {
-        return $this->characterSet;
+        return $this->charset;
     }
 
     /**
-     * Set the value of characterSet
+     * Set the value of charset
      *
-     * @param string $characterSet
+     * @param string $charset
      * @return static
      */
-    public function setCharacterSet(string $characterSet): static
+    public function setCharset(string $charset): static
     {
-        $this->characterSet = $characterSet;
+        $this->charset = $charset;
 
         return $this;
     }
@@ -84,11 +84,11 @@ class RandomString
     /**
      * Undocumented function
      *
-     * @param string $characterSet
+     * @param string $charset
      * @return static
      */
-    public function withCharacterSet(string $characterSet): static
+    public function withCharset(string $charset): static
     {
-        return (clone $this)->setCharacterSet($characterSet);
+        return (clone $this)->setCharset($charset);
     }
 }

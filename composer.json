@@ -41,5 +41,18 @@
         "coverage": [
             "vendor/bin/phpunit --coverage-html coverage"
         ]
-    }
+    },
+    "autoload": {
+        "psr-4": {
+          "Lightning\\": "src/"
+        },
+        "files": [
+          "src/Dotenv/functions.php"
+        ]
+      },
+      "autoload-dev": {
+        "psr-4": {
+          "Lightning\\Test\\": "tests/"
+        }
+      }
 }

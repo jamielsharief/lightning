@@ -3,45 +3,9 @@
 namespace Lightning\Test\View;
 
 use Lightning\View\View;
-use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Lightning\View\ViewCompiler;
-use Lightning\View\ViewHelperInterface;
-use Lightning\View\ViewExtensionInterface;
 use Lightning\View\Exception\ViewException;
-
-class DateHelper implements ViewHelperInterface
-{
-    public function getName(): string
-    {
-        return 'Date';
-    }
-
-    public function format(string $date): string
-    {
-        return date('d/m/Y', strtotime($date));
-    }
-}
-
-class DateExtension implements ViewExtensionInterface
-{
-    public function getMethods(): array
-    {
-        return [
-            'format'
-        ];
-    }
-
-    public function format(string $date): string
-    {
-        return date('d/m/Y', strtotime($date));
-    }
-
-    public function toTime(string $date): int
-    {
-        return strtotime($date);
-    }
-}
 
 final class ViewTest extends TestCase
 {
@@ -53,20 +17,6 @@ final class ViewTest extends TestCase
         $compiler = new ViewCompiler($path);
 
         return new View($compiler, __DIR__ .'/views');
-    }
-
-    public function testAddExtension(): void
-    {
-        $view = $this->createView();
-        $this->assertInstanceOf(View::class, $view->addExtension(new DateExtension()));
-        $this->assertEquals('31/01/2022', $view->format('2022-01-31 16:30'));
-    }
-
-    public function testAddHelper(): void
-    {
-        $view = $this->createView();
-        $this->assertInstanceOf(View::class, $view->addHelper(new DateHelper()));
-        $this->assertInstanceOf(DateHelper::class, $view->Date);
     }
 
     public function testRender(): void
@@ -148,12 +98,24 @@ final class ViewTest extends TestCase
         $view->render('index');
     }
 
-    public function testBadCall(): void
+    public function testSetGetAttribute(): void
     {
         $view = $this->createView();
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Unkown method `foo`');
+        $this->assertNull($view->getAttribute('foo'));
+        $this->assertEquals('bar', $view->setAttribute('foo', 'bar')->getAttribute('foo'));
+    }
 
-        $view->foo();
+    public function testRenderWithAttribute(): void
+    {
+        $this->assertEquals(
+            '{"foo":"bar"}',
+            $this->createView()->setAttribute('data', ['foo' => 'bar'])->render('index')
+        );
+
+        // Tests attributes are overwritten if param is set the same
+        $this->assertEquals(
+            '{"name":"jon"}',
+            $this->createView()->setAttribute('data', ['foo' => 'bar'])->render('index', ['data' => ['name' => 'jon']])
+        );
     }
 }

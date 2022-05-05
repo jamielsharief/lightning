@@ -75,87 +75,16 @@ You should pass all variables through the double curly brackets which will escap
 <h1>{{ $book->author }}</h1>
 ```
 
-## View Extensions
+## View Attributes
 
-You can extend view functionality by creating an `Extension`, then the methods will be available in the `View`.
+You can set attributes which are then accessible inside the `View`
 
 ```php
-use Lightning\View\ViewExtensionInterface;
-
-class DateExtension implements ViewExtensionInterface
-{
-    public function getMethods() : array 
-    {
-        return [
-            'format'
-        ];
-    }
-
-    protected function format(string $value) : string 
-    {
-        return date('d/m/Y H:i:s', strtotime($value));
-    }
-}
+$view->setAttribute('t', new Translator());
 ```
 
-When you create the `View` object
+Then inside your `View`
 
 ```php
-$view->addExtension(new DateExtension);
-```
-
-Then in your view file you can use it using `this`
-
-```php
-<span><?= $this->format($date) ?></span>
-```
-
-## View Helpers
-
-For more complex functionality you can add any helper object
-
-```php
-class DateHelper implements ViewHelperInterface
-{
-    public function getName() : string 
-    {
-        return 'Date';
-    }
-
-    public function format(string $value) : string 
-    {
-        return date('d/m/Y H:i:s', strtotime($value));
-    }
-}
-```
-
-When you create the `View` object
-
-```php
-$view->addHelper(new DateHelper());
-```
-
-Then in your view file you can use it using `this`
-
-```php
-<span><?= $this->Date->format($date) ?></span>
-```
-
-You can then also add docblock comments like this in your application view which will help with autocompletion when
-working with views.
-
-```php
-namespace App\View;
-use Lightning\View\View as BaseView;
-
-/**
- * @property \App\View\Helper\PaginatorHelper $Paginator Paginator Helper
- * @method int sum() sum(int $a, int $b)  Sum extension 
- */
-class ApplicationView extends BaseView
-{
-    protected function initialize() : void
-    {
-    }
-}
+<h1>{{ $t->translate('Users Home') }}</h1>
 ```

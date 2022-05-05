@@ -13,7 +13,6 @@
 
 namespace Lightning\View;
 
-use BadMethodCallException;
 use Lightning\View\Exception\ViewException;
 
 class View
@@ -23,8 +22,7 @@ class View
     private string $layoutPath;
     private string $viewExtension = '.php';
     protected ?string $layout = null;
-
-    private array $extensionMethods = [];
+    private array $attributes = [];
 
     private bool $inRender = false;
 
@@ -45,62 +43,37 @@ class View
     }
 
     /**
+     * Sets a view attribute
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return static
+     */
+    public function setAttribute(string $name, mixed $value): static
+    {
+        $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Gets an attribute from the view
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getAttribute(string $name): mixed
+    {
+        return $this->attributes[$name] ?? null;
+    }
+
+    /**
      * This is a hook that is called when the View is created
      *
      * @return void
      */
     protected function initialize(): void
     {
-    }
-
-    /**
-     * Magic method which will trigger extension callbacks
-     *
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        $callback = $this->extensionMethods[$name] ?? null;
-
-        if ($callback) {
-            return $callback(...$arguments);
-        }
-
-        throw new BadMethodCallException(sprintf('Unkown method `%s`', $name));
-    }
-
-    /**
-     * Extend the View object by loading Helpers
-     *
-     * @internal this is nice and simple but there is no code completion which normally you can fix with docblock comments
-     * when using objects.
-     *
-     * @param ViewExtensionInterface $extension
-     * @return static
-     */
-    public function addExtension(ViewExtensionInterface $extension): static
-    {
-        foreach ($extension->getMethods() as $method) {
-            $this->extensionMethods[$method] = [$extension,$method];
-        }
-
-        return $this;
-    }
-
-    /**
-     * Adds a Helper to the View
-     *
-     * @param ViewHelperInterface $helper
-     * @return static
-     */
-    public function addHelper(ViewHelperInterface $helper): static
-    {
-        $name = $helper->getName();
-        $this->$name = $helper;
-
-        return $this;
     }
 
     /**
@@ -208,6 +181,7 @@ class View
      */
     private function doRender(string $__filename__, array $__variables__ = []): string
     {
+        extract($this->attributes); # First
         extract($__variables__);
 
         ob_start();

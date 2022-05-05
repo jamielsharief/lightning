@@ -13,7 +13,6 @@ error_reporting(E_ALL);
 
 // Load composer autoload and our autoploader
 require __DIR__ . '/autoload.php';
-include dirname(__DIR__) . '/src/Dotenv/functions.php'; // TODO: temp
 
 // Load .env
 $dotEnv = (new Dotenv(dirname(__DIR__)))->load();

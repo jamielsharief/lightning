@@ -35,6 +35,14 @@ $view =  View(
 $output = $view->render('articles/index');
 ```
 
+
+You can also pass variables to the `View`
+
+```php
+$view->render('articles/index',['foo' => 'bar']); // 
+```
+
+
 To render a view using a specific file, make sure the view name starts with `/`
 
 ```php
@@ -58,7 +66,7 @@ Or you can set from within the view
 <h1>{{ $book->author }}</h1>
 ```
 
-## Partials
+## Partials
 
 You can also render a partial view (without a layout) from within the view
 
@@ -77,7 +85,7 @@ You should pass all variables through the double curly brackets which will escap
 
 ## View Attributes
 
-You can set attributes which are then accessible inside the `View`
+You can set attributes which are then accessible inside the `View`, if a 
 
 ```php
 $view->setAttribute('t', new Translator());

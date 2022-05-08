@@ -22,7 +22,7 @@ class UserValidator extends Validator
             ->notBlank()
             ->regularExpression('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/');
             ->method('confirm')
-            ->lengthBetween(5,255);
+            ->lengthBetween(8,255);
     }
 
     public function confirm(string $password, array $data) : bool 

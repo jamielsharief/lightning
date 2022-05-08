@@ -15,7 +15,7 @@ class UserValidator extends Validator
         $this->createRuleFor('email')
             ->notBlank()
             ->email()
-            ->regularExpression('/^[a-z]$/')
+            ->regularExpression('/^[a-z]+$/')
             ->lengthBetween(5,255);
         
         $this->createRuleFor('password')

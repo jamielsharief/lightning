@@ -116,12 +116,11 @@ class Validator
     private function getProperties(object $object): array
     {
         $reflection = new ReflectionClass($object);
-        $properties = $reflection->getProperties(
-            ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE
-        );
+        $properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
 
         $data = [];
         foreach ($properties as $property) {
+            $property->setAccessible(true); // From 8.1 this has not effect and is not required
             $data[$property->getName()] = $property->getValue($object);
         }
 

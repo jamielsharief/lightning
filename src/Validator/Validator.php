@@ -74,7 +74,7 @@ class Validator
      */
     public function validate(object|array $data): bool
     {
-        $this->errors->reset();
+        $this->errors = $this->createErrors(); // create or reset?
 
         # Prepare Data
         if ($data instanceof ServerRequestInterface) {

@@ -20,7 +20,7 @@ final class ViewCompilerTest extends TestCase
         $compiler = $this->createCompiler();
 
         $this->assertEquals(
-            "<h1><?php echo htmlspecialchars(\$title, ENT_QUOTES) ?></h1>\n<p><?php echo htmlspecialchars(\$body, ENT_QUOTES) ?></p>",
+            "<h1><?= \$this->escape(\$title) ?></h1>\n<p><?= \$this->escape(\$body) ?></p>",
             file_get_contents($compiler->compile(__DIR__ .'/views/escape.php'))
         );
     }

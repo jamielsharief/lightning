@@ -48,12 +48,8 @@ class ViewCompiler implements ViewCompilerInterface
         return $compiledFilename;
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     protected function compileView(string $path): string
     {
-        return preg_replace('/\{\{\s(.+?)\s\}\}/', '<?php echo htmlspecialchars($1, ENT_QUOTES) ?>', file_get_contents($path));
+        return preg_replace('/\{\{\s(.+?)\s\}\}/', '<?= $this->escape($1) ?>', file_get_contents($path));
     }
 }

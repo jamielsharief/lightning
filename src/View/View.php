@@ -25,6 +25,7 @@ class View
     private array $attributes = [];
 
     private bool $inRender = false;
+    private string $encoding;
 
     /**
      * Constructor
@@ -38,6 +39,7 @@ class View
         $this->compiler = $compiler;
         $this->viewPath = $path;
         $this->layoutPath = $path . '/' . $layoutsFolder;
+        $this->encoding = mb_internal_encoding() ?: 'UTF-8';
 
         $this->initialize();
     }
@@ -193,5 +195,13 @@ class View
         $this->inRender = false;
 
         return ob_get_clean();
+    }
+
+    /**
+     * Convert special characters to HTML entities
+     */
+    protected function escape(mixed $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, $this->encoding);
     }
 }

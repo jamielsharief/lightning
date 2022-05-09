@@ -23,7 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class Validator
 {
     private ValidationRules $validation;
-    private ?Errors $errors = null;
+    private Errors $errors ;
     private array $validate = [];
 
     /**

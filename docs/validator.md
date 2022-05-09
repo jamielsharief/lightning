@@ -46,6 +46,19 @@ $validator->validate(new UserEntity());
 $validator->validate($serverRequest);
 ```
 
+
+You can also just use the `Validator` as a generic validator.
+
+```php
+
+$validator = new Validator();
+$validator->createRuleFor('email')
+    ->notBlank()
+    ->email()
+    ->lengthBetween(5,255);
+$validator->validate($_POST);
+```
+
 ## Errors Object
 
 To work with the `Errors` object

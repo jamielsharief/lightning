@@ -52,6 +52,32 @@ class ErrorsTest extends TestCase
         $this->assertTrue($errors->hasErrors('foo'));
     }
 
+    public function testGetErrorsCount(): void
+    {
+        $errors = new Errors();
+        $this->assertEquals(0, $errors->getErrorsCount('foo'));
+
+        $errors->setError('foo', 'bar');
+
+        $this->assertEquals(1, $errors->getErrorsCount('foo'));
+        $this->assertEquals(0, $errors->getErrorsCount('bar'));
+
+        $errors->setError('foo', 'bar');
+        $this->assertEquals(2, $errors->getErrorsCount('foo'));
+    }
+
+    public function testCount(): void
+    {
+        $errors = new Errors();
+        $this->assertCount(0, $errors);
+
+        $errors->setError('foo', 'bar');
+        $this->assertCount(1, $errors);
+
+        $errors->setError('foo', 'bar');
+        $this->assertCount(2, $errors);
+    }
+
     public function testReset(): void
     {
         $errors = new Errors();

@@ -276,7 +276,7 @@ class ValidationSet
     /**
      * Value must be equal to
      */
-    public function equalTo(string $what, string $message = 'invalid value'): static
+    public function equalTo(mixed $what, string $message = 'invalid value'): static
     {
         return $this->add('equalTo', [$what], $message);
     }
@@ -284,7 +284,7 @@ class ValidationSet
     /**
      * Value must not be equal to
      */
-    public function notEqualTo(string $what, string $message = 'invalid value'): static
+    public function notEqualTo(mixed $what, string $message = 'invalid value'): static
     {
         return $this->add('notEqualTo', [$what], $message);
     }

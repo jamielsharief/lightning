@@ -547,4 +547,36 @@ class ValidationSetTest extends TestCase
 
         $this->assertEquals($expected, $validationSet->toArray());
     }
+
+    public function testEqualTo(): void
+    {
+        $validationSet = new ValidationSet();
+        $this->assertInstanceOf(ValidationSet::class, $validationSet->equalTo(5));
+
+        $expected = [
+            [
+                'rule' => 'equalTo',
+                'args' => [5],
+                'message' => 'invalid value',
+            ]
+        ];
+
+        $this->assertEquals($expected, $validationSet->toArray());
+    }
+
+    public function testNotEqualTo(): void
+    {
+        $validationSet = new ValidationSet();
+        $this->assertInstanceOf(ValidationSet::class, $validationSet->notEqualTo(5));
+
+        $expected = [
+            [
+                'rule' => 'notEqualTo',
+                'args' => [5],
+                'message' => 'invalid value',
+            ]
+        ];
+
+        $this->assertEquals($expected, $validationSet->toArray());
+    }
 }

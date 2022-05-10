@@ -34,6 +34,14 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
      */
     final public function __construct()
     {
+        $this->initialize();
+    }
+
+    /**
+     *  A hook that is called before execute when the Service Object is run.
+     */
+    protected function initialize(): void
+    {
     }
 
     /**
@@ -47,6 +55,7 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
         foreach ($state as $property => $value) {
             try {
                 $reflectionProperty = new ReflectionProperty($entity, $property);
+
                 if ($reflectionProperty->isPrivate()) {
                     $reflectionProperty->setAccessible(true);
                     $reflectionProperty->setValue($entity, $value);
@@ -65,9 +74,14 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
     {
         $reflection = new ReflectionClass($this);
         $data = [];
-        foreach ($reflection->getProperties(ReflectionProperty::IS_PRIVATE) as $property) {
-            $property->setAccessible(true); // From 8.1 this has no effect and is not required
-            $value = $property->getValue($this);
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PRIVATE) as $reflectionProperty) {
+            $reflectionProperty->setAccessible(true); // From 8.1 this has no effect and is not required
+
+            if (! $reflectionProperty->isInitialized($this)) {
+                continue;
+            }
+
+            $value = $reflectionProperty->getValue($this);
 
             if ($value instanceof EntityInterface) {
                 $value = $value->toState();
@@ -75,7 +89,7 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
                 $value = $this->fromIterable($value);
             }
 
-            $data[$property->getName()] = $value;
+            $data[$reflectionProperty->getName()] = $value;
         }
 
         return $data;

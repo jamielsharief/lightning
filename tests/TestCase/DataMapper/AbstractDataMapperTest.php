@@ -37,7 +37,7 @@ use Lightning\DataMapper\Exception\EntityNotFoundException;
 
 final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface, BeforeCreateInterface, BeforeUpdateInterface, BeforeDeleteInterface, AfterSaveInterface, AfterCreateInterface, AfterUpdateInterface, AfterLoadInterface, AfterDeleteInterface
 {
-    private ?int $id = null;
+    private int $id;
 
     private string $title;
     private string $body;
@@ -261,7 +261,6 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
 
         $data = [
-            'id' => null,
             'title' => 'test',
             'body' => 'none',
             'author_id' => 1234,
@@ -279,7 +278,6 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
 
         $data = [
-            'id' => null,
             'title' => 'test',
             'body' => 'none',
             'author_id' => 1234,
@@ -413,21 +411,6 @@ final class AbstractDataMapperTest extends TestCase
         $this->assertEquals($expected, $article->getId());
 
         $this->assertEquals(['beforeSave','beforeCreate','afterCreate','afterSave'], $article->getCallbacks());
-    }
-
-    public function testCreateWithGenericEntity(): void
-    {
-        $mapper = new Tag($this->storage);
-
-        $tag = $mapper->createEntity([
-            'name' => 'test',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
-
-        $this->assertTrue($mapper->save($tag));
-        $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 2003;
-        $this->assertEquals($expected, $tag->getId());
     }
 
     public function testUpdate(): void

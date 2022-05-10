@@ -2,7 +2,6 @@
 
 namespace Lightning\Test\DataMapper\Event;
 
-use Lightning\Entity\Entity;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
@@ -18,6 +17,7 @@ use Lightning\DataMapper\Event\AfterDeleteEvent;
 use Lightning\DataMapper\Event\AfterUpdateEvent;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
 use Lightning\DataMapper\Event\AbstractAfterWriteEvent;
+use Lightning\Test\TestCase\DataMapper\Entity\TagEntity;
 
 class TagAfterWriteDataMapper extends AbstractDataMapper
 {
@@ -26,6 +26,11 @@ class TagAfterWriteDataMapper extends AbstractDataMapper
     protected array $fields = [
         'id', 'name','created_at','updated_at'
     ];
+
+    public function mapDataToEntity(array $row): EntityInterface
+    {
+        return TagEntity::fromState($row);
+    }
 }
 
 final class AbstractAfterWriteEventTest extends TestCase
@@ -48,10 +53,10 @@ final class AbstractAfterWriteEventTest extends TestCase
         $this->datasource = new DatabaseDataSource($pdo, new QueryBuilder());
 
         return [
-            [new AfterCreateEvent(new TagAfterWriteDataMapper($this->datasource), new Entity())],
-            [new AfterUpdateEvent(new TagAfterWriteDataMapper($this->datasource), new Entity())],
-            [new AfterSaveEvent(new TagAfterWriteDataMapper($this->datasource), new Entity())],
-            [new AfterDeleteEvent(new TagAfterWriteDataMapper($this->datasource), new Entity())]
+            [new AfterCreateEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
+            [new AfterUpdateEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
+            [new AfterSaveEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
+            [new AfterDeleteEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())]
         ];
     }
 

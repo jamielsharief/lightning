@@ -11,28 +11,6 @@ use Lightning\Entity\AbstractEntity;
      private string $title;
      private string $description;
 
-     public static function fromState(array $state): self
-     {
-         $article = new static();
-
-         if (isset($state['id'])) {
-             $article->id = $state['id'];
-         }
-         $article->setTitle($state['title']);
-         $article->setDescription($state['description']);
-
-         return $article;
-     }
-
-     public function toArray(): array
-     {
-         return [
-             'id' => $this->id,
-             'title' => $this->title,
-             'description' => $this->description
-         ];
-     }
-
      public function getTitle(): string
      {
          return $this->title;

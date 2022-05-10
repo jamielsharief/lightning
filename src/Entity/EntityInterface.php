@@ -27,31 +27,21 @@ interface EntityInterface extends JsonSerializable
 {
     /**
      * Create the Entity using data from an array
-     *
-     * @param array $state
-     * @return self
      */
     public static function fromState(array $state): self;
 
     /**
-     * Get the state of the Entity as an array.
-     *
-     * @return array
+     * Gets the state of the entity
      */
-    public function toArray(): array;
+    public function toState(): array;
 
     /**
      * Checks if the Entity is a new and has not been persisted
-     *
-     * @return boolean
      */
     public function isNew(): bool;
 
     /**
      * Marks the Entity persisted state
-     *
-     * @param boolean $persisted
-     * @return void
      */
     public function markPersisted(bool $persisted): void;
 }

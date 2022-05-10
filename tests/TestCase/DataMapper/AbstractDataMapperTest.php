@@ -5,7 +5,6 @@ namespace Lightning\Test\DataMapper;
 use PDO;
 use ReflectionClass;
 use BadMethodCallException;
-use Lightning\Entity\Entity;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +32,7 @@ use Lightning\Entity\Callback\BeforeCreateInterface;
 use Lightning\Entity\Callback\BeforeDeleteInterface;
 use Lightning\Entity\Callback\BeforeUpdateInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
+use Lightning\Test\TestCase\DataMapper\Entity\TagEntity;
 use Lightning\DataMapper\Exception\EntityNotFoundException;
 
 final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface, BeforeCreateInterface, BeforeUpdateInterface, BeforeDeleteInterface, AfterSaveInterface, AfterCreateInterface, AfterUpdateInterface, AfterLoadInterface, AfterDeleteInterface
@@ -102,63 +102,6 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
         return in_array($callback, $this->callbacks);
     }
 
-    // public function autoSet(array $state)
-    // {
-    //     foreach ($state as $property => $value) {
-    //         if ($property === 'id') {
-    //             $this->id = $value;
-
-    //             continue;
-    //         }
-    //         $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
-
-    //         if (method_exists($this, $method)) {
-    //             $this->{$method}($value);
-    //         }
-    //     }
-    // }
-
-    public static function fromState(array $data): ArticleEntity
-    {
-        $article = new static();
-
-        $article->id = isset($data['id']) ? (int) $data['id'] : null; // work with sqlite
-
-        if (! empty($data['title'])) {
-            $article->setTitle($data['title']);
-        }
-
-        if (! empty($data['body'])) {
-            $article->setBody($data['body']);
-        }
-        if (! empty($data['author_id'])) {
-            $article->setAuthorId((int) $data['author_id']);
-        }
-
-        if (! empty($data['created_at'])) {
-            $article->setCreatedAt($data['created_at']);
-        }
-
-        if (! empty($data['updated_at'])) {
-            $article->setUpdatedAt($data['updated_at']);
-        }
-
-        return $article;
-    }
-
-    public function toArray(): array
-    {
-        $id = $this->id ? ['id' => $this->id] : [];
-
-        return $id + [
-            'title' => $this->title,
-            'body' => $this->body,
-            'author_id' => $this->author_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
-        ];
-    }
-
     public function getTitle(): string
     {
         return $this->title;
@@ -225,10 +168,6 @@ final class ArticleEntity extends AbstractEntity implements BeforeSaveInterface,
 
     /**
      * Set the value of id
-     *
-     * @param ?int $id
-     *
-     * @return self
      */
     public function setId(?int $id): self
     {
@@ -245,6 +184,11 @@ class Tag extends AbstractDataMapper
     protected array $fields = [
         'id', 'name','created_at','updated_at'
     ];
+
+    public function mapDataToEntity(array $row): EntityInterface
+    {
+        return TagEntity::fromState($row);
+    }
 }
 
 /**
@@ -317,6 +261,7 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
 
         $data = [
+            'id' => null,
             'title' => 'test',
             'body' => 'none',
             'author_id' => 1234,
@@ -326,7 +271,7 @@ final class AbstractDataMapperTest extends TestCase
 
         $entity = $mapper->createEntity($data);
         $this->assertInstanceOf(EntityInterface::class, $entity);
-        $this->assertSame($data, $entity->toArray());
+        $this->assertSame($data, $entity->toState());
     }
 
     public function testCreateEntities(): void
@@ -377,8 +322,8 @@ final class AbstractDataMapperTest extends TestCase
         /** @var ArticleEntity $article */
         $article = $mapper->getBy(['id' => 1000]);
 
-        $this->assertNull($article->toArray()['created_at']);
-        $this->assertNull($article->toArray()['updated_at']);
+        $this->assertNull($article->toState()['created_at']);
+        $this->assertNull($article->toState()['updated_at']);
     }
 
     public function testGetNotFound(): void
@@ -482,7 +427,7 @@ final class AbstractDataMapperTest extends TestCase
 
         $this->assertTrue($mapper->save($tag));
         $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 2003;
-        $this->assertEquals($expected, $tag->id);
+        $this->assertEquals($expected, $tag->getId());
     }
 
     public function testUpdate(): void
@@ -495,7 +440,7 @@ final class AbstractDataMapperTest extends TestCase
             'body' => 'none',
             'author_id' => 1234,
             'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
         $article->markPersisted(true);
 
@@ -510,7 +455,14 @@ final class AbstractDataMapperTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Primary key `id` has no value');
 
-        $entity = new Entity();
+        $entity = ArticleEntity::fromState([
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
         $entity->markPersisted(true);
         $mapper->save($entity);
     }

@@ -5,14 +5,17 @@ namespace Lightning\Test\DataMapper\Event;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\DataMapper\QueryObject;
-use Lightning\Fixture\FixtureManager;
 
+use Lightning\DataMapper\QueryObject;
+use Lightning\Entity\EntityInterface;
+
+use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\DataMapper\AbstractDataMapper;
 use Lightning\DataMapper\Event\BeforeFindEvent;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
+use Lightning\Test\TestCase\DataMapper\Entity\TagEntity;
 
 class TagBeforeFindDataMapper extends AbstractDataMapper
 {
@@ -21,6 +24,11 @@ class TagBeforeFindDataMapper extends AbstractDataMapper
     protected array $fields = [
         'id', 'name','created_at','updated_at'
     ];
+
+    public function mapDataToEntity(array $row): EntityInterface
+    {
+        return TagEntity::fromState($row);
+    }
 }
 
 final class BeforeFindEventTest extends TestCase

@@ -129,7 +129,7 @@ $groupedResultSet = $resultSet->groupBy(function($row){
 
 ## Hooks
 
-The following hooks can be intercepted
+The `DataMapper` offers hooks to allow you modify the behavior of the `DataMapper`. The following hooks can be intercepted
 
 - beforeSave  - triggered before beforeCreate or beforeUpdate
 - beforeCreate - triggered on save if the operation is a create
@@ -157,9 +157,26 @@ public function doSomething(EntityInterface $entity) : bool
 }
 ```
 
+## Entity Lifecycle Events
+
+The `DataMapper` also supports entity lifecycle events, attach one of the `Entity\Callaback` interfaces to you entity and these will be called.
+
+e.g 
+
+```php
+class User extends AbstractEntity implements BeforeSaveInterface
+{
+    public function beforeSave() : void 
+    {
+        // do something
+    }
+}
+
+```
+
 ## PSR-14 Events
 
-The following Events are triggered
+You can also use PSR-14 Events, the following events are triggered:
 
 - BeforeSave  - triggered before beforeCreate or beforeUpdate
 - BeforeCreate - triggered on save if the operation is a create

@@ -14,10 +14,16 @@
 namespace Lightning\Entity;
 
 use Stringable;
+use ReflectionClass;
 use JsonSerializable;
+use ReflectionProperty;
+use ReflectionException;
 
 /**
- * A simple base Entity implemenation
+ * AbstractEntity
+ *
+ * @internal this is intentionally abstract despite having no abstract methods to prevent creating an object of this class. Private properties
+ * are assumed to be the state, so only those are reflected.
  */
 abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stringable
 {
@@ -25,23 +31,82 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
 
     /**
      * Create the Entity using data from an array
-     *
-     * @param array $state
-     * @return self
+     * @internal only private properties are reflected, protected properties are not.
      */
-    abstract public static function fromState(array $state): self;
+    public static function fromState(array $state): self
+    {
+        $entity = new static();
+
+        foreach ($state as $property => $value) {
+            try {
+                $reflectionProperty = new ReflectionProperty($entity, $property);
+                if ($reflectionProperty->isPrivate()) {
+                    $reflectionProperty->setAccessible(true);
+                    $reflectionProperty->setValue($entity, $value);
+                }
+            } catch (ReflectionException) {
+            }
+        }
+
+        return $entity;
+    }
 
     /**
-     * Gets the Entity object as an array
-     *
-     * @return array
+     * Converts the entity to its state
      */
-    abstract public function toArray(): array;
+    public function toState(): array
+    {
+        $reflection = new ReflectionClass($this);
+        $data = [];
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PRIVATE) as $property) {
+            $property->setAccessible(true); // From 8.1 this has no effect and is not required
+            $value = $property->getValue($this);
+
+            if ($value instanceof EntityInterface) {
+                $value = $value->toState();
+            } elseif (is_array($value)) {
+                $value = array_map(function ($item) {
+                    return $item instanceof EntityInterface ? $item->toState() : $item;
+                }, $value);
+            }
+
+            $data[$property->getName()] = $value;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Gets the entity to an array using the getters
+     */
+    public function toArray(): array
+    {
+        $reflection = new ReflectionClass($this);
+        $data = [];
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PRIVATE | ReflectionProperty::IS_PROTECTED) as $property) {
+            $name = $property->getName();
+            $method = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
+
+            if (method_exists($this, $method)) {
+                $value = $this->$method();
+
+                if ($value instanceof AbstractEntity) {
+                    $value = $value->toArray();
+                } elseif (is_array($value)) {
+                    $value = array_map(function ($item) {
+                        return $item instanceof AbstractEntity ? $item->toArray() : $item;
+                    }, $value);
+                }
+
+                $data[$name] = $value;
+            }
+        }
+
+        return $data;
+    }
 
     /**
      * Check if this Entity is persisted
-     *
-     * @return boolean
      */
     public function isNew(): bool
     {
@@ -53,9 +118,6 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
      *
      * @internal Using set clashes between enity and might be confusing. Also I used boolean because when an entity is removed from storage,
      * we need to change the persisted state.
-     *
-     * @param boolean $persisted
-     * @return void
      */
     public function markPersisted(bool $persisted): void
     {
@@ -64,8 +126,6 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
 
     /**
      * Returns the data that needs to be serialized when converting to JSON, this is part of the JsonSerializable interface
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {

@@ -1,10 +1,10 @@
 # Entity
 
-Provides Entity classes and interfaces. You can use custom entities (setters+getters) or the generic entity (use set/get method) which can also be customised.
+An is a lightweight persistance domain object, which usually each entity represents a row in your table in the database.
 
 ## Usage
 
-Create your `Entity` class using a singular name, configure the `fromState` method and the `toArray` method, then create setters and getters for each property.
+Create your `Entity` class using a singular name, add the properties that represent your data in the table as `private` and then create the setters and getters. The `toArray` method can be overridded but by default it only pulls private properties which is then used to return back to the database.
 
 ```php
 class User extends AbstractEntity
@@ -12,50 +12,26 @@ class User extends AbstractEntity
     private ?int $id = null;
     private string $name;
 
-    public static function fromState(array $state): User
+    public function getId(): ?int
     {
-        // Check state
-        $user = new static();
-        
-        if(isset($state['id'])){
-            $user->id = $state['id'];
-        }
-
-        $user->setName($state['name']);
-
-        return $user;
+        return $this->id;
     }
 
-    // Gets this object state as an array which is sent to storage
-    public function toArray(): array
+    public function setId(?int $id): static
     {
-        $id = $this->id ? ['id' => $this->id] : [];
-
-        return $id + [
-            'name' => $this->name
-        ];
+        $this->id = $id;
+        return $this;
     }
 
-    public function setName(string $value) : void
+    public function setName(string $value) : static
     {
         $this->name = $value;
+        return $this;
     }
 
     public function getName() : string 
     {
         return $this->name;
-    }
-
-     public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
     }
 }
 ```

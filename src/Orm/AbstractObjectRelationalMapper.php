@@ -14,7 +14,6 @@
 namespace Lightning\Orm;
 
 use LogicException;
-use Lightning\Entity\Entity;
 use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
@@ -124,7 +123,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     public function delete(EntityInterface $entity): bool
     {
         if ($result = parent::delete($entity) && is_string($this->primaryKey)) {
-            $id = $entity->toArray()[$this->primaryKey] ?? null;
+            $id = $entity->toState()[$this->primaryKey] ?? null;
             if ($id) {
                 $this->deleteDependent($id);
             }
@@ -218,7 +217,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
         $primaryKey = $this->getPrimaryKey()[0];
 
         foreach ($resultSet as &$entity) {
-            $row = $entity->toArray();
+            $row = $entity->toState();
 
             foreach ($associations as $type => $association) {
                 foreach ($association as $config) {
@@ -236,7 +235,9 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
                             break;
                             case 'hasOne':
+
                                 $conditions[$config['foreignKey']] = $row[$primaryKey];
+
                                 $result = $mapper->findAllBy($conditions, $options);
                                 $this->setEntityValue($entity, $config['propertyName'], $result ? $result[0] : null);
 
@@ -270,14 +271,8 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
 
     private function setEntityValue(EntityInterface $entity, string $property, $value): void
     {
-        if ($entity instanceof Entity) {
-            $entity->$property = $value;
-
-            return;
-        }
-
-        $setter = 'set' . ucfirst($property);
-        $entity->$setter($value);
+        $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
+        $entity->$method($value);
     }
 
     /**

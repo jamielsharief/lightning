@@ -13,6 +13,7 @@
 
 namespace Lightning\DataMapper;
 
+use ReflectionProperty;
 use BadMethodCallException;
 use Lightning\Entity\Entity;
 use InvalidArgumentException;
@@ -127,7 +128,8 @@ abstract class AbstractDataMapper implements HookInterface
             $entity->beforeCreate();
         }
 
-        $result = $this->dataSource->create($this->table, $this->mapEntityToData($entity));
+        $data = array_intersect_key($this->mapEntityToData($entity), array_flip($this->fields));
+        $result = $this->dataSource->create($this->table, $data);
 
         if ($result) {
             $entity->markPersisted(true);
@@ -135,12 +137,12 @@ abstract class AbstractDataMapper implements HookInterface
             // Add generated ID
             $id = $this->dataSource->getGeneratedId();
             if ($id && is_string($this->primaryKey)) {
-                $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $this->primaryKey))); // bridge_water -> Bridge Water
-                if (method_exists($entity, $method)) {
-                    $entity->$method($id); // $articles->setId($id);
-                } else {
-                    $entity->{$this->primaryKey} = $id;
+                $primaryKey = $this->primaryKey;
+                $reflectionProperty = new ReflectionProperty($entity, $primaryKey);
+                if ($reflectionProperty->isPrivate() || $reflectionProperty->isProtected()) {
+                    $reflectionProperty->setAccessible(true); // Only required for PHP 8.0 and lower
                 }
+                $reflectionProperty->setValue($entity, $id);
             }
 
             if ($entity instanceof AfterCreateInterface) {
@@ -373,7 +375,6 @@ abstract class AbstractDataMapper implements HookInterface
             foreach ($resultSet as $index => $row) {
                 $entity = $this->mapDataToEntity($row->toArray());
                 $entity->markPersisted(true);
-
                 $resultSet[$index] = $entity;
 
                 if ($entity instanceof AfterLoadInterface) {
@@ -401,11 +402,11 @@ abstract class AbstractDataMapper implements HookInterface
         if ($entity instanceof BeforeUpdateInterface) {
             $entity->beforeUpdate();
         }
-        $row = $this->mapEntityToData($entity);
+
+        $row = array_intersect_key($this->mapEntityToData($entity), array_flip($this->fields));
         $query = $this->createQueryObject($this->getConditionsFromState($row));
 
         $result = $this->dataSource->update($this->table, $query, $row) === 1;
-
         if ($result) {
             if ($entity instanceof AfterUpdateInterface) {
                 $entity->afterUpdate();
@@ -551,37 +552,19 @@ abstract class AbstractDataMapper implements HookInterface
     }
 
     /**
-     * Maps
+     * Maps state array to entity
      *
-     * @param array $data
+     * @param array $state
      * @return EntityInterface
      */
-    public function mapDataToEntity(array $data): EntityInterface
-    {
-        return Entity::fromState($data);
-    }
+    abstract public function mapDataToEntity(array $state): EntityInterface;
 
     /**
      * Converts the entity into a database row
-     *
-     * @param EntityInterface $entity
-     * @return array
      */
     public function mapEntityToData(EntityInterface $entity): array
     {
-        return $entity->toArray();
-
-        // I think get state should be what goes into the storage as opposed to array which might be something else
-
-        // $result = [];
-
-        // foreach ($entity->toArray() as $property => $value) {
-        //     if (is_scalar($value) || is_null($value)) {
-        //         $result[$property] = $value;
-        //     }
-        // }
-
-        // return $result;
+        return $entity->toState();
     }
 
     /**

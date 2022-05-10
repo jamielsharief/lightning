@@ -130,7 +130,7 @@ class ValidationRules
      */
     public function length(mixed $value, int $length): bool
     {
-        return is_string($value) && mb_strlen($value) === $length;
+        return is_scalar($value) && mb_strlen((string) $value) === $length;
     }
 
     /**
@@ -138,7 +138,7 @@ class ValidationRules
      */
     public function lengthBetween(mixed $value, int $min, int $max): bool
     {
-        return is_string($value) && mb_strlen($value) >= $min && mb_strlen($value) <= $max;
+        return is_scalar($value) && mb_strlen((string) $value) >= $min && mb_strlen((string) $value) <= $max;
     }
 
     /**
@@ -146,7 +146,7 @@ class ValidationRules
      */
     public function minLength(mixed $value, int $length): bool
     {
-        return is_string($value) && mb_strlen($value) >= $length;
+        return is_scalar($value) && mb_strlen((string) $value) >= $length;
     }
 
     /**
@@ -154,7 +154,7 @@ class ValidationRules
      */
     public function maxLength(mixed $value, int $length): bool
     {
-        return is_string($value) && mb_strlen($value) <= $length;
+        return is_scalar($value) && mb_strlen((string) $value) <= $length;
     }
 
     /**

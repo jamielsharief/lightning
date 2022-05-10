@@ -30,6 +30,13 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
     protected bool $isPersisted = false;
 
     /**
+     * Constructor
+     */
+    final public function __construct()
+    {
+    }
+
+    /**
      * Create the Entity using data from an array
      * @internal only private properties are reflected, protected properties are not.
      */

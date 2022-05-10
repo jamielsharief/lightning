@@ -121,7 +121,9 @@ class Validator
         $data = [];
         foreach ($properties as $property) {
             $property->setAccessible(true); // From 8.1 this has not effect and is not required
-            $data[$property->getName()] = $property->getValue($object);
+            if ($property->isInitialized($object)) {
+                $data[$property->getName()] = $property->getValue($object);
+            }
         }
 
         return $data;

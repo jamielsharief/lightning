@@ -151,7 +151,7 @@ abstract class AbstractDataMapper implements HookInterface
             $id = $this->dataSource->getGeneratedId();
             if ($id && is_string($this->primaryKey)) {
                 $reflectionProperty = new ReflectionProperty($entity, $primaryKey);
-                if ($reflectionProperty->isPrivate() || $reflectionProperty->isProtected()) {
+                if ($reflectionProperty->isPrivate()) {
                     $reflectionProperty->setAccessible(true); // Only required for PHP 8.0 and lower
                 }
                 $reflectionProperty->setValue($entity, $id);

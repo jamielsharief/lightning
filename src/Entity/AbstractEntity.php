@@ -71,16 +71,30 @@ abstract class AbstractEntity implements EntityInterface, JsonSerializable, Stri
 
             if ($value instanceof EntityInterface) {
                 $value = $value->toState();
-            } elseif (is_array($value)) {
-                $value = array_map(function ($item) {
-                    return $item instanceof EntityInterface ? $item->toState() : $item;
-                }, $value);
+            } elseif (is_iterable($value)) {
+                $value = $this->fromIterable($value);
             }
 
             $data[$property->getName()] = $value;
         }
 
         return $data;
+    }
+
+    /**
+     * Gets states of deep entities and effectively convert into an array of arrays
+     */
+    private function fromIterable(iterable $items): array
+    {
+        $result = [];
+        foreach ($items as $key => $value) {
+            if (is_iterable($value)) {
+                $value = $this->fromIterable($items);
+            }
+            $result[$key] = $value instanceof EntityInterface ? $value->toState() : $value;
+        }
+
+        return $result;
     }
 
     /**

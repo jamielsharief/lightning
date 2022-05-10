@@ -4,7 +4,7 @@ An is a lightweight persistance domain object, which usually each entity represe
 
 ## Usage
 
-Create your `Entity` class using a singular name, add the properties that represent your data in the table as `private` and then create the setters and getters. The `toArray` method can be overridded but by default it only pulls private properties which is then used to return back to the database.
+Create your `Entity` class using a singular name, add the properties that represent your data in the table as `private` and then create the setters and getters. 
 
 ```php
 class User extends AbstractEntity
@@ -15,12 +15,6 @@ class User extends AbstractEntity
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(?int $id): static
-    {
-        $this->id = $id;
-        return $this;
     }
 
     public function setName(string $value) : static

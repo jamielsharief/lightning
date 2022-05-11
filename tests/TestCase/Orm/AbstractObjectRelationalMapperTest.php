@@ -6,6 +6,7 @@ use PDO;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
+use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Entity\AbstractEntity;
@@ -220,7 +221,7 @@ class AuthorEntity extends AbstractEntity
     private ?string $created_at = null;
     private ?string $updated_at = null;
 
-    private array $articles = [];
+    private Collection $articles;
 
     public function getCreatedAt(): ?string
     {
@@ -272,10 +273,8 @@ class AuthorEntity extends AbstractEntity
 
     /**
      * Get the value of articles
-     *
-     * @return array
      */
-    public function getArticles(): array
+    public function getArticles(): Collection
     {
         return $this->articles;
     }
@@ -287,7 +286,7 @@ class AuthorEntity extends AbstractEntity
      *
      * @return self
      */
-    public function setArticles(array $articles): self
+    public function setArticles(Collection $articles): self
     {
         $this->articles = $articles;
 
@@ -302,7 +301,7 @@ class PostEntity extends AbstractEntity
     private string $body;
     private string $created_at;
     private string $updated_at;
-    private array $tags = [];
+    private Collection $tags;
 
     public function getCreatedAt(): ?string
     {
@@ -390,22 +389,16 @@ class PostEntity extends AbstractEntity
 
     /**
      * Get the value of tags
-     *
-     * @return array
      */
-    public function getTags(): array
+    public function getTags(): Collection
     {
         return $this->tags;
     }
 
     /**
      * Set the value of tags
-     *
-     * @param array $tags
-     *
-     * @return self
      */
-    public function setTags(array $tags): self
+    public function setTags(Collection $tags): self
     {
         $this->tags = $tags;
 
@@ -725,8 +718,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 'id' => 2000,
                 'name' => 'Jon',
                 'created_at' => '2021-10-03 14:01:00',
-                'updated_at' => '2021-10-03 14:02:00',
-                'articles' => []
+                'updated_at' => '2021-10-03 14:02:00'
             ]
         ];
         $this->assertEquals($expected, $result->toState());

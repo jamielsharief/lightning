@@ -14,7 +14,7 @@
 namespace Lightning\Orm;
 
 use LogicException;
-use Lightning\DataMapper\ResultSet;
+use Lightning\Utility\Collection;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\AbstractDataMapper;
@@ -105,9 +105,9 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      * @param QueryObject $query
      * @param boolean $mapResult
-     * @return ResultSet
+     * @return Collection
      */
-    protected function read(QueryObject $query, bool $mapResult = true): ResultSet
+    protected function read(QueryObject $query, bool $mapResult = true): Collection
     {
         $resultSet = parent::read($query, $mapResult);
 
@@ -195,11 +195,8 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
     /**
      * Loads the related data
      *
-     * @param ResultSet $resultSet
-     * @param QueryObject $query
-     * @return ResultSet
      */
-    protected function loadRelatedData(ResultSet $resultSet, QueryObject $query): ResultSet
+    protected function loadRelatedData(Collection $resultSet, QueryObject $query): Collection
     {
         $options = $query->getOptions();
 
@@ -255,7 +252,7 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
                                 $otherForeignKey = $config['otherForeignKey'];
                                 $ids = array_map(function ($record) use ($otherForeignKey) {
                                     return $record[$otherForeignKey]; // extract tag_id
-                                }, $result->toArray());
+                                }, $result);
 
                                 $conditions[$primaryKey] = $ids;
                                 $this->setEntityValue($entity, $config['propertyName'], $mapper->findAllBy($conditions, $options));

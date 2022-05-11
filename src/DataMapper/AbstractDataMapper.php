@@ -19,6 +19,7 @@ use Lightning\Entity\Entity;
 use InvalidArgumentException;
 use Lightning\Hook\HookTrait;
 use Lightning\Hook\HookInterface;
+use Lightning\Utility\Collection;
 use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\Event\AfterFindEvent;
 use Lightning\DataMapper\Event\AfterSaveEvent;
@@ -215,14 +216,14 @@ abstract class AbstractDataMapper implements HookInterface
     {
         $query = $query ?? $this->createQueryObject();
 
-        return $this->read($query->setOption('limit', 1))->first();
+        return $this->read($query->setOption('limit', 1))->get(0);
     }
 
     /**
      * Finds multiple Entities
-     * @return ResultSet|EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
-    public function findAll(?QueryObject $query = null): ResultSet
+    public function findAll(?QueryObject $query = null): Collection
     {
         $query = $query ?? $this->createQueryObject();
 
@@ -267,9 +268,44 @@ abstract class AbstractDataMapper implements HookInterface
             throw new InvalidArgumentException('Cannot determine primary key');
         }
 
-        return $this->read($query, false)->toList(
+        return $this->convertCollectionToList(
+            $this->read($query, false),
             $keyField, $fields['valueField'] ?? null, $fields['groupField'] ?? null
         );
+    }
+
+    /**
+     * Converts the ResultSet to a list
+     */
+    private function convertCollectionToList(Collection $collection, string $keyField, ?string $valueField = null, ?string $groupField = null): array
+    {
+        $result = [];
+
+        foreach ($collection as $row) {
+
+            // Create list
+            $key = $row[$keyField] ?? null;
+
+            if (! $valueField) {
+                $result[] = $key;
+
+                continue;
+            }
+
+            if ($groupField) {
+                $group = $row[$groupField] ?? null;
+                if (! isset($result[$group])) {
+                    $result[$group] = [];
+                }
+                $result[$group][$key] = $row[$valueField] ?? null;
+
+                continue;
+            }
+
+            $result[$key] = $row[$valueField] ?? null;
+        }
+
+        return $result;
     }
 
     /**
@@ -303,9 +339,9 @@ abstract class AbstractDataMapper implements HookInterface
     /**
      * Finds multiple instances
 
-     * @return ResultSet|EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
-    public function findAllBy(array $criteria, array $options = []): ResultSet
+    public function findAllBy(array $criteria, array $options = []): Collection
     {
         return $this->findAll($this->createQueryObject($criteria, $options));
     }
@@ -339,36 +375,44 @@ abstract class AbstractDataMapper implements HookInterface
     }
 
     /**
+     * Factory method
+     */
+    protected function createCollection(array $items = []): Collection
+    {
+        return new Collection($items);
+    }
+
+    /**
      * Reads from the datasource
      *
      * @param QueryObject $query
      * @param boolean $mapResult
-     * @return ResultSet
+     * @return Collection
      */
-    protected function read(QueryObject $query, bool $mapResult = true): ResultSet
+    protected function read(QueryObject $query, bool $mapResult = true): Collection
     {
         $this->dispatchEvent(new BeforeFindEvent($this, $query));
         if (! $this->triggerHook('beforeFind', [$query])) {
-            return new ResultSet([]);
+            return $this->createCollection();
         }
 
         if ($this->fields && ! $query->getOption('fields')) {
             $query->setOption('fields', $this->fields);
         }
 
-        $resultSet = $this->createResultSet($this->dataSource->read($this->table, $query));
-        if ($resultSet->isEmpty()) {
-            return $resultSet;
+        $collection = $this->createCollection($this->dataSource->read($this->table, $query));
+        if ($collection->isEmpty()) {
+            return $collection;
         }
 
-        $this->triggerHook('afterFind', [$resultSet, $query], false); //  this is called here to produce consistent results
-        $this->dispatchEvent(new AfterFindEvent($this, $resultSet, $query));
+        $this->triggerHook('afterFind', [$collection, $query], false); //  this is called here to produce consistent results
+        $this->dispatchEvent(new AfterFindEvent($this, $collection, $query));
 
         if ($mapResult) {
-            foreach ($resultSet as $index => $row) {
+            foreach ($collection as $index => $row) {
                 $entity = $this->mapDataToEntity($row->toArray());
                 $entity->markPersisted(true);
-                $resultSet[$index] = $entity;
+                $collection[$index] = $entity;
 
                 if ($entity instanceof AfterLoadInterface) {
                     $entity->afterLoad();
@@ -376,7 +420,7 @@ abstract class AbstractDataMapper implements HookInterface
             }
         }
 
-        return $resultSet;
+        return $collection;
     }
 
     /**

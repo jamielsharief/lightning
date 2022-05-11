@@ -13,27 +13,23 @@
 
 namespace Lightning\DataMapper\Event;
 
-use Lightning\DataMapper\ResultSet;
+use Lightning\Utility\Collection;
 use Lightning\DataMapper\QueryObject;
 use Lightning\DataMapper\AbstractDataMapper;
 
 class AfterFindEvent
 {
-    protected ResultSet $resultSet;
+    protected Collection $collection;
     protected QueryObject $query;
     protected AbstractDataMapper $dataMapper;
 
     /**
      * Constructor
-     *
-     * @param AbstractDataMapper $dataMapper
-     * @param ResultSet $resultSet
-     * @param QueryObject $query
      */
-    public function __construct(AbstractDataMapper $dataMapper, ResultSet $resultSet, QueryObject $query)
+    public function __construct(AbstractDataMapper $dataMapper, Collection $collection, QueryObject $query)
     {
         $this->dataMapper = $dataMapper;
-        $this->resultSet = $resultSet;
+        $this->collection = $collection;
         $this->query = $query;
     }
 
@@ -58,12 +54,12 @@ class AfterFindEvent
     }
 
     /**
-     * Get the ResultSet from the find query
+     * Get the Collection from the find query
      *
-     * @return ResultSet
+     * @return Collection
      */
-    public function getResultSet(): ResultSet
+    public function getCollection(): Collection
     {
-        return $this->resultSet;
+        return $this->collection;
     }
 }

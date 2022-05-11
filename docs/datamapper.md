@@ -71,61 +71,9 @@ $mapper->deleteAll($query);
 $mapper->updateAll($query, ['status'=> 'approved']);
 ```
 
-## ResultSet
+## Collection
 
-During the find query the results from the database query are in the `ResultSet` object, and this is passed around to `Events` and `Hooks` and make it easy for modification.
-
-```php
-function addFoo(ResultSet $resultSet) { 
-    foreach($resultSet as $key => $row){
-        $resultSet[$key]['foo'] = 'bar';
-    }
-}
-```
-
-The `ResultSet` object implements `ArrayAccess` and `Countable` and offers some basic methods for working with a result collection.
-
-```php
-$resultSet->isEmpty();
-$row = $resultSet->first();
-$array = $resultSet->toArray();
-$string = $resultSet->toString();
-```
-
-There are also collection like methods to help manipulate collections of records.
-
-### Map
-
-```php
-$mappedResultSet = $resultSet->map(function($row){
-    $row['status'] = 'active';
-    return $row;
-});
-```
-
-### Filter
-
-```php
-$filteredResultSet = $resultSet->filter(function($row){
-    return $row['status'] === 'active';
-});
-```
-
-### IndexBy
-
-```php
-$indexedResultSet = $resultSet->indexBy(function($row){
-    return $row['id'];
-});
-```
-
-### GroupBy
-
-```php
-$groupedResultSet = $resultSet->groupBy(function($row){
-    return $row['status'];
-});
-```
+When a find query is created a `Utility\Collection` object is used to store the results and this is passed around to `Events` and `Hooks` and make it easy for modification.
 
 ## Hooks
 

@@ -3,9 +3,9 @@
 namespace Lightning\Test\DataMapper\Event;
 
 use PHPUnit\Framework\TestCase;
+use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 
 use Lightning\Entity\EntityInterface;
@@ -51,9 +51,9 @@ final class AfterFindEventTest extends TestCase
     {
         $dataMapper = new TagAfterFindDataMapper($this->datasource);
         $queryObject = new QueryObject(['foo' => 'bar']);
-        $resultSet = new ResultSet([]);
+        $collection = new Collection([]);
 
-        return new AfterFindEvent($dataMapper, $resultSet, $queryObject);
+        return new AfterFindEvent($dataMapper, $collection, $queryObject);
     }
 
     public function testGetDataMapper(): void
@@ -66,8 +66,8 @@ final class AfterFindEventTest extends TestCase
         $this->assertInstanceOf(QueryObject::class, $this->createAfterFindEvent()->getQuery());
     }
 
-    public function testGetResultSet(): void
+    public function testGetCollection(): void
     {
-        $this->assertInstanceOf(ResultSet::class, $this->createAfterFindEvent()->getResultSet());
+        $this->assertInstanceOf(Collection::class, $this->createAfterFindEvent()->getCollection());
     }
 }

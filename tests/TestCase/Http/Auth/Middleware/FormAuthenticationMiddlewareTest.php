@@ -48,7 +48,8 @@ final class FormAuthenticationMiddlewareTest extends TestCase
     {
         $identityService = (new PdoIdentityService($this->pdo))
             ->setTable('identities')
-            ->setIdentifierName('username');
+            ->setIdentifierName('username')
+            ->setCredentialName('password');
 
         return new FormAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), $this->session, new Response());
     }

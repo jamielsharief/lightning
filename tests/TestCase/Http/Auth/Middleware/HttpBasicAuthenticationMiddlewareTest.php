@@ -37,7 +37,8 @@ final class HttpBasicAuthenticationMiddlewareTest extends TestCase
     {
         $identityService = (new PdoIdentityService($this->pdo))
             ->setTable('identities')
-            ->setIdentifierName('username');
+            ->setIdentifierName('username')
+            ->setCredentialName('password');
 
         return new HttpBasicAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), new Response());
     }

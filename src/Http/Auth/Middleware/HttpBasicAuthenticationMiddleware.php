@@ -104,7 +104,7 @@ class HttpBasicAuthenticationMiddleware extends AbstractAuthenticationMiddleware
         }
 
         $identity = $this->identityService->findByIdentifier($username);
-        if ($identity && $this->passwordHasher->verify($password, $identity->get('password'))) {
+        if ($identity && $this->passwordHasher->verify($password, $identity->get($this->identityService->getCredentialName()))) {
             return $identity;
         }
 

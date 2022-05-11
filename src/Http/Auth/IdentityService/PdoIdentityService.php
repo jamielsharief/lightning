@@ -23,7 +23,7 @@ class PdoIdentityService implements IdentityServiceInterface
     private PDO $pdo;
     private string $table = 'users';
     private string $identifierName = 'email';
-
+    private string $credentialName = 'password';
     /**
      * Constructor
      *
@@ -97,5 +97,23 @@ class PdoIdentityService implements IdentityServiceInterface
         $user = $statement->fetch();
 
         return $user ? new Identity($user) : null;
+    }
+
+    /**
+     * Get the value of credential name
+     */
+    public function getCredentialName(): string
+    {
+        return $this->credentialName;
+    }
+
+    /**
+     * Set the value of credential name
+     */
+    public function setCredentialName(string $credentialName): static
+    {
+        $this->credentialName = $credentialName;
+
+        return $this;
     }
 }

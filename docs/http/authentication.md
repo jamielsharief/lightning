@@ -10,6 +10,7 @@ The identity service is for handling the user details lookup, you can use the `P
 $identityService = (new PdoIdentityService($container->get(PDO::class)))
     ->setTable('identities') // database table name
     ->setIdentifierName('username');  // the name/column for the identifier, e.g. username, email , token etc
+    ->setCredentialName('password');  // this is the password name/column e.g. password, hashed_password
 ```
 
 ## Password Hashers

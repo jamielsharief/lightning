@@ -20,16 +20,18 @@ interface IdentityServiceInterface
 {
     /**
      * Get the identifier name e.g. username, email, token etc
-     *
-     * @return string
      */
     public function getIdentifierName(): string;
+
+    /**
+     * Gets the credential name e.g. password, hashed_password
+     */
+    public function getCredentialName(): string;
 
     /**
      * Finds the user details by the provided identifier
      *
      * @param string $identifier    username, email, token etc
-     * @return Identity|null
      */
     public function findByIdentifier(string $identifier): ?Identity;
 }

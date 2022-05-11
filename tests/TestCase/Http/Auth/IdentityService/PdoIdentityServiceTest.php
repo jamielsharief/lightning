@@ -36,6 +36,14 @@ final class PdoIdentityServiceTest extends TestCase
         $this->assertEquals('token', $identityService->setIdentifierName('token')->getIdentifierName());
     }
 
+    public function testGetCredential(): void
+    {
+        $identityService = (new PdoIdentityService($this->pdo))
+            ->setTable('identities');
+        $this->assertEquals('password', $identityService->getCredentialName());
+        $this->assertEquals('foo', $identityService->setCredentialName('foo')->getCredentialName());
+    }
+
     public function testFindByIdentifier(): void
     {
         $identityService = (new PdoIdentityService($this->pdo))

@@ -198,7 +198,7 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
 
         // User not found
         $identity = $this->identityService->findByIdentifier($username);
-        if ($identity && $this->passwordHasher->verify($password, $identity->get($this->passwordField))) {
+        if ($identity && $this->passwordHasher->verify($password, $identity->get($this->identityService->getCredentialName()))) {
             return $identity;
         }
 

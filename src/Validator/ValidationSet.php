@@ -306,6 +306,14 @@ class ValidationSet
     }
 
     /**
+     * Enables the stop on failure mechansim
+     */
+    public function stopOnFailure(): static
+    {
+        return $this->add('stopOnFailure');
+    }
+
+    /**
      * Create the validation rule array
      */
     private function add(string $method, array $args = [], string $message = 'invalid value'): static

@@ -24,9 +24,9 @@ class UserValidator extends Validator
             ->lengthBetween(8,255);
     }
 
-    public function confirm(string $password, array $data) : bool 
+    public function confirm(mixed $password, array $data) : bool 
     {
-        return $password === $data['password_confirm'];
+        return is_string($password) && $password === $data['password_confirm'];
     }
 }
 ```
@@ -58,6 +58,44 @@ $validator->createRuleFor('email')
     ->lengthBetween(5,255);
 $validator->validate($_POST);
 ```
+
+
+## Validators
+
+- alpha
+- alphaNumeric
+- notNull
+- notEmpty
+- notBlank
+- email
+- in
+- notIn
+- length
+- lengthBetween
+- minLength
+- maxLength
+- greaterThanOrEqualTo
+- greaterThan
+- lessThanOrEqualTo
+- lessThan
+- equalTo
+- notEqualTo
+- range
+- integer
+- string
+- numeric
+- decimal
+- array
+- date (format)
+- datetime (format)
+- time (format)
+- before (date)
+- after  (date)
+
+Special rules
+
+- optional If data is empty, validation does not take place
+- stopOnFailure Validators that fail after this point in the set will stop further validations
 
 ## Errors Object
 

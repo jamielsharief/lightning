@@ -84,6 +84,8 @@ class Validator
         }
 
         foreach ($this->validate as $field => $validationSet) {
+            $stopOnFailure = false;
+
             $value = $data[$field] ?? null;
 
             foreach ($validationSet->toArray() as $validationRule) {
@@ -91,6 +93,12 @@ class Validator
                     if ($this->validation->empty($value)) {
                         break;
                     }
+
+                    continue;
+                }
+
+                if ($validationRule['rule'] === 'stopOnFailure') {
+                    $stopOnFailure = true;
 
                     continue;
                 }
@@ -103,6 +111,9 @@ class Validator
 
                 if (! call_user_func_array([$object,$validationRule['rule']], [$value,  ...$validationRule['args']])) {
                     $this->errors->setError($field, $validationRule['message']);
+                    if ($stopOnFailure) {
+                        break;
+                    }
                 }
             }
         }
@@ -130,11 +141,29 @@ class Validator
     }
 
     /**
-     * Adds a validation rule
+     * Creates a rule for property field
      */
-    public function createRuleFor(string $name): ValidationSet
+    public function createRuleFor(string $property): ValidationSet
     {
-        return $this->validate[$name] = $this->createValdiationSet();
+        return $this->validate[$property] = $this->createValdiationSet();
+    }
+
+    /**
+     * Removes a validators for a property
+     */
+    public function removeRuleFor(string $property): static
+    {
+        unset($this->validate[$property]);
+
+        return $this;
+    }
+
+    /**
+     * Returns a new validator without validators for a property
+     */
+    public function withoutRuleFor(string $property): static
+    {
+        return (clone $this)->removeRuleFor($property);
     }
 
     /**
@@ -159,5 +188,15 @@ class Validator
     protected function createErrors(): Errors
     {
         return new Errors();
+    }
+
+    /**
+     * Deep copy
+     */
+    public function __clone()
+    {
+        foreach ($this->validate as $key => $value) {
+            $this->validate[$key] = clone $value;
+        }
     }
 }

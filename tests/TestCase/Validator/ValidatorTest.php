@@ -92,14 +92,14 @@ class UserValidator extends Validator
             ->lengthBetween(8, 255);
     }
 
-    public function passwordIsStrong(string $password): bool
+    public function passwordIsStrong(mixed $password): bool
     {
-        return (bool) preg_match('/!/', $password);
+        return is_string($password) && (bool) preg_match('/!/', $password);
     }
 
     public function confirm(string $password, array $data): bool
     {
-        return $password === $data['password_confirm'];
+        return is_string($password) && $password === $data['password_confirm'];
     }
 }
 
@@ -273,5 +273,38 @@ final class ValidatorTest extends TestCase
             'email' => '*',
             'password' => '12345678!'
         ])));
+    }
+
+    public function testRemove(): void
+    {
+        $validator = new UserValidator();
+        $this->assertArrayHasKey('email', $validator->getRules());
+        $this->assertArrayNotHasKey('email', $validator->removeRuleFor('email')->getRules());
+    }
+
+    public function testWithoutRule(): void
+    {
+        $validator = new UserValidator();
+        $this->assertArrayHasKey('email', $validator->getRules());
+        $this->assertArrayNotHasKey('email', $validator->withoutRuleFor('email')->getRules());
+        $this->assertArrayHasKey('email', $validator->getRules());
+    }
+
+    public function testStopOnFailure(): void
+    {
+        $validator = new Validator();
+
+        $validator->createRuleFor('email')
+            ->notBlank()
+            ->stopOnFailure()
+            ->email()
+            ->lengthBetween(5, 255);
+
+        $this->assertTrue($validator->validate([
+            'email' => 'foo@example.com',
+        ]));
+
+        $this->assertFalse($validator->validate([]));
+        $this->assertCount(2, $validator->getErrors()); // NotBlank and Email error, lengthBetween should not be run
     }
 }

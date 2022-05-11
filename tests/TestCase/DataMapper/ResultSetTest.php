@@ -177,4 +177,83 @@ final class ResultSetTest extends TestCase
 
         $this->assertEquals($expected, $resultSet->toArray());
     }
+
+    public function testToList(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new','group' => 'admin'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived','group' => 'user'],
+            ['id' => 300,'name' => 'Betty','status' => 'new','group' => 'user'],
+        ]);
+
+        $this->assertEquals([100,200,300], $resultSet->toList());
+        $this->assertEquals(['Jon','Claire','Betty'], $resultSet->toList('name'));
+
+        $expected = [
+            100 => 'Jon',
+            200 => 'Claire',
+            300 => 'Betty'
+        ];
+        $this->assertEquals($expected, $resultSet->toList('id', 'name'));
+    }
+
+    public function testToListValue(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new','group' => 'admin'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived','group' => 'user'],
+            ['id' => 300,'name' => 'Betty','status' => 'new','group' => 'user'],
+        ]);
+
+        $expected = [
+            100 => 'Jon',
+            200 => 'Claire',
+            300 => 'Betty'
+        ];
+        $this->assertEquals($expected, $resultSet->toList('id', 'name'));
+    }
+
+    public function testToListGroup(): void
+    {
+        $resultSet = new ResultSet([
+            ['id' => 100,'name' => 'Jon','status' => 'new','group' => 'admin'],
+            ['id' => 200,'name' => 'Claire','status' => 'archived','group' => 'user'],
+            ['id' => 300,'name' => 'Betty','status' => 'new','group' => 'user'],
+        ]);
+
+        $expected = [
+            'admin' => [
+                100 => 'Jon'
+            ],
+            'user' => [
+                200 => 'Claire',
+                300 => 'Betty',
+            ]
+        ];
+
+        $this->assertEquals($expected, $resultSet->toList('id', 'name', 'group'));
+    }
+
+    public function testToListMissingData(): void
+    {
+        $resultSet = new ResultSet([
+            ['name' => 'Jon','status' => 'new','group' => 'admin'],
+            ['id' => 200,'status' => 'archived','group' => 'user'],
+            ['id' => 300,'name' => 'Betty','status' => 'new'],
+        ]);
+
+        $expected = [
+            'admin' => [
+                '' => 'Jon'
+            ],
+            'user' => [
+                200 => null
+            ],
+            '' => [
+                300 => 'Betty'
+            ]
+        ];
+
+        $this->assertEquals($expected, $resultSet->toList('id', 'name', 'group'));
+    }
 }

@@ -16,7 +16,7 @@ namespace Lightning\DataMapper;
 interface DataSourceInterface
 {
     public function create(string $table, array $data): bool;
-    public function read(string $table, QueryObject $query): ResultSet;
+    public function read(string $table, QueryObject $query): array;
     public function update(string $table, QueryObject $query, array $data): int;
     public function delete(string $table, QueryObject $query): int;
     public function count(string $table, QueryObject $query): int;

@@ -191,12 +191,6 @@ class Tag extends AbstractDataMapper
     }
 }
 
-/**
- * @method ?ArticleEntity find(QueryObject $query)
- * @method ArticleEntity[] findAll(QueryObject $query)
- * @method ?ArticleEntity findBy(array $criteria =[], array $options = [])
- * @method ArticleEntity[] findAllby(array $criteria =[], array $options = [])
- */
 class Article extends AbstractDataMapper
 {
     protected $primaryKey = 'id';
@@ -668,7 +662,7 @@ final class AbstractDataMapperTest extends TestCase
         $mapper->registerHook('beforeFind', 'hookFail');
 
         $this->assertNull($mapper->find());
-        $this->assertEquals([], $mapper->findAll());
+        $this->assertTrue($mapper->findAll()->isEmpty());
         $this->assertEquals([], $mapper->findList());
         $this->assertEquals(0, $mapper->findCount());
     }

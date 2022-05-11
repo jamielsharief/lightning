@@ -248,9 +248,11 @@ final class AbstractRepositoryTest extends TestCase
     {
         $respository = $this->createRepository();
         $entities = $respository->findAll();
-        array_walk($entities, function ($entity) {
+
+        foreach ($entities as  $entity) {
             $entity->setTitle('foo');
-        });
+        }
+
         $this->assertTrue($respository->saveMany($entities));
     }
 

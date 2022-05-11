@@ -220,15 +220,13 @@ abstract class AbstractDataMapper implements HookInterface
 
     /**
      * Finds multiple Entities
-     *
-     * @param QueryObject|null $query
-     * @return array
+     * @return ResultSet|EntityInterface[]
      */
-    public function findAll(?QueryObject $query = null): array
+    public function findAll(?QueryObject $query = null): ResultSet
     {
         $query = $query ?? $this->createQueryObject();
 
-        return $this->read($query)->toArray();
+        return $this->read($query);
     }
 
     /**
@@ -269,11 +267,8 @@ abstract class AbstractDataMapper implements HookInterface
             throw new InvalidArgumentException('Cannot determine primary key');
         }
 
-        return $this->convertToList(
-            $this->read($query, false)->toArray(),
-            $keyField,
-            $fields['valueField'] ?? null,
-            $fields['groupField'] ?? null
+        return $this->read($query, false)->toList(
+            $keyField, $fields['valueField'] ?? null, $fields['groupField'] ?? null
         );
     }
 
@@ -307,12 +302,10 @@ abstract class AbstractDataMapper implements HookInterface
 
     /**
      * Finds multiple instances
-     *
-     * @param array $criteria
-     * @param array $options
-     * @return EntityInterface[]
+
+     * @return ResultSet|EntityInterface[]
      */
-    public function findAllBy(array $criteria, array $options = []): array
+    public function findAllBy(array $criteria, array $options = []): ResultSet
     {
         return $this->findAll($this->createQueryObject($criteria, $options));
     }
@@ -363,7 +356,7 @@ abstract class AbstractDataMapper implements HookInterface
             $query->setOption('fields', $this->fields);
         }
 
-        $resultSet = $this->dataSource->read($this->table, $query);
+        $resultSet = $this->createResultSet($this->dataSource->read($this->table, $query));
         if ($resultSet->isEmpty()) {
             return $resultSet;
         }
@@ -631,51 +624,8 @@ abstract class AbstractDataMapper implements HookInterface
         return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
     }
 
-    /**
-     * Converts to list
-     *
-     * @param array $data
-     * @param string $keyField
-     * @param string|null $valueField
-     * @param string|null $groupField
-     * @return array
-     */
-    private function convertToList(array $data, string $keyField, ?string $valueField = null, ?string $groupField = null): array
+    protected function createResultSet(array $rows): ResultSet
     {
-        $result = [];
-
-        foreach ($data as $row) {
-            // Check data
-            if (! isset($row[$keyField])) {
-                continue;
-            } elseif ($valueField && ! isset($row[$valueField])) {
-                continue;
-            } elseif ($groupField && ! isset($row[$groupField])) {
-                continue;
-            }
-
-            // Create list
-            $key = $row[$keyField] ?? null;
-
-            if (! $valueField) {
-                $result[] = $key;
-
-                continue;
-            }
-
-            if ($groupField) {
-                $group = $row[$groupField];
-                if (! isset($result[$group])) {
-                    $result[$group] = [];
-                }
-                $result[$group][$key] = $row[$valueField];
-
-                continue;
-            }
-
-            $result[$key] = $row[$valueField];
-        }
-
-        return $result;
+        return new ResultSet($rows);
     }
 }

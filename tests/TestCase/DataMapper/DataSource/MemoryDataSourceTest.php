@@ -58,10 +58,10 @@ final class MemoryDataSourceTest extends TestCase
         ]);
 
         $result = $ds->read('test', new QueryObject(['id' => 1000]));
-        $this->assertEquals(['id','name'], array_keys($result->first()));
+        $this->assertEquals(['id','name'], array_keys($result[0]));
 
         $result = $ds->read('test', new QueryObject(['id' => 1000], ['fields' => ['name']]));
-        $this->assertEquals(['name'], array_keys($result->first()));
+        $this->assertEquals(['name'], array_keys($result[0]));
     }
 
     public function testReadOrder(): void
@@ -80,7 +80,7 @@ final class MemoryDataSourceTest extends TestCase
         $result = $ds->read('test', $query);
         $this->assertEquals(
             ['Alex','Becky','Claire','Debby'],
-            array_column($result->toArray(), 'name')
+            array_column($result, 'name')
         );
     }
 
@@ -99,7 +99,7 @@ final class MemoryDataSourceTest extends TestCase
 
         $this->assertEquals(
             ['Becky','Debby','Alex','Claire'],
-            array_column($result->toArray(), 'name')
+            array_column($result, 'name')
         );
     }
 

@@ -21,9 +21,6 @@ use ArrayIterator;
 use JsonSerializable;
 use IteratorAggregate;
 
-/**
- * ResultSet
- */
 class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Stringable
 {
     private array $rows = [];
@@ -236,5 +233,44 @@ class ResultSet implements ArrayAccess, Countable, IteratorAggregate, JsonSerial
         }
 
         return new static($result);
+    }
+
+    /**
+     * Converts the ResultSet to a list
+     */
+    public function toList(?string $keyField = null, ?string $valueField = null, ?string $groupField = null): array
+    {
+        $result = [];
+
+        // get the first key in the first row as the default keyField, e.g. id
+        if (! $keyField && ! $keyField = array_key_first($this->rows[0] ?? [])) {
+            return [];
+        }
+
+        foreach ($this->rows as $row) {
+
+            // Create list
+            $key = $row[$keyField] ?? null;
+
+            if (! $valueField) {
+                $result[] = $key;
+
+                continue;
+            }
+
+            if ($groupField) {
+                $group = $row[$groupField] ?? null;
+                if (! isset($result[$group])) {
+                    $result[$group] = [];
+                }
+                $result[$group][$key] = $row[$valueField] ?? null;
+
+                continue;
+            }
+
+            $result[$key] = $row[$valueField] ?? null;
+        }
+
+        return $result;
     }
 }

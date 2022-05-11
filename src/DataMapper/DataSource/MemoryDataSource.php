@@ -15,7 +15,6 @@ namespace Lightning\DataMapper\DataSource;
 
 use RuntimeException;
 use Lightning\Criteria\Criteria;
-use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\DataMapper\DataSourceInterface;
 
@@ -71,13 +70,7 @@ class MemoryDataSource implements DataSourceInterface
         return true;
     }
 
-    /**
-     * @param string $collection
-     * @param QueryObject $query
-     * @param boolean $preserveKeys
-     * @return ResultSet
-     */
-    public function read(string $collection, QueryObject $query, bool $preserveKeys = false): ResultSet
+    public function read(string $collection, QueryObject $query, bool $preserveKeys = false): array
     {
         $criteria = $query->getCriteria();
         $options = $query->getOptions();
@@ -113,7 +106,7 @@ class MemoryDataSource implements DataSourceInterface
             $i++;
         }
 
-        return new ResultSet($result);
+        return $result;
     }
 
     /**

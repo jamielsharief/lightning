@@ -18,7 +18,6 @@ use PDOStatement;
 use RuntimeException;
 use Lightning\Database\Row;
 use InvalidArgumentException;
-use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\DataMapper\DataSourceInterface;
@@ -83,12 +82,8 @@ class DatabaseDataSource implements DataSourceInterface
 
     /**
      * Reads from the DataSource
-     *
-     * @param string $table
-     * @param QueryObject $query
-     * @return ResultSet
      */
-    public function read(string $table, QueryObject $query): ResultSet
+    public function read(string $table, QueryObject $query): array
     {
         $criteria = $query->getCriteria();
         $options = $query->getOptions();
@@ -101,9 +96,7 @@ class DatabaseDataSource implements DataSourceInterface
         }
         $this->applyOptions($builder, $options);
 
-        return new ResultSet(
-            $this->execute($builder->toString(), $builder->getParameters())->fetchAll(PDO::FETCH_CLASS, Row::class)
-        );
+        return $this->execute($builder->toString(), $builder->getParameters())->fetchAll(PDO::FETCH_CLASS, Row::class);
     }
 
     /**
@@ -163,16 +156,10 @@ class DatabaseDataSource implements DataSourceInterface
 
     /**
     * Runs a SELECT query on the database
-    *
-    * @param string $sql
-    * @param array $params
-    * @return ResultSet
     */
-    public function query(string $sql, array $params = [], int $mode = PDO::FETCH_ASSOC): ResultSet
+    public function query(string $sql, array $params = [], int $mode = PDO::FETCH_ASSOC): array
     {
-        return new ResultSet(
-            $this->execute($sql, $params)->fetchAll($mode)
-        );
+        return $this->execute($sql, $params)->fetchAll($mode);
     }
 
     /**

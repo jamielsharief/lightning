@@ -13,6 +13,7 @@
 
 namespace Lightning\Repository;
 
+use Lightning\DataMapper\ResultSet;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\AbstractDataMapper;
@@ -63,11 +64,9 @@ abstract class AbstractRepository
 
     /**
      * Finds multiple Entities
-     *
-     * @param QueryObject|null $query
-     * @return array
+     * @return ResultSet|EntityInterface[]
      */
-    public function findAll(?QueryObject $query = null): array
+    public function findAll(?QueryObject $query = null): ResultSet
     {
         return $this->mapper->findAll($query);
     }
@@ -116,9 +115,9 @@ abstract class AbstractRepository
      *
      * @param array $criteria
      * @param array $options
-     * @return EntityInterface[]
+     * @return ResultSet|EntityInterface[]
      */
-    public function findAllBy(array $criteria, array $options = []): array
+    public function findAllBy(array $criteria, array $options = []): ResultSet
     {
         return $this->mapper->findAllBy($criteria, $options);
     }

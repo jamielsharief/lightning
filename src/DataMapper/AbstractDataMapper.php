@@ -275,7 +275,7 @@ abstract class AbstractDataMapper implements HookInterface
     }
 
     /**
-     * Converts the ResultSet to a list
+     * Converts the Collection to a list
      */
     private function convertCollectionToList(Collection $collection, string $keyField, ?string $valueField = null, ?string $groupField = null): array
     {
@@ -666,10 +666,5 @@ abstract class AbstractDataMapper implements HookInterface
     protected function dispatchEvent(object $event): ?object
     {
         return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
-    }
-
-    protected function createResultSet(array $rows): ResultSet
-    {
-        return new ResultSet($rows);
     }
 }

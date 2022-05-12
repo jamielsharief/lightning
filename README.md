@@ -50,3 +50,4 @@ $ vendor/bin/phpunit
 - rather than `getState` use `toArray`, this prevents clashing with user defined value objects which have their own getters and setters
 - setters and getters, set,Get. If setter does not return a bool, instead of void return the object.
 - accesibility, main methods on object should be public even if they are not supposed to be called from outside. e.g. controller render, console command output.
+- GET should be used for single items

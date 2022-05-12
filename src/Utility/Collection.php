@@ -25,11 +25,13 @@ use IteratorAggregate;
 /**
  * Collection
  *
- * Problem: Using lots of similar objects to replace arrays and I dont want to use full blown Collection library
- *
- * A array based object that will be used instead of array. Only a few basic array based functions are included, e.g. filter, map etc.
+ * This is not suppose to be full collection class, e.g. median, average, some etc. This is more a base
+ * supped up array object with filter,map, reduce, min and max, as well sort and slicing. No chunking and
+ * bloat. Rather than a component or seperate package, its something that can be reused and extended.
+ * So dont polute the method names either. For example if you need index by or group by, this can be done
+ * with reduce.
  */
-class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAggregate, Serializable, Stringable
+class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAggregate, Stringable, Serializable
 {
     protected array $elements = [];
 
@@ -43,6 +45,46 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
         } else {
             iterator_to_array($items, $preserveKeys);
         }
+    }
+
+    /**
+     * Sets an item in the collection using the key
+     */
+    public function set(string|int $key, mixed $element): static
+    {
+        $this->elements[$key] = $element;
+
+        return $this;
+    }
+
+    /**
+     * Gets an item from the collection
+     */
+    public function get(string|int $key = null, mixed $default = null): mixed
+    {
+        if ($key === null) {
+            $key = array_key_first($this->elements);
+        }
+
+        return $this->elements[$key] ?? $default;
+    }
+
+    /**
+     * Unsets an element using a key
+     */
+    public function unset(string|int $key): static
+    {
+        unset($this->elements[$key]);
+
+        return $this;
+    }
+
+    /**
+     * Checks if the collection key exists
+     */
+    public function has(string|int $key): bool
+    {
+        return array_key_exists($key, $this->elements);
     }
 
     /**
@@ -69,29 +111,11 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     }
 
     /**
-     * Sets an item in the collection using the key
-     */
-    public function set(string|int $key, mixed $element): static
-    {
-        $this->elements[$key] = $element;
-
-        return $this;
-    }
-
-    /**
-     * Gets an item from the collection
-     */
-    public function get(string|int $key, mixed $default = null): mixed
-    {
-        return $this->elements[$key] ?? $default;
-    }
-
-    /**
      * Check if the collection contains the element
      */
     public function contains(mixed $element): bool
     {
-        return $this->indexOf($element) !== null;
+        return in_array($element, $this->elements, true);
     }
 
     /**
@@ -99,13 +123,9 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
      */
     public function indexOf(mixed $element): mixed
     {
-        foreach ($this->elements as $index => $value) {
-            if ($value === $element) {
-                return $index;
-            }
-        }
+        $index = array_search($element, $this->elements, true);
 
-        return null;
+        return $index === false ? null : $index;
     }
 
     /**
@@ -169,20 +189,81 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     }
 
     /**
-     * Checks if an item exists in the collection if the callback returns true
+     * Reduces a list of values into a single a value
      */
-    public function exists(callable $callback): bool
+    public function reduce(callable $callback): mixed
     {
-        $result = false;
-        foreach ($this->elements as $key => $value) {
-            if ($callback($value, $key)) {
-                $result = true;
+        $called = false;
 
-                break;
-            }
+        $result = null;
+        foreach ($this->elements as $key => $value) {
+            $result = $called ? $callback($result, $value, $key) : $value;
+            $called = true;
         }
 
         return $result;
+    }
+
+    /**
+     * Extracts a slice of the Collection
+     */
+    public function slice(int $offset, ?int $length = null): static
+    {
+        return new static(array_slice($this->elements, $offset, $length));
+    }
+
+    /**
+    * Sorts the Collection in ascending order by the value returned by the callback
+    */
+    public function sort(int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
+    {
+        $function = $direction === SORT_DESC ? 'arsort' : 'asort';
+        $elements = $this->elements;
+        $function($elements, $flags);
+
+        return new static($elements);
+    }
+
+    public function sortBy(callable $callback, int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
+    {
+        $function = $direction === SORT_DESC ? 'arsort' : 'asort';
+
+        $result = [];
+        foreach ($this->elements as $key => $value) {
+            $result[$key] = $callback($value, $key);
+        }
+
+        $function($result, $flags);
+
+        foreach ($this->elements as $key => $value) {
+            $result[$key] = $this->elements[$key];
+        }
+
+        return new static($result);
+    }
+
+    /**
+     * Gets the collection in reverse order
+     */
+    public function reverse(): static
+    {
+        return new static(array_reverse($this->elements));
+    }
+
+    /**
+     * Gets the element from the collection which matches the min value
+     */
+    public function min(callable $callback): mixed
+    {
+        return $this->sortBy($callback)->get();
+    }
+
+    /**
+     * Gets the element from the collection which matches the max value
+     */
+    public function max(callable $callback): mixed
+    {
+        return $this->sortBy($callback)->reverse()->get();
     }
 
     /**
@@ -191,6 +272,14 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     public function toArray(): array
     {
         return $this->elements;
+    }
+
+    /**
+     * Get the values of the collection (without keys)
+     */
+    public function toList(): array
+    {
+        return array_values($this->elements);
     }
 
     /**
@@ -269,16 +358,6 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
         unset($this->elements[$key]);
     }
 
-    public function serialize()
-    {
-        return serialize($this->elements);
-    }
-
-    public function unserialize($data)
-    {
-        $this->elements = unserialize($data);
-    }
-
     /**
      * Called after clone
      */
@@ -307,6 +386,26 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
         }
 
         return is_object($value) ? clone $value : $value;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->elements);
+    }
+
+    public function unserialize(string $data)
+    {
+        return unserialize($data);
+    }
+
+    public function __serialize(): array
+    {
+        return $this->elements;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->elements = $data;
     }
 
     public function __debugInfo()

@@ -2,6 +2,90 @@
 
 A collection of utility components
 
+## Collection
+
+A Collection object
+
+```php
+$entity = new UserEntity();
+
+$collection = new Collection();
+
+$collection->add($entity);
+$collection->remove($entity);
+$key = $collection->indexOf($entity);
+
+$bool = $collection->contains($entity);
+
+$first = $collection->get(); // Gets the first element
+$element = $collection->get(5); // gets by key
+
+$bool = $collection->empty();
+$collection->clear();
+
+$count = $collection->count();
+
+$collection->sort(); // sorts by keys
+$collection->reverse(); // gets the collection keys reversed
+
+$collection->toArray();
+$collection->toList(); // gets the values (without keys);
+```
+
+### For Each
+
+Iterate over each item in the `Collection`, return `false` to break.
+
+```php
+$collection->forEach(function($contact){
+    $this->log($contact->name);
+})->toArray();
+```
+
+### Map
+
+Iterate over each item in the `Collection` and returns a new `Collection` using the result that you returned.
+
+```php
+$collection = new Collection($contacts);
+$contactNames = $collection->map(function($contact){
+    return $contact->firstName . ' '. $contact->lastName;
+})->toArray();
+```
+
+### Reduce
+
+Iterate over each item in the `Collection` and return a single value
+
+```php
+$collection = new Collection([1,2,3]);
+$result = $collection->reduce(function ($accumulated, $value) {
+    return $accumulated + $value;
+}); // 6
+```
+
+### Filter
+
+Returns a new `Collection` for only the items that returned `true`.
+
+```php
+$collection->filter(function($contact){
+   return $contact['status'] === 'active';
+})->toArray();
+```
+
+### Other functions
+
+```php
+$callable = function(Entity $contact){
+   return $contact->getAge();
+};
+
+$collection->min($callable);
+$collection->max($callable);
+$collection->sortBy($callable);
+```
+
 ## RandomString
 
 A secure random string generator, with various character set constants such as hex, base36, base58, base62, base64, base64 url safe and numeric. Use this to securely generate tokens, passwords, keys, salts etc.

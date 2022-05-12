@@ -6,15 +6,19 @@ use PDO;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
-use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Entity\AbstractEntity;
+use Lightning\Test\Entity\TagEntity;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
+use Lightning\Test\Entity\PostEntity;
+use Lightning\Test\Entity\UserEntity;
+use Lightning\Test\Entity\AuthorEntity;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
+use Lightning\Test\Entity\ArticleEntity;
+use Lightning\Test\Entity\ProfileEntity;
 use Lightning\Test\Fixture\PostsFixture;
 use Lightning\Test\Fixture\UsersFixture;
 use Lightning\Test\Fixture\AuthorsFixture;
@@ -23,7 +27,6 @@ use Lightning\Test\Fixture\ProfilesFixture;
 use Lightning\Test\Fixture\PostsTagsFixture;
 use Lightning\Orm\AbstractObjectRelationalMapper;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
-use Lightning\Test\TestCase\DataMapper\Entity\TagEntity;
 
 abstract class MockMapper extends AbstractObjectRelationalMapper
 {
@@ -66,130 +69,6 @@ abstract class MockMapper extends AbstractObjectRelationalMapper
     }
 }
 
-class ArticleEntity extends AbstractEntity
-{
-    private ?int $id = null;
-    private string $title;
-    private string $body;
-    private ?int $author_id = null;
-    private ?string $created_at = null;
-    private ?string $updated_at = null;
-    private ?EntityInterface $author = null;
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the value of body
-     *
-     * @return string
-     */
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * Set the value of body
-     *
-     * @param string $body
-     *
-     * @return self
-     */
-    public function setBody(string $body): self
-    {
-        $this->body = $body;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of author_id
-     *
-     * @return int
-     */
-    public function getAuthorId(): int
-    {
-        return $this->author_id;
-    }
-
-    /**
-     * Set the value of author_id
-     *
-     * @param int $author_id
-     *
-     * @return self
-     */
-    public function setAuthorId(int $author_id): self
-    {
-        $this->author_id = $author_id;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?string
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?string $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?string $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of author
-     *
-     * @return ?EntityInterface
-     */
-    public function getAuthor(): ?EntityInterface
-    {
-        return $this->author;
-    }
-
-    /**
-     * Set the value of author
-     *
-     * @param ?EntityInterface $author
-     *
-     * @return self
-     */
-    public function setAuthor(?EntityInterface $author): self
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-}
-
 class Article extends MockMapper
 {
     protected $primaryKey = 'id';
@@ -211,198 +90,6 @@ class Article extends MockMapper
     public function mapDataToEntity(array $data): EntityInterface
     {
         return ArticleEntity::fromState($data);
-    }
-}
-
-class AuthorEntity extends AbstractEntity
-{
-    private ?int $id = null;
-    private ?string $name = null;
-    private ?string $created_at = null;
-    private ?string $updated_at = null;
-
-    private Collection $articles;
-
-    public function getCreatedAt(): ?string
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?string $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?string $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of articles
-     */
-    public function getArticles(): Collection
-    {
-        return $this->articles;
-    }
-
-    /**
-     * Set the value of articles
-     *
-     * @param array $articles
-     *
-     * @return self
-     */
-    public function setArticles(Collection $articles): self
-    {
-        $this->articles = $articles;
-
-        return $this;
-    }
-}
-
-class PostEntity extends AbstractEntity
-{
-    private ?int $id = null;
-    private string $title;
-    private string $body;
-    private string $created_at;
-    private string $updated_at;
-    private Collection $tags;
-
-    public function getCreatedAt(): ?string
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?string $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?string $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of title
-     *
-     * @return string
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * Set the value of title
-     *
-     * @param string $title
-     *
-     * @return self
-     */
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of body
-     *
-     * @return string
-     */
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * Set the value of body
-     *
-     * @param string $body
-     *
-     * @return self
-     */
-    public function setBody(string $body): self
-    {
-        $this->body = $body;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of tags
-     */
-    public function getTags(): Collection
-    {
-        return $this->tags;
-    }
-
-    /**
-     * Set the value of tags
-     */
-    public function setTags(Collection $tags): self
-    {
-        $this->tags = $tags;
-
-        return $this;
     }
 }
 
@@ -434,87 +121,6 @@ class Author extends MockMapper
     }
 }
 
-class ProfileEntity extends AbstractEntity
-{
-    private ?int $id = null;
-    private string $name;
-    private int $user_id;
-    private string $created_at;
-    private string $updated_at;
-
-    public function getCreatedAt(): ?string
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?string $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?string $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of user_id
-     *
-     * @return int
-     */
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the value of user_id
-     *
-     * @param int $user_id
-     *
-     * @return self
-     */
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
-    }
-}
-
 class Profile extends MockMapper
 {
     protected string $table = 'profiles';
@@ -530,87 +136,6 @@ class Profile extends MockMapper
     public function mapDataToEntity(array $data): EntityInterface
     {
         return ProfileEntity::fromState($data);
-    }
-}
-
-class UserEntity extends AbstractEntity
-{
-    private ?int $id = null;
-    private ?string $name = null;
-    private ?string $created_at = null;
-    private ?string $updated_at = null;
-    private ?ProfileEntity $profile = null;
-
-    public function getCreatedAt(): ?string
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?string $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?string $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of profile
-     *
-     * @return ?ProfileEntity
-     */
-    public function getProfile(): ?ProfileEntity
-    {
-        return $this->profile;
-    }
-
-    /**
-     * Set the value of profile
-     *
-     * @param ?ProfileEntity $profile
-     *
-     * @return self
-     */
-    public function setProfile(?ProfileEntity $profile): self
-    {
-        $this->profile = $profile;
-
-        return $this;
     }
 }
 
@@ -896,8 +421,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #1',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:01:00',
-                    'updated_at' => '2021-10-03 09:02:00',
-                    'author' => null
+                    'updated_at' => '2021-10-03 09:02:00'
                 ],
                 1 => [
                     'id' => 1002,
@@ -905,8 +429,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #3',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:05:00',
-                    'updated_at' => '2021-10-03 09:06:00',
-                    'author' => null
+                    'updated_at' => '2021-10-03 09:06:00'
                 ]
             ]
         ];
@@ -949,8 +472,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #3',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:05:00',
-                    'updated_at' => '2021-10-03 09:06:00',
-                    'author' => null
+                    'updated_at' => '2021-10-03 09:06:00'
                 ]
             ]
         ];
@@ -980,7 +502,6 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:05:00',
                     'updated_at' => '2021-10-03 09:06:00',
-                    'author' => null
                 ],
                 1 => [
                     'id' => 1000,
@@ -988,8 +509,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                     'body' => 'A description for article #1',
                     'author_id' => 2000,
                     'created_at' => '2021-10-03 09:01:00',
-                    'updated_at' => '2021-10-03 09:02:00',
-                    'author' => null
+                    'updated_at' => '2021-10-03 09:02:00'
                 ]
             ]
         ];
@@ -1017,20 +537,12 @@ final class AbstractObjectRelationalMapperTest extends TestCase
                 0 => [
                     'id' => 1000,
                     'title' => 'Article #1',
-                    'body' => 'A description for article #1',
-                    'author_id' => null,
-                    'created_at' => null,
-                    'updated_at' => null,
-                    'author' => null
+                    'body' => 'A description for article #1'
                 ],
                 1 => [
                     'id' => 1002,
                     'title' => 'Article #3',
-                    'body' => 'A description for article #3',
-                    'author_id' => null,
-                    'created_at' => null,
-                    'updated_at' => null,
-                    'author' => null
+                    'body' => 'A description for article #3'
                 ]
             ]
         ];

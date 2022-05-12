@@ -196,10 +196,10 @@ final class CollectionTest extends TestCase
         $this->assertEquals([1,2,3], $collection->reverse()->toArray());
     }
 
-    public function testSortWithCallback(): void
+    public function testSortBy(): void
     {
         $collection = new Collection(['a' => 10,'b' => 5,'c' => 20]);
-        $this->assertEquals(['b' => 5,'a' => 10,'c' => 20], $collection->sort(function ($value, $key) {
+        $this->assertEquals(['b' => 5,'a' => 10,'c' => 20], $collection->sortBy(function ($value, $key) {
             return $value;
         })->toArray());
     }

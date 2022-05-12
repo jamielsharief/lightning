@@ -20,13 +20,13 @@ $bool = $collection->contains($entity);
 $first = $collection->get(); // Gets the first element
 $element = $collection->get(5); // gets by key
 
-$bool = $collection->empty();
+$bool = $collection->isEmpty();
 $collection->clear();
 
 $count = $collection->count();
 
-$collection->sort(); // sorts by keys
-$collection->reverse(); // gets the collection keys reversed
+$collection->sort(); // gets a new collection sorted by keys
+$collection->reverse(); // gets a new collection with keys reversed
 
 $collection->toArray();
 $collection->toList(); // gets the values (without keys);

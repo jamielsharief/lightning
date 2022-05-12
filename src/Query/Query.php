@@ -229,7 +229,7 @@ class Query implements IteratorAggregate
      *
      * @return Row|null
      */
-    public function first()
+    public function get(): ?Row
     {
         $statement = $this->run();
 

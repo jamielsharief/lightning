@@ -225,7 +225,7 @@ final class QueryTest extends TestCase
         $entity = $query
             ->select(['*'])
             ->from('articles')
-            ->first();
+            ->get();
 
         $this->assertInstanceOf(Row::class, $entity);
 
@@ -249,7 +249,7 @@ final class QueryTest extends TestCase
             ->from('articles')
             ->where(['id' => 1234]);
 
-        $this->assertNull($query->first());
+        $this->assertNull($query->get());
     }
 
     public function testGet()
@@ -272,7 +272,7 @@ final class QueryTest extends TestCase
             ->select(['articles.id','articles.title','articles.author_id','authors.id','authors.name'])
             ->from('articles')
             ->leftJoin('authors', 'authors', ['articles.author_id = authors.id'])
-            ->first();
+            ->get();
 
         $this->assertInstanceOf(Row::class, $result->authors);
         $this->assertEquals('Jon', $result->authors->name);

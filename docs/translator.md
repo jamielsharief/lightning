@@ -8,7 +8,9 @@ Create the `Translator` object and add to your DI container and configure the ob
 
 ```php
 $translator = new Translator(
-    new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 'en_US', 'default'
+    new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 
+    'en_US', 
+    'default'
 );
 ```
 

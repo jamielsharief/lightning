@@ -26,16 +26,8 @@ use IteratorAggregate;
 /**
  * Collection
  *
- * This is not suppose to be full collection class, e.g. median, average, some etc. This is more a base
- * supped up array object with filter,map, reduce, min and max, as well sort and slicing. Keep bloat to minimum.
- * Rather than a component or seperate package, its something that can be reused and extended.
- * So dont polute the method names either. For example if you need index by or group by, this can be done
- * with reduce.
- *
- * Naming issues:
- * - Keys and Values, its standard in similar objects in other languages without get prefix even if they
- * use get prefix for other things. The array functions are similar as well. So decided to got without
- * the prefix.
+ * A OOP version of an array, keep names similar to array functions, also no bloat, no need for median,
+ * some, every etc.
  */
 class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAggregate, Stringable, Serializable
 {
@@ -88,7 +80,7 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     /**
      * Checks if the collection key exists
      */
-    public function has(string|int $key): bool
+    public function keyExists(string|int $key): bool
     {
         return array_key_exists($key, $this->elements);
     }
@@ -223,7 +215,7 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
             return $this->sortBy($callback, $direction, $flags);
         }
 
-        $function = $direction === SORT_DESC ? 'arsort' : 'asort';
+        $function = $direction === SORT_DESC ? 'krsort' : 'ksort';
         $function($this->elements, $flags);
 
         return $this;

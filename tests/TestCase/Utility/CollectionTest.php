@@ -153,8 +153,8 @@ final class CollectionTest extends TestCase
     {
         $collection = new Collection(['a' => 1,'b' => 2,'c' => 3]);
 
-        $this->assertTrue($collection->has('a'));
-        $this->assertFalse($collection->has(2));
+        $this->assertTrue($collection->keyExists('a'));
+        $this->assertFalse($collection->keyExists(2));
     }
 
     public function testContains(): void
@@ -203,8 +203,10 @@ final class CollectionTest extends TestCase
 
     public function testSort(): void
     {
-        $collection = new Collection(['c' => 1,'b' => 2,'a' => 3]);
-        $this->assertEquals(['a' => 3,'b' => 2,'c' => 1], $collection->sort()->toArray());
+        $collection = new Collection(['c' => 1,'a' => 6,'b' => 5]);
+        $this->assertEquals(['a' => 6,'b' => 5,'c' => 1], $collection->sort()->toArray());
+        $collection = new Collection(['c' => 1,'a' => 6,'b' => 5]);
+        $this->assertEquals(['c' => 1,'b' => 5,'a' => 6], $collection->sort(null, SORT_DESC)->toArray());
     }
 
     public function testReverse(): void

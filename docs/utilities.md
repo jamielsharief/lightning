@@ -18,6 +18,7 @@ $bool = $collection->contains($entity);
 
 $first = $collection->get(); // Gets the first available element
 $element = $collection->get(5); // gets by key
+$bool = $collection->keyExists('foo');
 
 $bool = $collection->isEmpty();
 $count = $collection->count();

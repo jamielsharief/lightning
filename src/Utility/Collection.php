@@ -27,8 +27,8 @@ use IteratorAggregate;
  * Collection
  *
  * This is not suppose to be full collection class, e.g. median, average, some etc. This is more a base
- * supped up array object with filter,map, reduce, min and max, as well sort and slicing. No chunking and
- * bloat. Rather than a component or seperate package, its something that can be reused and extended.
+ * supped up array object with filter,map, reduce, min and max, as well sort and slicing. Keep bloat to minimum.
+ * Rather than a component or seperate package, its something that can be reused and extended.
  * So dont polute the method names either. For example if you need index by or group by, this can be done
  * with reduce.
  */
@@ -255,7 +255,7 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     /**
      * Gets the element from the collection which matches the min value
      */
-    public function min(?Closure $closure = null): mixed
+    public function min(?closure $closure = null): mixed
     {
         return $closure ? $this->sortBy($closure)->get() : min($this->elements);
     }
@@ -263,7 +263,7 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     /**
      * Gets the element from the collection which matches the max value
      */
-    public function max(?Closure $closure = null): mixed
+    public function max(?closure $closure = null): mixed
     {
         return $closure ? $this->sortBy($closure)->reverse()->get() : max($this->elements);
     }

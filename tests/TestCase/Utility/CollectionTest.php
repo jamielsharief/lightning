@@ -46,6 +46,17 @@ final class CollectionTest extends TestCase
         );
     }
 
+    public function testChunk(): void
+    {
+        $this->assertIsArray((new Collection())->chunk(5));
+        $collection = new Collection([1 => 'foo',2 => 'bar',3 => 'foobar',4 => 'barfoo']);
+
+        $chunks = $collection->chunk(3, true);
+        $this->assertCount(2, $chunks);
+        $this->assertInstanceOf(Collection::class, $chunks[0]);
+        $this->assertEquals('{"1":"foo","2":"bar","3":"foobar"}', (string) $chunks[0]);
+    }
+
     public function testToString(): void
     {
         $collection = new Collection([1,2,3]);

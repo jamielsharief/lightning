@@ -23,14 +23,15 @@ $bool = $collection->isEmpty();
 $count = $collection->count();
 $collection->clear();
 
+// These 3 methods you can pass a closure e.g fn(UserEntity $user) => $user->getId(), to customise the value used.
 $collection->sort(); // gets a new collection sorted by keys
-$collection->reverse(); // gets a new collection with the elements in reverse order
-
 $collection->min(); // gets the minimum value
 $collection->max(); // gets the maximum value
 
+$collection->reverse(); // reverses the order the collection is in
+
 $collection->slice(0,5); // slice a collection
-$collection->chunk(10);
+$collection->chunk(10); // chunks the collection into an array of collections
 
 $collection->toArray();
 $collection->toList(); // gets the values (without keys);
@@ -68,12 +69,14 @@ $result = $collection->reduce(function ($carry, $value) {
 }); // 6
 ```
 
-You can also supply an initial value, so lets say you wanted to index a collection by an id;
+You can also supply an initial value, so lets say you wanted to index a collection by an id.
 
 ```php
-$result = $collection->reduce(function ($entities, $entity, []) {
-    return $entities[$entity->getId()] = $entity;
-});
+$intialValue = []; // entities
+$collection->reduce(function ($entities, $entity) {
+    $entities[$entity->getId()] = $entity;
+    return $entities;
+}, $initialValue); // [] 
 ```
 
 ### Filter

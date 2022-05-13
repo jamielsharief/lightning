@@ -23,20 +23,20 @@ $bool = $collection->isEmpty();
 $count = $collection->count();
 $collection->clear();
 
-# Sortin
+# Sorting
 // These 3 methods you can pass a closure e.g fn(UserEntity $user) => $user->getId(), to customise the value used.
-$collection->sort(); // gets a new collection sorted by keys
-$collection->min(); // gets the minimum value
-$collection->max(); // gets the maximum value
+$collection->sort(); // sorts the collection by key
+$collection->min(); // gets the minimum value of an element in the collection
+$collection->max(); // gets the maximum value of an element in the collection
 $collection->reverse(); // reverses the order the collection is in
 
 
 # Extracting
-$collection->slice(0,5); // slice a collection
+$collection->slice(0,5); // slice a collection into a new collection
 $collection->chunk(10); // chunks the collection into an array of collections
 
-$collection->keys(); // Keys of the collection
-$collection->values(); // Values of the collection (toList)
+$collection->keys(); // returns just the keys
+$collection->values(); // returns just the values of the elements
 
 $collection->toArray();
 ```

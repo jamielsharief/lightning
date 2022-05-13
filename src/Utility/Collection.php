@@ -383,10 +383,6 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
             return $value;
         }
 
-        if (is_object($value)) {
-            return clone $value;
-        }
-
         return is_object($value) ? clone $value : $value;
     }
 

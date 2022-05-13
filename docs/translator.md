@@ -7,7 +7,9 @@ The `Translator` component provides an object that can be passed around your app
 Create the `Translator` object and add to your DI container and configure the object in your `Middleware` or `Controller`
 
 ```php
-$translator = new Translator(new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 'en_US', 'default');
+$translator = new Translator(
+    new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 'en_US', 'default'
+);
 ```
 
 To translate a message using ICU message format:

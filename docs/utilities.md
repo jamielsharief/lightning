@@ -24,12 +24,16 @@ $count = $collection->count();
 $collection->clear();
 
 # Sorting
-// These 3 methods you can pass a closure e.g fn(UserEntity $user) => $user->getId(), to customise the value used.
 $collection->sort(); // sorts the collection by key
-$collection->min(); // gets the minimum value of an element in the collection
-$collection->max(); // gets the maximum value of an element in the collection
+$collection->sort(fn(UserEntity $user) => $user->getId());
 $collection->reverse(); // reverses the order the collection is in
 
+
+$collection->min();
+$collection->min(fn(UserEntity $user) => $user->getAge())
+
+$collection->max(); 
+$collection->max(fn(UserEntity $user) => $user->getAge())
 
 # Extracting
 $collection->slice(0,5); // slice a collection into a new collection
@@ -39,72 +43,27 @@ $collection->keys(); // returns just the keys
 $collection->values(); // returns just the values of the elements
 
 $collection->toArray();
-```
 
-### Each
-
-Iterate over each item in the `Collection`, return `false` to break.
-
-```php
+# For each
 $collection->each(function($contact){
     $this->log($contact->name);
 })->toArray();
-```
 
-### Map
+# Map
+$collection->map(fn(UserEntity $user) => $user->getId());
 
-Iterate over each item in the `Collection` and returns a new `Collection` using the result that you returned.
-
-```php
-$collection = new Collection($contacts);
-$contactNames = $collection->map(function($contact){
-    return $contact->firstName . ' '. $contact->lastName;
-})->toArray();
-```
-
-### Reduce
-
-Iterate over each item in the `Collection` and return a single value
-
-```php
-$collection = new Collection([1,2,3]);
-$result = $collection->reduce(function ($carry, $value) {
+# Reduce
+$collection->reduce(function ($carry, $value) {
     return $carry + $value;
 }); // 6
-```
 
-You can also supply an initial value, so lets say you wanted to index a collection by an id.
-
-```php
-$intialValue = []; // entities
 $collection->reduce(function ($entities, $entity) {
     $entities[$entity->getId()] = $entity;
     return $entities;
-}, $initialValue); // [] 
-```
+}, $initialValue); // use reduce to indexBy
 
-### Filter
-
-Returns a new `Collection` for only the items that returned `true`.
-
-```php
-$collection->filter(function($contact){
-   return $contact['status'] === 'active';
-})->toArray();
-```
-
-### Passing closures
-
-The `min`, `max` and `sort` methods also support passing a closure .
-
-```php
-$closure = function(Entity $contact){
-   return $contact->getAge();
-};
-
-$collection->min($closure);
-$collection->max($closure);
-$collection->sort($closure);
+# Filter
+$collection->filter(fn(UserEntity $user) => $user->getStatus()  === 'active');
 ```
 
 ## RandomString

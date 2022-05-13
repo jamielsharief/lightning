@@ -216,9 +216,10 @@ final class CollectionTest extends TestCase
     public function testSortBy(): void
     {
         $collection = new Collection(['a' => 10,'b' => 5,'c' => 20]);
-        $this->assertEquals(['b' => 5,'a' => 10,'c' => 20], $collection->sort(function ($value, $key) {
-            return $value;
-        })->toArray());
+        $this->assertEquals(
+            ['b' => 5,'a' => 10,'c' => 20],
+            $collection->sort(fn ($value) => $value)->toArray()
+        );
     }
 
     public function testMin(): void

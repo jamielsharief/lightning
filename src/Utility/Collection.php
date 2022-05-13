@@ -360,32 +360,6 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
         unset($this->elements[$key]);
     }
 
-    /**
-     * Called after clone
-     */
-    public function __clone()
-    {
-        foreach ($this->elements as $index => $value) {
-            $this->elements[$index] = $this->removeReferences($value);
-        }
-    }
-
-    /**
-     * Deep copy clone
-     */
-    private function removeReferences(mixed $value): mixed
-    {
-        if ($value instanceof ArrayAccess || is_array($value)) {
-            foreach ($value as $k => $v) {
-                $value[$k] = $this->removeReferences($v);
-            }
-
-            return $value;
-        }
-
-        return is_object($value) ? clone $value : $value;
-    }
-
     public function serialize()
     {
         return serialize($this->elements);

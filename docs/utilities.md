@@ -4,7 +4,7 @@ A collection of utility components
 
 ## Collection
 
-The base Collection object.
+The collection is an super charged object oriented array.
 
 ```php
 $entity = new UserEntity();

@@ -13,6 +13,7 @@
 
 namespace Lightning\Utility;
 
+use Closure;
 use Countable;
 use Stringable;
 use ArrayAccess;
@@ -149,7 +150,7 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     /**
      * Loop through each item in the collection
      */
-    public function forEach(callable $callback): static
+    public function each(callable $callback): static
     {
         foreach ($this->elements as $key => $value) {
             if ($callback($value, $key) === false) {
@@ -161,47 +162,31 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     }
 
     /**
-     * Modify data through the map, this function must return the value
+     * Applies the callback to the data and returns a new collection
      */
     public function map(callable $callback): static
     {
-        $result = [];
-        foreach ($this->elements as $key => $value) {
-            $result[$key] = $callback($value, $key);
-        }
-
-        return new static($result);
+        return new static(
+            array_map($callback, $this->elements)
+        );
     }
 
     /**
-     * Use a callback to filter the elements in the collection
+     * Filters the collection using a callback and returns a new collection
      */
     public function filter(callable $callback): static
     {
-        $result = [];
-        foreach ($this->elements as $key => $value) {
-            if ($callback($value, $key)) {
-                $result[$key] = $value;
-            }
-        }
-
-        return new static($result);
+        return new static(
+            array_filter($this->elements, $callback, ARRAY_FILTER_USE_BOTH)
+        );
     }
 
     /**
-     * Reduces a list of values into a single a value
+     * Iteratively reduce the collection to a single value using a callback
      */
-    public function reduce(callable $callback): mixed
+    public function reduce(closure $callback, mixed $initial = null): mixed
     {
-        $called = false;
-
-        $result = null;
-        foreach ($this->elements as $key => $value) {
-            $result = $called ? $callback($result, $value, $key) : $value;
-            $called = true;
-        }
-
-        return $result;
+        return array_reduce($this->elements, $callback, $initial);
     }
 
     /**
@@ -209,22 +194,37 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
      */
     public function slice(int $offset, ?int $length = null): static
     {
-        return new static(array_slice($this->elements, $offset, $length));
+        return new static(
+            array_slice($this->elements, $offset, $length)
+        );
+    }
+
+    /**
+     * Split the collection into chunks
+     */
+    public function chunk(int $length, bool $preserveKeys = false): array
+    {
+        return array_map(function (array $chunk) use ($preserveKeys) {
+            return new static($chunk, $preserveKeys);
+        }, array_chunk($this->elements, $length, $preserveKeys));
     }
 
     /**
     * Sorts the Collection in ascending order by the value returned by the callback
     */
-    public function sort(int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
+    public function sort(?closure $callback = null, int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
     {
-        $function = $direction === SORT_DESC ? 'arsort' : 'asort';
-        $elements = $this->elements;
-        $function($elements, $flags);
+        if ($callback) {
+            return $this->sortBy($callback, $direction, $flags);
+        }
 
-        return new static($elements);
+        $function = $direction === SORT_DESC ? 'arsort' : 'asort';
+        $function($this->elements, $flags);
+
+        return $this;
     }
 
-    public function sortBy(callable $callback, int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
+    private function sortBy(closure $callback, int $direction = SORT_ASC, int $flags = SORT_REGULAR): static
     {
         $function = $direction === SORT_DESC ? 'arsort' : 'asort';
 
@@ -239,7 +239,9 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
             $result[$key] = $this->elements[$key];
         }
 
-        return new static($result);
+        $this->elements = $result;
+
+        return $this;
     }
 
     /**
@@ -253,17 +255,17 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     /**
      * Gets the element from the collection which matches the min value
      */
-    public function min(callable $callback): mixed
+    public function min(?Closure $closure = null): mixed
     {
-        return $this->sortBy($callback)->get();
+        return $closure ? $this->sortBy($closure)->get() : min($this->elements);
     }
 
     /**
      * Gets the element from the collection which matches the max value
      */
-    public function max(callable $callback): mixed
+    public function max(?Closure $closure = null): mixed
     {
-        return $this->sortBy($callback)->reverse()->get();
+        return $closure ? $this->sortBy($closure)->reverse()->get() : max($this->elements);
     }
 
     /**

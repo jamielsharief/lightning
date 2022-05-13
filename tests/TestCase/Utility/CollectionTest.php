@@ -20,9 +20,6 @@ final class CollectionTest extends TestCase
 
         $collection = new Collection([1,2,3]);
         $this->assertFalse($collection->isEmpty());
-
-        $collection->forEach(function (int $id) {
-        });
     }
 
     public function testClear(): void
@@ -151,7 +148,7 @@ final class CollectionTest extends TestCase
     public function testForEach(): void
     {
         $collection = new Collection([1,2,3]);
-        $collection->forEach(function (int $id) {
+        $collection->each(function (int $id) {
             $this->assertTrue(in_array($id, [1,2,3]));
         });
     }
@@ -199,7 +196,7 @@ final class CollectionTest extends TestCase
     public function testSortBy(): void
     {
         $collection = new Collection(['a' => 10,'b' => 5,'c' => 20]);
-        $this->assertEquals(['b' => 5,'a' => 10,'c' => 20], $collection->sortBy(function ($value, $key) {
+        $this->assertEquals(['b' => 5,'a' => 10,'c' => 20], $collection->sort(function ($value, $key) {
             return $value;
         })->toArray());
     }

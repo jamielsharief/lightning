@@ -4,7 +4,7 @@ A collection of utility components
 
 ## Collection
 
-A Collection object
+The base Collection object.
 
 ```php
 $entity = new UserEntity();
@@ -14,30 +14,34 @@ $collection = new Collection();
 $collection->add($entity);
 $collection->remove($entity);
 $key = $collection->indexOf($entity);
-
 $bool = $collection->contains($entity);
 
-$first = $collection->get(); // Gets the first element
+$first = $collection->get(); // Gets the first available element
 $element = $collection->get(5); // gets by key
 
 $bool = $collection->isEmpty();
+$count = $collection->count();
 $collection->clear();
 
-$count = $collection->count();
-
 $collection->sort(); // gets a new collection sorted by keys
-$collection->reverse(); // gets a new collection with keys reversed
+$collection->reverse(); // gets a new collection with the elements in reverse order
+
+$collection->min(); // gets the minimum value
+$collection->max(); // gets the maximum value
+
+$collection->slice(0,5); // slice a collection
+$collection->chunk(10);
 
 $collection->toArray();
 $collection->toList(); // gets the values (without keys);
 ```
 
-### For Each
+### Each
 
 Iterate over each item in the `Collection`, return `false` to break.
 
 ```php
-$collection->forEach(function($contact){
+$collection->each(function($contact){
     $this->log($contact->name);
 })->toArray();
 ```
@@ -59,9 +63,17 @@ Iterate over each item in the `Collection` and return a single value
 
 ```php
 $collection = new Collection([1,2,3]);
-$result = $collection->reduce(function ($accumulated, $value) {
-    return $accumulated + $value;
+$result = $collection->reduce(function ($carry, $value) {
+    return $carry + $value;
 }); // 6
+```
+
+You can also supply an initial value, so lets say you wanted to index a collection by an id;
+
+```php
+$result = $collection->reduce(function ($entities, $entity, []) {
+    return $entities[$entity->getId()] = $entity;
+});
 ```
 
 ### Filter
@@ -74,16 +86,18 @@ $collection->filter(function($contact){
 })->toArray();
 ```
 
-### Other functions
+### Passing closures
+
+The `min`, `max` and `sort` methods also support passing a closure .
 
 ```php
-$callable = function(Entity $contact){
+$closure = function(Entity $contact){
    return $contact->getAge();
 };
 
-$collection->min($callable);
-$collection->max($callable);
-$collection->sortBy($callable);
+$collection->min($closure);
+$collection->max($closure);
+$collection->sort($closure);
 ```
 
 ## RandomString

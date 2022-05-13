@@ -31,6 +31,11 @@ use IteratorAggregate;
  * Rather than a component or seperate package, its something that can be reused and extended.
  * So dont polute the method names either. For example if you need index by or group by, this can be done
  * with reduce.
+ *
+ * Naming issues:
+ * - Keys and Values, its standard in similar objects in other languages without get prefix even if they
+ * use get prefix for other things. The array functions are similar as well. So decided to got without
+ * the prefix.
  */
 class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAggregate, Stringable, Serializable
 {
@@ -277,14 +282,6 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     }
 
     /**
-     * Get the values of the collection (without keys)
-     */
-    public function toList(): array
-    {
-        return array_values($this->elements);
-    }
-
-    /**
      *  CountableInterface
      */
     public function count(): int
@@ -322,6 +319,22 @@ class Collection implements ArrayAccess, Countable, JsonSerializable, IteratorAg
     public function __toString()
     {
         return $this->toString();
+    }
+
+    /**
+     * array_keys function for Collection object
+     */
+    public function keys(): array
+    {
+        return array_keys($this->elements);
+    }
+
+    /**
+     * array values function for collection object
+     */
+    public function values(): array
+    {
+        return array_values($this->elements);
     }
 
     /**

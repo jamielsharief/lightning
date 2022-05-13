@@ -37,12 +37,21 @@ final class CollectionTest extends TestCase
         $this->assertEquals([1,2,3], $collection->toArray());
     }
 
-    public function testToList(): void
+    public function testKeys(): void
+    {
+        $collection = new Collection(['foo' => 1,'bar' => 2,'foobar' => 3]);
+        $this->assertEquals(
+            ['foo','bar','foobar'],
+            $collection->keys()
+        );
+    }
+
+    public function testValues(): void
     {
         $collection = new Collection([1 => 'foo',2 => 'bar',3 => 'foobar']);
         $this->assertEquals(
-            [0 => 'foo',1 => 'bar',2 => 'foobar'],
-            $collection->toList()
+            ['foo','bar','foobar'],
+            $collection->values()
         );
     }
 

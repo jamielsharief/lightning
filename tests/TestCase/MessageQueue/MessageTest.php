@@ -30,4 +30,12 @@ final class MessageTest extends TestCase
             (new Message('foo'))->getTimestamp()
         );
     }
+
+    public function testSerialization(): void
+    {
+        $message = new Message('foo');
+
+        $serialized = serialize($message);
+        $this->assertEquals(unserialize($serialized), $message);
+    }
 }

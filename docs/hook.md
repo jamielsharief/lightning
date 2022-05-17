@@ -4,15 +4,19 @@ Hooks package allows you to modify or extend the behavior of an object using the
 
 ## Usage
 
-Register a hook to a method or multiple methods, by default all hooks can cancel the behavior that is being hooked into. The triggerHook always returns true even if there are no hooks registered, it only returns false if the hook was stoppable and the method returned false.
+Register a hook to a method or multiple methods, by default all hooks can cancel the behavior that is being hooked into. 
+
+The `triggerHook` method always returns true even if there are no hooks registered, it only returns false if the hook was stoppable and the method returned `false`.
+
+
+
 
 ```php
-
-class MyObject implements HookInterface
+class MyObject
 {
     use HookTrait; 
 
-    public function __construct() 
+    public function __construct()
     {
         $this->registerHook('beforeFind','doSomething');
     }

@@ -17,41 +17,37 @@ use InvalidArgumentException;
 
 trait HookTrait
 {
-    protected $registeredHooks = [];
+    protected array $registeredHooks = [];
 
     /**
      * Registers a hook
-     *
-     * @param string $name
-     * @param string $method
-     * @return void
      */
-    public function registerHook(string $name, string $method): void
+    public function registerHook(string $name, string $method): static
     {
         if (! method_exists($this, $method)) {
             throw new InvalidArgumentException(sprintf('Hook method `%s` does not exist', $method)); // This is not fine
         }
 
+        if (! isset($this->registeredHooks[$name])) {
+            $this->registeredHooks[$name] = [];
+        }
+
         $this->registeredHooks[$name][] = $method;
+
+        return $this;
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $name
-     * @param array $arguments
-     * @param boolean $isStoppable
-     * @return boolean
+     * Trigger a hook and calls the register hooks method the first time, avoid having to use
+     * in the constructor method.
      */
     public function triggerHook(string $name, array $arguments = [], bool $isStoppable = true): bool
     {
         $hooks = $this->registeredHooks[$name] ?? [];
 
-        if ($hooks) {
-            foreach ($hooks as $method) {
-                if (call_user_func_array([$this,$method], $arguments) === false && $isStoppable) {
-                    return false;
-                }
+        foreach ($hooks as $method) {
+            if (call_user_func_array([$this,$method], $arguments) === false && $isStoppable) {
+                return false;
             }
         }
 

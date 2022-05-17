@@ -13,15 +13,10 @@
 
 namespace Lightning\Hook;
 
+/**
+ * An interface to help identify objects that are hook ready
+ */
 interface HookInterface
 {
-    /**
-     * Trigger hook
-     *
-     * @param string $name
-     * @param array $arguments
-     * @param boolean $isStoppable
-     * @return boolean
-     */
     public function triggerHook(string $name, array $arguments = [], bool $isStoppable = true): bool;
 }

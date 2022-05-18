@@ -127,10 +127,12 @@ $router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' =>
 
 When you create the `Router` object, if you supply a `EventDispatcher` object, the following events will be called
 
-- BeforeDispatch
-- AfterDispatch
+- `BeforeDispatch`
+- `BeforeFilter`
+- `AfterFilter`
+- `AfterDispatch`
 
-## PSR-11: Container
+## PSR-11: DI Container
 
 When creating the Router object add a `Container` object to use when creating the object from the matched route proxy.
 

@@ -68,7 +68,9 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
      DataSourceInterface::class => DatabaseDataSource::class,
      ResponseFactoryInterface::class => Psr17Factory::class,
      IdentityServiceInterface::class => function (ContainerInterface $container) {
-         return (new PdoIdentityService($container->get(PDO::class)))->setTable('identities')->setIdentifierName('username');
+         return (new PdoIdentityService($container->get(PDO::class)))
+             ->setTable('identities')
+             ->setIdentifierName('username');
      },
      SessionInterface::class => PhpSession::class
  ];

@@ -51,14 +51,12 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
     /**
      * Constructor
-     *
-     * @param ContainerInterface|null $container
-     * @param EventDispatcherInterface|null $eventDispatcher
-     * @param Autowire|null $autowire
-     * @param ResponseInterface|null $emptyResponse
      */
     public function __construct(
-        ?ContainerInterface $container = null, ?EventDispatcherInterface $eventDispatcher = null, ?Autowire $autowire = null, ?ResponseInterface $emptyResponse = null
+        ?ContainerInterface $container = null,
+        ?EventDispatcherInterface $eventDispatcher = null,
+        ?Autowire $autowire = null,
+        ?ResponseInterface $emptyResponse = null
         ) {
         $this->container = $container;
         $this->eventDispatcher = $eventDispatcher;
@@ -71,8 +69,6 @@ class Router implements RequestHandlerInterface, RoutesInterface
     * Create a group to organize your routes
     *
     * @param string $path e.g. /admin
-    * @param callable $callable
-    * @return RouteCollection
         */
     public function group(string $path, callable $callable): RouteCollection
     {
@@ -83,9 +79,6 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
     /**
      * Matches a Route
-     *
-     * @param ServerRequestInterface $request
-     * @return Route|null
      */
     public function match(ServerRequestInterface $request): ?Route
     {
@@ -123,9 +116,6 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
     /**
      * Dispatches a ServerRequest
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
@@ -145,7 +135,15 @@ class Router implements RequestHandlerInterface, RoutesInterface
             $request = $request->withAttribute($name, $value);
         }
 
-        $response = (new RequestHandler($this->createMiddlewareStack($route, $this->createCallable($route))))->handle($request);
+        if ($route) {
+            $callable = $route->getCallable();
+        } else {
+            $callable = function (ServerRequestInterface $request) {
+                throw new NotFoundException(sprintf('The requested URL %s was not found', $request->getRequestTarget()));
+            };
+        }
+
+        $response = (new RequestHandler($this->createMiddlewareStack($route, $callable)))->handle($request);
 
         if ($this->eventDispatcher) {
             $response = $this->eventDispatcher->dispatch(new AfterDispatchEvent($request, $response))->getResponse();
@@ -154,30 +152,16 @@ class Router implements RequestHandlerInterface, RoutesInterface
         return $response;
     }
 
-    private function createCallable(?Route $route): callable
-    {
-        if ($route) {
-            return $this->autowire ? $this->createAutowireCallable($route->getCallable()) : $route->getCallable();
-        }
-
-        return function (ServerRequestInterface $request) {
-            throw new NotFoundException(sprintf('The requested URL %s was not found', $request->getRequestTarget()));
-        };
-    }
-
     private function createMiddlewareStack(?Route $route, callable $callable): array
     {
         $middleware = $route ? $route->getMiddlewares() : $this->middlewares; # Important: to add Router main middlewares
-        array_push($middleware, new DispatcherMiddleware($callable, $this->emptyResponse));
+        array_push($middleware, new DispatcherMiddleware($callable, $this->emptyResponse, $this->eventDispatcher, $this->autowire));
 
         return $middleware;
     }
 
     /**
      * Calls dispatch part of the RequestHandlerInterface
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -185,45 +169,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
     }
 
     /**
-     * Creates a callable that can be autowired
-     *
-     * @param callable $callable
-     * @return mixed
-     */
-    private function createAutowireCallable(callable $callable): mixed
-    {
-        return function (ServerRequestInterface $request, ?ResponseInterface $response = null) use ($callable) {
-            $params = [ServerRequestInterface::class => $request];
-            if ($response) {
-                $params[ResponseInterface::class] = $response;
-            }
-
-            if (is_array($callable)) {
-                if ($callable[0] instanceof ControllerInterface && $result = $callable[0]->startup($request)) {
-                    return $result;
-                }
-
-                $response = $this->autowire->method($callable[0], $callable[1], $params);
-
-                if ($callable[0] instanceof ControllerInterface) {
-                    $response = $callable[0]->shutdown($request, $response);
-                }
-
-                return $response;
-            }
-
-            return $this->autowire->function($callable, $params);
-        };
-    }
-
-    /**
      * Creates the regular expression and add to routes
-     *
-     * @param string $method
-     * @param string $path
-     * @param callable|array|string $handler
-     * @param array $constraints
-     * @return Route
      */
     public function map(string $method, string $path, callable|array|string $handler, array $constraints = []): Route
     {
@@ -232,10 +178,6 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
     /**
      * Factory method
-     *
-     * @param string|null $prefix
-     * @param callable|null $callback
-     * @return RouteCollection
      */
     private function createRouteCollection(string $prefix = null, callable $callback = null): RouteCollection
     {

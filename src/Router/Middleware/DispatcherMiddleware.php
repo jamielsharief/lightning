@@ -13,44 +13,63 @@
 
 namespace Lightning\Router\Middleware;
 
+use Lightning\Autowire\Autowire;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Lightning\Router\Event\AfterFilterEvent;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Lightning\Router\Event\BeforeFilterEvent;
 use Lightning\Router\Exception\RouterException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class DispatcherMiddleware implements MiddlewareInterface
 {
     private $callable;
     private ?ResponseInterface $response;
+    private ?EventDispatcherInterface $eventDispatcher;
+    private ?Autowire $autowire;
 
     /**
      * Constructor
-     *
-     * @param callable $callable
-     * @param ResponseInterface|null $response
      */
-    public function __construct(callable $callable, ?ResponseInterface $response = null)
+    public function __construct(callable $callable, ?ResponseInterface $response = null, ?EventDispatcherInterface $eventDispatcher = null, ?Autowire $autowire = null)
     {
         $this->callable = $callable;
         $this->response = $response;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->autowire = $autowire;
     }
 
     /**
      * Processes the incoming request
-     *
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $callable = $this->callable;
-        $arguments = $this->response ? [$request, $this->response] : [$request];
+        $params = [ServerRequestInterface::class => $request,ResponseInterface::class => $this->response];
 
-        $response = $callable(...$arguments);
+        if ($this->eventDispatcher) {
+            $event = $this->eventDispatcher->dispatch(new BeforeFilterEvent($request));
+            if ($response = $event->getResponse()) {
+                return $response;
+            }
+
+            $request = $event->getRequest();
+        }
+
+        if ($this->autowire) {
+            $response = is_array($callable) ? $this->autowire->method($callable[0], $callable[1], $params) : $this->autowire->function($callable, $params);
+        } else {
+            $response = $callable($request, $this->response);
+        }
+
         if (! $response instanceof ResponseInterface) {
             throw new RouterException('No response was returned');
+        }
+
+        if ($this->eventDispatcher) {
+            $response = $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
         }
 
         return $response;

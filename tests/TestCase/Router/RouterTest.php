@@ -12,16 +12,17 @@ use Lightning\Autowire\Autowire;
 use Lightning\Router\RouteCollection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Lightning\Router\ControllerInterface;
+use Lightning\Router\Event\AfterFilterEvent;
 use Lightning\TestSuite\TestEventDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
+use Psr\Http\Server\RequestHandlerInterface;
+use Lightning\Router\Event\BeforeFilterEvent;
 use Lightning\Router\Event\AfterDispatchEvent;
 use Lightning\Router\Event\BeforeDispatchEvent;
 use Lightning\Router\Exception\RouterException;
 
-class DummyController implements ControllerInterface
+class DummyController
 {
     public function index()
     {
@@ -31,20 +32,6 @@ class DummyController implements ControllerInterface
     public function autowire(ServerRequestInterface $request, ResponseInterface $response, ApcuCache $class)
     {
         return new Response(200, [], 'ok');
-    }
-
-    public function startup(ServerRequestInterface $request): ?ResponseInterface
-    {
-        if ($request->getAttribute('requiresAuth')) {
-            return new Response(401, [], 'Unauthorized');
-        }
-
-        return null;
-    }
-
-    public function shutdown(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
-        return $response;
     }
 }
 
@@ -303,7 +290,9 @@ final class RouterTest extends TestCase
 
         $router->dispatch(new ServerRequest('GET', '/articles'));
 
-        $this->assertEquals([BeforeDispatchEvent::class, AfterDispatchEvent::class], $eventDispatcher->getDispatchedEvents());
+        $this->assertEquals([
+            BeforeDispatchEvent::class, BeforeFilterEvent::class,AfterFilterEvent::class, AfterDispatchEvent::class
+        ], $eventDispatcher->getDispatchedEvents());
     }
 
     public function testNoResponse(): void
@@ -337,20 +326,6 @@ final class RouterTest extends TestCase
 
         $response = $router->dispatch(new ServerRequest('GET', '/articles'));
         $this->assertInstanceOf(ResponseInterface::class, $response);
-    }
-
-    public function testStartupIsCalled(): void
-    {
-        $router = new Router(null, null, new Autowire());
-        $router->get('/articles', ['Lightning\Test\Router\DummyController','autowire']);
-
-        $request = new ServerRequest('GET', '/articles');
-        $request = $request->withAttribute('requiresAuth', true);
-
-        $response = $router->dispatch($request);
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-
-        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testBeforeDispatchResponseChanged(): void

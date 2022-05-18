@@ -1,13 +1,25 @@
 # Controller
 
-A PSR friendly `Controller` with `View`, with a couple of important methods `render`, `renderJson` ,`renderFile` and `redirect` to keep code dry when working with `ResponseInterface` with events.
+A PSR-7 `Controller` with `View`,and a couple of important methods `render`, `renderJson` ,`renderFile` and `redirect` to keep code dry when working with `ResponseInterface`.
 
-Also works with  PSR-14 event dispatcher and PSR-3 logger.
+Create your application controller with the factory method `createResponse`
 
 ```php
-use Lightning\Controller\AbstractController as BaseController;
+se Lightning\Controller\AbstractController as BaseController;
 
-class ArticlesController extends BaseController
+class AppController extends BaseController
+{
+    public function createResponse(): ResponseInterface
+    {
+        return new Response(); // A factory method 
+    }
+}
+```
+
+Now create your controllers
+
+```php
+class ArticlesController extends AppController
 {
     public function index(ServerRequest $request): ResponseInterface
     {
@@ -24,16 +36,16 @@ To a render a `View`
 
 ```php
 return $this->render('articles/index', [
-        'title' => 'foo',
-    ]);
+    'title' => 'foo',
+]);
 ```
 
 To render JSON
 
 ```php
 return $this->renderJson([
-        'title' => 'foo',
-    ]);
+    'title' => 'foo',
+]);
 ```
 
 ## Redirecting
@@ -54,72 +66,42 @@ return $this->renderFile('/var/www/downloads/2021.txt',['download' => 'false']);
 return $this->renderFile('/var/www/downloads/2021.pdf',['name' =>'important.pdf']); // To give the file a different name
 ```
 
-## Events
 
-When the `Controller` is created will run the `initialize` method so that you do not have to override the constructor.
+## Router & PSR-14 implementaion Example
 
-The following PSR events are triggered
+If you are using the lightning router, you can add hook the beforeFilter and afterFilter events.
 
-- AfterInitialize
-- BeforeFilter - Psr\EventDispatcher\StoppableEventInterface
-- BeforeRender - Psr\EventDispatcher\StoppableEventInterface
-- BeforeRedirect - Psr\EventDispatcher\StoppableEventInterface
-- AfterRender
-- AfterFilter
-
-> The `beforeFilter` and `afterFilter` events are dispatched when the controller `startup` and `shutdown` methods are called, which are called by the Lightning router, you can use a different router but you will need to call those methods to use this events and hooks.
-
-If you want to change a `Response` during an `Event` set the `Response` object in `Event`, stopping the event does not change the response nor does setting the `Response` in the `Controller`.
-
-
-## Hooks
-
-The `Controller` uses the `Hook` component, this allows you to hook into the controller and change its behavior.
-
-The following Hooks can be triggered
-
-- AfterInitialize
-- BeforeFilter - Stoppable
-- BeforeRender - Stoppable
-- BeforeRedirect - Stoppable
-- AfterRender
-- AfterFilter
-
-> The `beforeFilter` and `afterFilter` hooks are triggered when the controller `startup` and `shutdown` methods are called, which are called by the Lightning router, you can use a different router but you will need to call those methods to use this events and hooks.
-
-If you return `false` in the stoppable hooks, the `Controller` response will be returned, likewise if in those methods you change the `Controller` response to a redirect, this will stop the processing and return that response.
-
-
-In your `Controller` you can register the hook
 
 ```php
-protected function initialize() : void
+class AppController extends AbstractController implements EventSubscriberInterface
 {
-    $this->registerHook('beforeFilter','doSomething');
-}
+    protected ?string $layout = 'default';
 
-public function doSomething(ServerRequestInterface $request) : bool 
-{
-    // do something here
-    return true;
-}
-
-```
-
-You can also create reusuable behaviors using traits.
-
-```php
-trait DoSomething
-{
-    public function initializeDoSomethingTrait(): void 
+    public function getSubscribedEvents(): array
     {
-        $this->registerHook('beforeFilter','doSomething');
+        return [
+            BeforeFilterEvent::class => 'beforeFilter',
+            AfterFilterEvent::class => 'afterFilter'
+        ];
+    }
+    public function __construct(View $view, protected EventDispatcher $eventDispatcher)
+    {
+        $eventDispatcher->addSubscriber($this);
+
+        parent::__construct($view);
     }
 
-    public function doSomething(ServerRequestInterface $request) : bool 
+    public function beforeFilter(BeforeFilterEvent $event): void
     {
-        // do something here
-        return true;
+    }
+
+    public function afterFilter(AfterFilterEvent $event): void
+    {
+    }
+
+    public function createResponse(): ResponseInterface
+    {
+        return new Response();
     }
 }
 ```

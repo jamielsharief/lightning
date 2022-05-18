@@ -2,14 +2,19 @@
 
 namespace Lightning\Test\TestCase\Controller\TestApp;
 
-use Psr\Log\LogLevel;
+use Lightning\View\View;
+use Nyholm\Psr7\Response;
+use Lightning\Event\EventDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController as BaseController;
 
 class ArticlesController extends BaseController
 {
-    protected array $stopEvents = [];
-    protected bool $hookWasCalled = false;
+    public function __construct(View $view, ?EventDispatcher $eventDispatcher = null)
+    {
+        $this->view = $view;
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     public function addListener(string $event, callable $callable): self
     {
@@ -20,8 +25,6 @@ class ArticlesController extends BaseController
 
     public function index(): ResponseInterface
     {
-        $this->log(LogLevel::DEBUG, __method__, ['action' => 'index']);
-
         return $this->render('articles/index', [
             'title' => 'Articles'
         ]);
@@ -29,8 +32,6 @@ class ArticlesController extends BaseController
 
     public function status($payload, int $statusCode = 200): ResponseInterface
     {
-        $this->log(LogLevel::DEBUG, __method__, $payload);
-
         return $this->renderJson($payload, $statusCode);
     }
 
@@ -44,23 +45,8 @@ class ArticlesController extends BaseController
         return $this->renderFile($path, $options);
     }
 
-    /**
-     * Register this as a method to test stop
-     *
-     * @return boolean
-     */
-    protected function stopHook(): bool
+    public function createResponse(): ResponseInterface
     {
-        return false;
-    }
-
-    protected function logHook(): bool
-    {
-        return $this->hookWasCalled = true;
-    }
-
-    public function hookWasCalled(): bool
-    {
-        return $this->hookWasCalled;
+        return new Response();
     }
 }

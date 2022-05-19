@@ -45,7 +45,6 @@ abstract class AbstractController
         $this->logger = $logger;
 
         $this->initialize();
-
         $this->dispatchEvent(new InitializeEvent($this));
     }
 

@@ -29,9 +29,7 @@ use Lightning\DataMapper\Event\AfterUpdateEvent;
 use Lightning\DataMapper\Event\BeforeCreateEvent;
 use Lightning\DataMapper\Event\BeforeDeleteEvent;
 use Lightning\DataMapper\Event\BeforeUpdateEvent;
-use Lightning\Entity\Callback\AfterLoadInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Lightning\Entity\Callback\AfterDeleteInterface;
 use Lightning\DataMapper\Exception\EntityNotFoundException;
 
 abstract class AbstractDataMapper
@@ -328,10 +326,6 @@ abstract class AbstractDataMapper
                 $entity = $this->mapDataToEntity($row->toArray());
                 $entity->markPersisted(true);
                 $collection[$index] = $entity;
-
-                if ($entity instanceof AfterLoadInterface) {
-                    $entity->afterLoad();
-                }
             }
         }
 
@@ -425,9 +419,6 @@ abstract class AbstractDataMapper
         $result = $this->dataSource->delete($this->table, $query) === 1;
 
         if ($result) {
-            if ($entity instanceof AfterDeleteInterface) {
-                $entity->afterDelete();
-            }
             $this->dispatchEvent(new AfterDeleteEvent($this, $entity));
         }
 

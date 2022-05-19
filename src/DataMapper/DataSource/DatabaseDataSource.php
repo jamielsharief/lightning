@@ -35,11 +35,8 @@ class DatabaseDataSource implements DataSourceInterface
     protected $id = null;
 
     /**
-       * Constructor
-       *
-       * @param PDO $pdo
-       * @param QueryBuilder $builder
-       */
+     * Constructor
+    */
     public function __construct(PDO $pdo, QueryBuilder $builder)
     {
         $this->pdo = $pdo;
@@ -47,8 +44,6 @@ class DatabaseDataSource implements DataSourceInterface
     }
 
     /**
-     *
-     *
      * @return string|int|null
      */
     public function getGeneratedId()
@@ -58,10 +53,6 @@ class DatabaseDataSource implements DataSourceInterface
 
     /**
      * Creates a record in the database
-     *
-     * @param string $table
-     * @param array $data
-     * @return boolean
      */
     public function create(string $table, array $data): bool
     {
@@ -101,11 +92,6 @@ class DatabaseDataSource implements DataSourceInterface
 
     /**
      * Updates records in the datasource
-     *
-     * @param string $table
-     * @param QueryObject $query
-     * @param array $data
-     * @return integer
      */
     public function update(string $table, QueryObject $query, array $data): int
     {
@@ -122,10 +108,6 @@ class DatabaseDataSource implements DataSourceInterface
 
     /**
      * Deletes records from the Datasource
-     *
-     * @param string $table
-     * @param QueryObject $query
-     * @return integer
      */
     public function delete(string $table, QueryObject $query): int
     {
@@ -163,14 +145,8 @@ class DatabaseDataSource implements DataSourceInterface
     }
 
     /**
-    * Execute raw queries on the data source
-    *
-    * @internal this should be public
-    *
-    * @param string $sql
-    * @param array $params
-    * @return PDOStatement
-    */
+     * Execute raw queries on the data source
+     */
     public function execute(string $sql, array $params = []): PDOStatement
     {
         $statement = $this->pdo->prepare($sql);

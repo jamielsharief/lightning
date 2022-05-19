@@ -2,14 +2,25 @@
 
 namespace Lightning\Test\Controller;
 
-use Lightning\View\View;
+use Psr\Log\LogLevel;
 
+use Lightning\View\View;
+use Lightning\Logger\Logger;
 use InvalidArgumentException;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 
 use Lightning\View\ViewCompiler;
+use Lightning\TestSuite\TestLogger;
+use Lightning\Event\EventDispatcher;
+use Lightning\TestSuite\TestEventDispatcher;
+use Lightning\Controller\Event\InitializeEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
+
+class TestEvent
+{
+}
 
 final class AbstractControllerTest extends TestCase
 {
@@ -28,6 +39,97 @@ final class AbstractControllerTest extends TestCase
         $request = new ServerRequest('GET', '/');
         $controller->setRequest($request);
         $this->assertEquals($request, $controller->getRequest());
+    }
+
+    public function testSetEventDispatcher(): void
+    {
+        $this->assertInstanceOf(
+            ArticlesController::class, $this->createController()->setEventDispatcher(new EventDispatcher())
+        );
+
+        $this->assertInstanceOf(
+            ArticlesController::class, $this->createController()->setEventDispatcher(null)
+        );
+    }
+
+    public function testGetEventDispatcher(): void
+    {
+        $controller = $this->createController();
+        $eventDispatcher = new EventDispatcher();
+
+        $this->assertNull($controller->getEventDispatcher());
+
+        $controller->setEventDispatcher($eventDispatcher);
+
+        $this->assertEquals(
+            $eventDispatcher, $controller->getEventDispatcher()
+        );
+    }
+
+    public function testDispatch(): void
+    {
+        $controller = $this->createController();
+        $eventDispatcher = new TestEventDispatcher();
+
+        $controller->setEventDispatcher(null);
+        $event = new TestEvent();
+
+        $this->assertNull($controller->dispatch($event));
+        $this->assertFalse($eventDispatcher->hasDispatchedEvent(TestEvent::class));
+
+        $controller->setEventDispatcher($eventDispatcher);
+        $this->assertEquals($event, $controller->dispatch($event));
+
+        $this->assertTrue($eventDispatcher->hasDispatchedEvent(TestEvent::class));
+    }
+
+    public function testDispatchInitialize(): void
+    {
+        $request = new ServerRequest('GET', '/articles/index');
+        $eventDispatcher = new TestEventDispatcher();
+
+        $controller = $this->createController($eventDispatcher);
+
+        $this->assertTrue($eventDispatcher->hasDispatchedEvent(InitializeEvent::class));
+    }
+
+    public function testSetLogger(): void
+    {
+        $this->assertInstanceOf(
+            ArticlesController::class, $this->createController()->setLogger(new Logger())
+        );
+        $this->assertInstanceOf(
+            ArticlesController::class, $this->createController()->setLogger(null)
+        );
+    }
+
+    public function testGetLogger(): void
+    {
+        $controller = $this->createController();
+        $logger = new Logger();
+
+        $this->assertNull($controller->getLogger());
+
+        $controller->setLogger($logger);
+
+        $this->assertEquals(
+            $logger, $controller->getLogger()
+        );
+    }
+
+    public function testLog(): void
+    {
+        $controller = $this->createController();
+        $logger = new TestLogger();
+
+        $controller->setLogger(null);
+        $controller->log(LogLevel::DEBUG, 'this is a test');
+        $this->assertFalse($logger->hasMessage('this is a test', LogLevel::DEBUG));
+
+        $controller->setLogger($logger);
+        $controller->log(LogLevel::DEBUG, 'this is a test');
+
+        $this->assertTrue($logger->hasMessage('this is a test', LogLevel::DEBUG));
     }
 
     public function testRender(): void
@@ -123,12 +225,13 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    private function createController(): ArticlesController
+    private function createController(?EventDispatcherInterface $eventDispatcher = null): ArticlesController
     {
         $path = __DIR__ .'/TestApp/templates';
 
         return new ArticlesController(
-            new View(new ViewCompiler($path, sys_get_temp_dir()), $path)
+            new View(new ViewCompiler($path, sys_get_temp_dir()), $path),
+            $eventDispatcher
         );
     }
 }

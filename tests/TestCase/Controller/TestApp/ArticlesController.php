@@ -2,20 +2,12 @@
 
 namespace Lightning\Test\TestCase\Controller\TestApp;
 
-use Lightning\View\View;
 use Nyholm\Psr7\Response;
-use Lightning\Event\EventDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController as BaseController;
 
 class ArticlesController extends BaseController
 {
-    public function __construct(View $view, ?EventDispatcher $eventDispatcher = null)
-    {
-        $this->view = $view;
-        $this->eventDispatcher = $eventDispatcher;
-    }
-
     public function addListener(string $event, callable $callable): self
     {
         $this->eventCallables[$event] = $callable;
@@ -45,7 +37,7 @@ class ArticlesController extends BaseController
         return $this->renderFile($path, $options);
     }
 
-    public function createResponse(): ResponseInterface
+    protected function createResponse(): ResponseInterface
     {
         return new Response();
     }

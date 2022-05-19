@@ -9,7 +9,7 @@ se Lightning\Controller\AbstractController as BaseController;
 
 class AppController extends BaseController
 {
-    public function createResponse(): ResponseInterface
+    protected function createResponse(): ResponseInterface
     {
         return new Response(); // A factory method 
     }
@@ -66,42 +66,28 @@ return $this->renderFile('/var/www/downloads/2021.txt',['download' => 'false']);
 return $this->renderFile('/var/www/downloads/2021.pdf',['name' =>'important.pdf']); // To give the file a different name
 ```
 
+## PSR 3 Logger
 
-## Router & PSR-14 implementaion Example
 
-If you are using the lightning router, you can add hook the beforeFilter and afterFilter events.
+If you provide a PSR-3 `Logger` to the constructor or configure this in your DI container or use the `setLogger` method, then when you call the `log` method you can log to that logger instance.
+
+```php
+public function index()
+{
+    $this->log(LogLevel::DEBUG,'This is a test');
+}
+```
+
+## PSR 14 Event Dispatcher
+
+If you provide a PSR-14 `EventDispatcher` to the constructor or configure this in your DI container or use the `setEventDispatcher` method, then when you call the `dispatch` method you can dispatch events easily from the controller.
 
 
 ```php
-class AppController extends AbstractController implements EventSubscriberInterface
+public function thanks(ServerRequestInterface $request)
 {
-    protected ?string $layout = 'default';
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            BeforeFilterEvent::class => 'beforeFilter',
-            AfterFilterEvent::class => 'afterFilter'
-        ];
-    }
-    public function __construct(View $view, protected EventDispatcher $eventDispatcher)
-    {
-        $eventDispatcher->addSubscriber($this);
-
-        parent::__construct($view);
-    }
-
-    public function beforeFilter(BeforeFilterEvent $event): void
-    {
-    }
-
-    public function afterFilter(AfterFilterEvent $event): void
-    {
-    }
-
-    public function createResponse(): ResponseInterface
-    {
-        return new Response();
-    }
+    $this->dispatch(new OrderCompletedEvent($request));
 }
 ```
+
+If the PSR 14 Event Dispatcher is provided, then when the `controller` is created it will dispatch the `InitializeEvent`.

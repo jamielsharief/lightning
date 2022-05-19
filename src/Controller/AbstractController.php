@@ -14,15 +14,19 @@
 namespace Lightning\Controller;
 
 use Lightning\View\View;
-
+use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Lightning\Controller\Event\InitializeEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 abstract class AbstractController
 {
     protected View $view;
-    protected ServerRequestInterface $request;
+    protected ?EventDispatcherInterface $eventDispatcher;
+    protected ?LoggerInterface $logger;
+    protected ?ServerRequestInterface $request;
 
     protected ?string $layout = null;
 
@@ -34,11 +38,15 @@ abstract class AbstractController
     /**
      * Constructor
      */
-    public function __construct(View $view)
+    public function __construct(View $view, ?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->view = $view;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
 
         $this->initialize();
+
+        $this->dispatch(new InitializeEvent($this));
     }
 
     /**
@@ -151,5 +159,62 @@ abstract class AbstractController
         return $this->request;
     }
 
-    abstract public function createResponse(): ResponseInterface;
+    /**
+     * Factory method
+     */
+    abstract protected function createResponse(): ResponseInterface;
+
+    /**
+     * Get the value of eventDispatcher
+     */
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * Set the value of eventDispatcher
+     */
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): static
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
+    /**
+     * Dispatches an Event if the EventDispatcher is available
+     */
+    public function dispatch(object $event): ?object
+    {
+        return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
+    }
+
+    /**
+     * Get the value of logger
+     */
+    public function getLogger(): ?LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
+     * Set the value of logger
+     */
+    public function setLogger(?LoggerInterface $logger): static
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * Logs with an arbitrary level if the Logger is available
+     */
+    public function log(string $level, string $message, array $context = []): void
+    {
+        if ($this->logger) {
+            $this->logger->log($level, $message, $context);
+        }
+    }
 }

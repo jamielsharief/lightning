@@ -46,7 +46,7 @@ abstract class AbstractController
 
         $this->initialize();
 
-        $this->dispatch(new InitializeEvent($this));
+        $this->dispatchEvent(new InitializeEvent($this));
     }
 
     /**
@@ -185,7 +185,7 @@ abstract class AbstractController
     /**
      * Dispatches an Event if the EventDispatcher is available
      */
-    public function dispatch(object $event): ?object
+    public function dispatchEvent(object $event): ?object
     {
         return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
     }

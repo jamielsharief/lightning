@@ -74,11 +74,11 @@ final class AbstractControllerTest extends TestCase
         $controller->setEventDispatcher(null);
         $event = new TestEvent();
 
-        $this->assertNull($controller->dispatch($event));
+        $this->assertNull($controller->dispatchEvent($event));
         $this->assertFalse($eventDispatcher->hasDispatchedEvent(TestEvent::class));
 
         $controller->setEventDispatcher($eventDispatcher);
-        $this->assertEquals($event, $controller->dispatch($event));
+        $this->assertEquals($event, $controller->dispatchEvent($event));
 
         $this->assertTrue($eventDispatcher->hasDispatchedEvent(TestEvent::class));
     }

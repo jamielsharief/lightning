@@ -13,22 +13,16 @@
 
 namespace Lightning\DataMapper\Event;
 
-use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\AbstractDataMapper;
 
-abstract class AbstractAfterWriteEvent
+class InitializeEvent
 {
-    protected AbstractDataMapper $dataMapper;
-    protected EntityInterface $entity;
-
-    public function __construct(AbstractDataMapper $dataMapper, EntityInterface $entity)
+    public function __construct(protected AbstractDataMapper $dataMapper)
     {
-        $this->dataMapper = $dataMapper;
-        $this->entity = $entity;
     }
 
     /**
-     * Gets the DataMapper
+     * Get the value of dataMapper
      */
     public function getDataMapper(): AbstractDataMapper
     {
@@ -36,10 +30,12 @@ abstract class AbstractAfterWriteEvent
     }
 
     /**
-     * Gets the Entity for this Event
+     * Set the value of dataMapper
      */
-    public function getEntity(): EntityInterface
+    public function setDataMapper(AbstractDataMapper $dataMapper): static
     {
-        return $this->entity;
+        $this->dataMapper = $dataMapper;
+
+        return $this;
     }
 }

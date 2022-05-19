@@ -32,8 +32,6 @@ abstract class AbstractBeforeWriteEvent implements StoppableEventInterface
 
     /**
      * Gets the DataMapper
-     *
-     * @return  AbstractDataMapper
      */
     public function getDataMapper(): AbstractDataMapper
     {
@@ -42,8 +40,6 @@ abstract class AbstractBeforeWriteEvent implements StoppableEventInterface
 
     /**
      * Gets the Entity for this Event
-     *
-     * @return EntityInterface
      */
     public function getEntity(): EntityInterface
     {

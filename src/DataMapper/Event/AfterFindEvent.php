@@ -35,8 +35,6 @@ class AfterFindEvent
 
     /**
      * Gets the DataMapper
-     *
-     * @return AbstractDataMapper
      */
     public function getDataMapper(): AbstractDataMapper
     {
@@ -45,8 +43,6 @@ class AfterFindEvent
 
     /**
      * Gets the Query Object
-     *
-     * @return QueryObject
      */
     public function getQuery(): QueryObject
     {
@@ -54,9 +50,6 @@ class AfterFindEvent
     }
 
     /**
-     * Get the Collection from the find query
-     *
-     * @return Collection
      */
     public function getCollection(): Collection
     {

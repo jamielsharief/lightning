@@ -86,7 +86,7 @@ If you provide a PSR-14 `EventDispatcher` to the constructor or configure this i
 ```php
 public function thanks(ServerRequestInterface $request)
 {
-    $this->dispatch(new OrderCompletedEvent($request));
+    $this->dispatchEvent(new OrderCompletedEvent($request));
 }
 ```
 

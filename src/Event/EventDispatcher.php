@@ -26,11 +26,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     /**
      * Adds a Listener
-     *
-     * @param string $eventType
-     * @param callable $callable
-     * @param integer $priority
-     * @return static
      */
     public function addListener(string $eventType, callable $callable, int $priority = self::DEFAULT_PRIORITY): static
     {
@@ -42,9 +37,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     /**
      * Adds a subscriber
-     *
-     * @param EventSubscriberInterface $subscriber
-     * @return static
      */
     public function addSubscriber(EventSubscriberInterface $subscriber): static
     {
@@ -58,10 +50,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string|array $method
-     * @return array
+     * Standardize the array
      */
     private function normalizeEvents($method): array
     {
@@ -82,10 +71,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
         return $methods;
     }
 
-    /**
-     * @param object $event
-     * @return iterable
-     */
     public function getListenersForEvent(object $event): iterable
     {
         $eventType = $event instanceof Event ? $event->getName() : $event::class;
@@ -104,10 +89,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     /**
      * Removes a listener
-     *
-     * @param string $eventType
-     * @param callable $callable e.g. [$this,'method']
-     * @return static
      */
     public function removeListener(string $eventType, callable $callable): static
     {
@@ -124,9 +105,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     /**
      * Removes a subscriber
-     *
-     * @param EventSubscriberInterface $subscriber
-     * @return static
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber): static
     {
@@ -141,9 +119,6 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     /**
      * Dispatches an event
-     *
-     * @param object $event
-     * @return object
      */
     public function dispatch(object $event): object
     {

@@ -298,7 +298,7 @@ abstract class AbstractDataMapper
     /**
      * Factory method
      */
-    protected function createCollection(array $items = []): Collection
+    public function createCollection(array $items = []): Collection
     {
         return new Collection($items);
     }

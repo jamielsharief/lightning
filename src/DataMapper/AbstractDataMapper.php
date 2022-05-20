@@ -15,6 +15,7 @@ namespace Lightning\DataMapper;
 
 use ReflectionProperty;
 use BadMethodCallException;
+use Lightning\Database\Row;
 use InvalidArgumentException;
 use Lightning\Utility\Collection;
 use Lightning\Entity\EntityInterface;
@@ -217,28 +218,31 @@ abstract class AbstractDataMapper
     {
         $result = [];
 
-        foreach ($collection as $row) {
+        // grouped list
+        if ($groupField && $valueField && $keyField) {
+            $result = $collection->reduce(function (array $entitites, Row $row) use ($keyField, $valueField, $groupField) {
+                $entitites[$row[$groupField] ?? null][$row[$keyField] ?? null] = $row[$valueField] ?? null;
 
-            // Create list
-            $key = $row[$keyField] ?? null;
+                return $entitites;
+            }, []);
+        }
 
-            if (! $valueField) {
-                $result[] = $key;
+        // key value list
+        elseif ($valueField && $keyField) {
+            $result = $collection->reduce(function (array $entitites, Row $row) use ($keyField, $valueField) {
+                $entitites[$row[$keyField] ?? null] = $row[$valueField] ?? null;
 
-                continue;
-            }
+                return $entitites;
+            }, []);
+        }
 
-            if ($groupField) {
-                $group = $row[$groupField] ?? null;
-                if (! isset($result[$group])) {
-                    $result[$group] = [];
-                }
-                $result[$group][$key] = $row[$valueField] ?? null;
+        // value list
+        elseif ($keyField) {
+            $result = $collection->reduce(function (array $entitites, Row $row) use ($keyField) {
+                $entitites[] = $row[$keyField] ?? null;
 
-                continue;
-            }
-
-            $result[$key] = $row[$valueField] ?? null;
+                return $entitites;
+            }, []);
         }
 
         return $result;

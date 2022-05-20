@@ -422,8 +422,21 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testSaveManyFail(): void
     {
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
+
+        $article = ArticleEntity::fromState([
+            'id' => 1234,
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+        $article->markPersisted(true);
+        $this->assertFalse($mapper->save($article));
+
         $mapper = new Article($this->storage);
-        $entities = $mapper->findAll();
+        $entities = $mapper->createCollection([$article]);
         $this->assertFalse($mapper->saveMany($entities));
     }
 

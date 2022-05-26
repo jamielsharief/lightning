@@ -308,9 +308,9 @@ class ValidationSet
     /**
      * Enables the stop on failure mechansim
      */
-    public function stopOnFailure(): static
+    public function stopIfFailure(): static
     {
-        return $this->add('stopOnFailure');
+        return $this->add('stopIfFailure');
     }
 
     /**

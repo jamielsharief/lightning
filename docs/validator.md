@@ -98,7 +98,7 @@ $validator->validate($_POST);
 Special rules
 
 - `optional` If data is empty validation rules are skipped for that field/property.
-- `stopOnFailure` Validators that fail after this point in the set will stop further validations
+- `stopIfFailure` If there are any validation errors for this field/property, then stop, do not run anymore validation rules. For example, if you are validating DNS records for a domain, but its an invalid domain, then there is no point checking the DNS records.
 
 ## Errors Object
 

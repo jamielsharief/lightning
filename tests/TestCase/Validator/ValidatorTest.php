@@ -296,7 +296,7 @@ final class ValidatorTest extends TestCase
 
         $validator->createRuleFor('email')
             ->notBlank()
-            ->stopOnFailure()
+            ->stopIfFailure()
             ->email()
             ->lengthBetween(5, 255);
 

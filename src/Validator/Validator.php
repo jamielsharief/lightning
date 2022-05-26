@@ -84,7 +84,7 @@ class Validator
         }
 
         foreach ($this->validate as $field => $validationSet) {
-            $stopOnFailure = false;
+            $stopIfFailure = false;
 
             $value = $data[$field] ?? null;
 
@@ -97,8 +97,8 @@ class Validator
                     continue;
                 }
 
-                if ($validationRule['rule'] === 'stopOnFailure') {
-                    $stopOnFailure = true;
+                if ($validationRule['rule'] === 'stopIfFailure') {
+                    $stopIfFailure = true;
 
                     continue;
                 }
@@ -111,7 +111,7 @@ class Validator
 
                 if (! call_user_func_array([$object,$validationRule['rule']], [$value,  ...$validationRule['args']])) {
                     $this->errors->setError($field, $validationRule['message']);
-                    if ($stopOnFailure) {
+                    if ($stopIfFailure) {
                         break;
                     }
                 }

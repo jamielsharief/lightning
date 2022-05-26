@@ -16,6 +16,8 @@ namespace Lightning\Validator;
 class ValidationSet
 {
     protected array $validationRules = [];
+    protected bool $stopOnFailure = false;
+    protected bool $optional = false;
 
     /**
      * Value must must only contain alphabetic characters
@@ -266,14 +268,6 @@ class ValidationSet
     }
 
     /**
-     * The value is optional, and no further validation takes place if the value is empty
-     */
-    public function optional(): static
-    {
-        return $this->add('optional', [], '');
-    }
-
-    /**
      * Value must be equal to
      */
     public function equalTo(mixed $what, string $message = 'invalid value'): static
@@ -306,7 +300,43 @@ class ValidationSet
     }
 
     /**
+     * The value is optional, and no further validation takes place if the value is empty
+     */
+    public function optional(): static
+    {
+        $this->optional = true;
+
+        return $this;
+    }
+
+    /**
+     * Validation rule is only run if there is data
+     */
+    public function isOptional(): bool
+    {
+        return $this->optional;
+    }
+
+    /**
      * Enables the stop on failure mechansim
+     */
+    public function stopOnFailure(): static
+    {
+        $this->stopOnFailure = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks if this validation rule stops on an error.
+     */
+    public function isStoppable(): bool
+    {
+        return $this->stopOnFailure;
+    }
+
+    /**
+     * Stops if there has been validation error so far
      */
     public function stopIfFailure(): static
     {

@@ -255,7 +255,7 @@ final class ValidatorTest extends TestCase
             'password' => '12345678!'
         ]);
 
-        $this->assertTrue($validator->validate($entity));;
+        //$this->assertTrue($validator->validate($entity));
         $this->assertFalse($validator->validate($entity->setId(1)));
     }
 
@@ -296,8 +296,26 @@ final class ValidatorTest extends TestCase
 
         $validator->createRuleFor('email')
             ->notBlank()
-            ->stopIfFailure()
+            ->stopOnFailure()
             ->email()
+            ->lengthBetween(5, 255);
+
+        $this->assertTrue($validator->validate([
+            'email' => 'foo@example.com',
+        ]));
+
+        $this->assertFalse($validator->validate([]));
+        $this->assertCount(1, $validator->getErrors()); // NotBlank and Email error, lengthBetween should not be run
+    }
+
+    public function testStopIfFailure(): void
+    {
+        $validator = new Validator();
+
+        $validator->createRuleFor('email')
+            ->notBlank()
+            ->email()
+            ->stopIfFailure()
             ->lengthBetween(5, 255);
 
         $this->assertTrue($validator->validate([

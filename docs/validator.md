@@ -50,7 +50,6 @@ $validator->validate(new UserEntity());
 $validator->validate($serverRequest);
 ```
 
-
 You can also just use the `Validator` as a generic validator.
 
 ```php
@@ -98,7 +97,9 @@ $validator->validate($_POST);
 Special rules
 
 - `optional` If data is empty validation rules are skipped for that field/property.
-- `stopIfFailure` If there are any validation errors for this field/property, then stop, do not run anymore validation rules. For example, if you are validating DNS records for a domain, but its an invalid domain, then there is no point checking the DNS records.
+- `stopOnFailure` - Any validation rule will immediately stop running any subsequent rules, calling this will ensure that only one error is every returned.
+- `stopIfFailure` - If there are any validation errors for this field/property, then stop, do not run anymore validation rules. For example, if you are validating DNS records for a domain, but its an invalid domain, then there is no point checking the DNS records.
+
 
 ## Errors Object
 

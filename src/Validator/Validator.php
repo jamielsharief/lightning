@@ -84,34 +84,31 @@ class Validator
         }
 
         foreach ($this->validate as $field => $validationSet) {
-            $stopIfFailure = false;
-
             $value = $data[$field] ?? null;
 
-            foreach ($validationSet->toArray() as $validationRule) {
-                if ($validationRule['rule'] === 'optional') {
-                    if ($this->validation->empty($value)) {
+            if ($validationSet->isOptional() && $this->validation->empty($value)) {
+                continue;
+            }
+
+            foreach ($validationSet->toArray() as $validation) {
+                $object = $this->validation;
+
+                if ($validation['rule'] === 'stopIfFailure') {
+                    if ($this->errors->hasErrors()) {
                         break;
                     }
 
                     continue;
                 }
 
-                if ($validationRule['rule'] === 'stopIfFailure') {
-                    $stopIfFailure = true;
-
-                    continue;
-                }
-
-                $object = $this->validation;
-                if (method_exists($this, $validationRule['rule'])) {
+                if (method_exists($this, $validation['rule'])) {
                     $object = $this;
-                    array_push($validationRule['args'], $data); // add data to method
+                    array_push($validation['args'], $data); // add data to method
                 }
 
-                if (! call_user_func_array([$object,$validationRule['rule']], [$value,  ...$validationRule['args']])) {
-                    $this->errors->setError($field, $validationRule['message']);
-                    if ($stopIfFailure) {
+                if (! call_user_func_array([$object,$validation['rule']], [$value,  ...$validation['args']])) {
+                    $this->errors->setError($field, $validation['message']);
+                    if ($validationSet->isStoppable()) {
                         break;
                     }
                 }

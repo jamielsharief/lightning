@@ -519,17 +519,8 @@ class ValidationSetTest extends TestCase
     public function testOptional(): Void
     {
         $validationSet = new ValidationSet();
-        $this->assertInstanceOf(ValidationSet::class, $validationSet->optional());
-
-        $expected = [
-            [
-                'rule' => 'optional',
-                'args' => [],
-                'message' => '',
-            ]
-        ];
-
-        $this->assertEquals($expected, $validationSet->toArray());
+        $this->assertFalse($validationSet->isOptional());
+        $this->assertTrue($validationSet->optional()->isOptional());
     }
 
     public function testMethod(): Void

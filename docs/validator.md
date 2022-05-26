@@ -26,16 +26,20 @@ class UserValidator extends Validator
 
     public function confirm(mixed $password, array $data) : bool 
     {
-        return is_string($password) && $password === $data['password_confirm'];
+        return is_string($password) && isset($data['password_confirm']) && $password === $data['password_confirm'];
     }
 }
+```
+
+Create the validator object
+
+```php
+$validator  = new UserValidator();
 ```
 
 To validate a an array of data
 
 ```php
-$validator  = new UserValidator();
-
 // validate an array
 $result = $validator->validate($_POST);
 
@@ -50,7 +54,6 @@ $validator->validate($serverRequest);
 You can also just use the `Validator` as a generic validator.
 
 ```php
-
 $validator = new Validator();
 $validator->createRuleFor('email')
     ->notBlank()
@@ -60,7 +63,7 @@ $validator->validate($_POST);
 ```
 
 
-## Validators
+## Validation rules
 
 - alpha
 - alphaNumeric
@@ -94,8 +97,8 @@ $validator->validate($_POST);
 
 Special rules
 
-- optional If data is empty, validation does not take place
-- stopOnFailure Validators that fail after this point in the set will stop further validations
+- `optional` If data is empty validation rules are skipped for that field/property.
+- `stopOnFailure` Validators that fail after this point in the set will stop further validations
 
 ## Errors Object
 

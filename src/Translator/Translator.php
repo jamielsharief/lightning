@@ -27,11 +27,7 @@ class Translator implements TranslatorInterface
     private array $messages = [];
 
     /**
-     * Undocumented function
-     *
-     * @param MessageLoaderInterface $loader
-     * @param string $locale
-     * @param string $domain
+     * Constrcutor
      */
     public function __construct(
         MessageLoaderInterface $loader, string $locale, string $domain = 'default'
@@ -48,8 +44,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Gets the message loader used by the translator
-     *
-     * @return MessageLoaderInterface
      */
     public function getMessageLoader(): MessageLoaderInterface
     {
@@ -60,7 +54,6 @@ class Translator implements TranslatorInterface
      * Sets the Message Loader
      *
      * @param MessageLoaderInterface $loader
-     * @return static
      */
     public function setMessageLoader(MessageLoaderInterface $loader): static
     {
@@ -73,9 +66,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Sets the Locale
-     *
-     * @param string $locale
-     * @return static
      */
     public function setLocale(string $locale): static
     {
@@ -87,8 +77,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Gets the locale
-     *
-     * @return string
      */
     public function getLocale(): string
     {
@@ -97,9 +85,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Sets the Locale
-     *
-     * @param string $locale
-     * @return static
      */
     public function setDefaultLocale(string $locale): static
     {
@@ -110,8 +95,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Gets the locale
-     *
-     * @return string
      */
     public function getDefaultLocale(): string
     {
@@ -120,9 +103,6 @@ class Translator implements TranslatorInterface
 
     /**
      * Set Domain
-     *
-     * @param string $domain
-     * @return static
      */
     public function setDomain(string $domain): static
     {
@@ -143,31 +123,23 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Load the messages first nl_BE, nl, then en_US (default locale).
-     *
-     * @return void
+     * Load messages using inheritance.
      */
     private function loadMessages(): void
     {
-        $this->messages = [];
+        $this->messages = $this->loader->load($this->domain, $this->defaultLocale);
 
-        foreach ([$this->locale, Locale::getPrimaryLanguage($this->locale),$this->defaultLocale] as $locale) {
+        foreach ([Locale::getPrimaryLanguage($this->locale),$this->locale] as $locale) {
             try {
-                $this->messages = $this->loader->load($this->domain, $locale);
-
-                break;
+                $this->messages = array_merge($this->messages, $this->loader->load($this->domain, $locale));
             } catch (MessageFileNotFound $exception) {
-                // TODO: logging
             }
         }
     }
 
     /**
      * Translates a message
-     *
-     * @param string|null $message
      * @param array $values Values to be interpolated, the `count` value is reserved for simple pluralization engine
-     * @return string
      */
 
     public function translate(?string $message, array $values = []): string

@@ -44,15 +44,15 @@ $locale->getDisplayName('es_ES'); // español (España)
 
 ## Resource Bundle
 
-The `ResourceBundle` handles the loading and retriving the key values from a `php` (default) or `json` file.
+The `ResourceBundle` handles the loading and retriving the key/value dictonary.
 
-To create the `ResourceBundle`
+To create the `ResourceBundle` call the factory method `create`.
 
 ```php
-$bundle = new ResourceBundle('/var/www/resources', new Locale('en_GB'), 'messages'); // /var/www/resources/messages.en_GB.php
+$bundle = ResourceBundle::create(new Locale('en_US'), __DIR__ . '/resources/app'); // /var/www/resources/app/en_GB.php
 ```
 
-Then create the file e.g. `/var/www/resources/messages.en_GB.php`
+Then create the file e.g. `/var/www/resources/app/en_GB.php`
 
 ```php
 <?php
@@ -61,19 +61,22 @@ return [
 ];
 ```
 
-If you prefer to work a different file format then you can create your own custom `ResourceBundle` and overwrite the `loadContents` method, for example:
+If you prefer to work a different file format then you can create your own custom `ResourceBundle` and overwrite the factory method `create`, for example if you wanted to work with `json` files instead.
 
 ```php
 class JsonResourceBundle extends ResourceBundle
 {
-    protected function loadContents(): array
+    public static function create(Locale $locale, string $bundle): static
     {
-        $path = $this->getResourceBundlePath('json'); // e.g /var/www/resources/messages.en_GB.json
+        $path = sprintf('%s/%s.json', $bundle, $locale->toString());
         if (! file_exists($path)) {
             throw new ResourceNotFoundException(sprintf('Resource bundle `%s` cannot be found', basename($path)));
         }
 
-        return json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        return new static(
+            $locale, 
+            json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR)
+        );
     }
 }
 ```
@@ -81,14 +84,6 @@ class JsonResourceBundle extends ResourceBundle
 To work with the `ResourceBundle`
 
 ```php
-$string = $bundle->get('hello_world');
-$bundle->has('hello_world');
-
-// Changing the name or locale will load the messages again
-$bundle->setLocale(new Locale('es_ES')); // /var/www/resources/messages.es_ES.yaml
-$bundle->setName('invoice_plugin'); // /var/www/resources/invoice_plugin.en_GB.yaml
-
-// Get a new isntance with a different locale or a different resource
-$bundle = $bundle->withLocale(new Locale('es_ES')); 
-$bundle = $bundle->withName('invoice_plugin');
+$bundle->has('hello_world'); // check if key exists
+$string = $bundle->get('hello_world'); // throws exception if key does not exist
 ```

@@ -10,20 +10,11 @@ use Lightning\Locale\Exception\ResourceNotFoundException;
 
 class ResourceBundle implements ResourceBundleInterface, IteratorAggregate, Countable
 {
-    protected string $basePath;
-    protected Locale $locale;
-    protected string $name;
-    protected array $contents = [];
-
     /**
      * Constructor
      */
-    public function __construct(string $basePath, Locale $locale, string $name = 'resources')
+    final public function __construct(protected Locale $locale, protected array $contents)
     {
-        $this->basePath = $basePath;
-        $this->name = $name;
-
-        $this->setLocale($locale);
     }
 
     /**
@@ -49,19 +40,7 @@ class ResourceBundle implements ResourceBundleInterface, IteratorAggregate, Coun
     }
 
     /**
-     * Set the locale for the resource bundle
-     */
-    public function setLocale(Locale $locale): static
-    {
-        $this->locale = $locale;
-
-        $this->contents = $this->loadContents();
-
-        return $this;
-    }
-
-    /**
-     * Gets the Locale for this resource bundle
+     * Gets the locale for the Resource Bundle [read only]
      */
     public function getLocale(): Locale
     {
@@ -69,60 +48,17 @@ class ResourceBundle implements ResourceBundleInterface, IteratorAggregate, Coun
     }
 
     /**
-     * Return an instance of resource bundle with a locale
+     * Factory method
      */
-    public function withLocale(Locale $locale): static
+    public static function create(Locale $locale, string $bundle): static
     {
-        return (clone $this)->setLocale($locale);
-    }
+        $path = sprintf('%s/%s.php', $bundle, $locale->toString());
 
-    /**
-     * Sets the resource bundle name (domains in gettext)
-     */
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        $this->contents = $this->loadContents();
-
-        return $this;
-    }
-
-    /**
-     * Gets the resource bundle name
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Return an instance of the resource bundle with the name
-     */
-    public function withName(string $name): static
-    {
-        return (clone $this)->setName($name);
-    }
-
-    /**
-     * Gets the path for the bundle with the extension
-     */
-    protected function getResourceBundlePath(string $extension): string
-    {
-        return sprintf('%s/%s.%s.%s', $this->basePath, $this->name, $this->locale->toString(), $extension);
-    }
-
-    /**
-     * Load the resource bundle contents from file
-     */
-    protected function loadContents(): array
-    {
-        $path = $this->getResourceBundlePath('php');
         if (! file_exists($path)) {
             throw new ResourceNotFoundException(sprintf('Resource bundle `%s` cannot be found', basename($path)));
         }
 
-        return include $path;
+        return new static($locale,include $path);
     }
 
     /**

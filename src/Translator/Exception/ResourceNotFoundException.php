@@ -11,7 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Locale\Exception;
+namespace Lightning\Translator\Exception;
 
 use RuntimeException;
 

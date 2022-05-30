@@ -13,47 +13,35 @@
 
 namespace Lightning\Translator;
 
+use Lightning\Locale\Locale;
 use InvalidArgumentException;
 
 interface TranslatorInterface
 {
     /**
-    * Gets the locale
-    *
-    * @return string
-    */
-    public function getLocale(): string;
-
-    /**
      * Sets the Locale
-     *
-     * @param string $locale
-     * @return static
      */
     public function setLocale(string $locale): static;
 
     /**
-     * Set Domain
-     *
-     * @param string $domain
-     * @return static
+     * Gets the locale
      */
-    public function setDomain(string $domain): static;
+    public function getLocale(): string;
 
     /**
-     * Gets the Domaing
-     *
-     * @return string
+     * Set Bundle
      */
-    public function getDomain(): string;
+    public function setResourceBundle(ResourceBundle $bundle): static;
+
+    /**
+     * Gets the Bundle
+     */
+    public function getResourceBundle(): ResourceBundle;
 
     /**
      * The translate method must always return a string
      *
-     * @param string|null $message
-     * @param array $values
-     * @throws InvalidArgumentException default locale and domain file does not exist
-     * @return string
+     * @throws InvalidArgumentException default locale and bundle file does not exist
      */
     public function translate(?string $message, array $values = []): string;
 }

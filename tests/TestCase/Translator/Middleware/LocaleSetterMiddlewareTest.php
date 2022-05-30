@@ -6,15 +6,16 @@ use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\Translator\Translator;
+use Lightning\Translator\ResourceBundle;
 use Lightning\TestSuite\TestRequestHandler;
-use Lightning\Translator\MessageLoader\PhpMessageLoader;
 use Lightning\Translator\Middleware\LocaleSetterMiddleware;
 
 final class LocaleSetterMiddlewareTest extends TestCase
 {
     public function testSetLocale(): void
     {
-        $translator = new Translator(new PhpMessageLoader(__DIR__ . '/locale'), 'en_US');
+        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/test');
+        $translator = new Translator($bundle);
         $handler = new TestRequestHandler(new LocaleSetterMiddleware($translator), new Response());
 
         $request = new ServerRequest('GET', '/home');

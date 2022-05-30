@@ -1,31 +1,43 @@
 # Translator
 
-The `Translator` component provides an object that can be passed around your application to translate messages into different languages using the ICU message formatter. It also supports simple message formatting.
+The `Translator` component provides an object that can be passed around your application to translate messages into different languages using the ICU message formatter. It also supports simple message formatting. The `Translator` package uses the `Locale` package includes the `ResourceBundle` object.
 
 ## Usage
 
-Create the `Translator` object and add to your DI container and configure the object in your `Middleware` or `Controller`
+Create the `Translator` object and add to your DI container and configure the object in your `Middleware` or `Controller`. 
 
 ```php
-$translator = new Translator(
-    new PoMessageLoader('/var/www/resources/messages','/var/tmp/cached/messages'), 
-    'en_US', 
-    'default'
-);
+$defaultLocale = new Locale('en_US');
+$bundle = ResourceBundle::create($defaultLocale, __DIR__ . '/resources/app'); 
+$translator = new Translator($bundle);
 ```
 
-To translate a message using ICU message format:
+Create your translation file
+
+
+```php
+return [
+    'Hello {user}!' => '¡Hola {user}!'
+    'Hello world!' => '¡Hola Mundo!',
+    'You have {count} messages' => 'Tienes {count} mensaje(s)'
+];
+```
+
+The `Translator` uses ICU message format, but also provides a custom pluralazation engine if you dont want or need to use the ICU message format syntax.
+
+To translate a message
 
 ```php
 $message = $translator->translate('Hello {user}!', ['user'=> $user->name]); // Hallo Jim
 ```
 
-The translator also supports simple message formatting, by providing a `|` with the key `count`. When the string is split, if the index is found for the count it will use that, if not it will use the last index.
+> Many languages only have two plural forms such as English, then Chinese and Japanses only has one plural form, slavic langauges have 3 or more forms and arabic and a few other languages have 6 or more.
+
+If you are not using the ICU message format syntax, you can provide the different plural forms and seeperating with a `|`, and pass a key called `count`. When the string is split, if the index is found for the count it will use that, if not it will use the last index. 
 
 ```php
 $message = $translator->translate('There are zero apples|There is 1 apple|There are {count} apples', ['count'=> count($apples)]); 
 ```
-
 
 To change the locale run the folloing method, if you try to set a `locale` which does not exist, then it will use the `default` locale which was set when creating the `Translator` object.
 
@@ -33,50 +45,7 @@ To change the locale run the folloing method, if you try to set a `locale` which
 $translator->setLocale('en_GB');
 ```
 
-The translator provides a locale fallback. So if `es_MX` is not available and there are translation files for `es` using the primary language then these will be loaded. This is quite practical since most applications just have main languages rather than one for each region. 
-
-
-When you created the `Translator` object you either provided a domain or used the `default` one, domains allow you to work with multiple
-language files in the same locale.
-
-```php
-$translator->setDomain('invoices'); // invoices.es_ES.po
-```
-
 The translator will always return a message, if no message is found it will return the original message sent.
-
-## Message Loaders
-
-The `MessageLoader` object file naming is `domain.locale.extension` for example `application.es_ES.po`
-
-### PO Message Loader
-
-A simple `PO` file loader which only supports basic syntax `msgid`, `msgstr` and string wrapping. This does not support pluralization, as this is designed to work with other message formatters which might have their own pluralization features such as ICU message syntax or our own `MessageFormatter`.
-
-```php
-# Comments and empty lines are ignored.
-msgid "This is a translation test."
-msgstr "Esta es una prueba de traducción."
-
-# String wrapping
-msgid ""
-"This is an example of a really long line of text,"
-" that will be translated into another language."
-msgstr ""
-"Este es un ejemplo de una línea de texto realmente larga,"
-" que será traducida a otro idioma."
-```
-
-### PHP Message Loader
-
-The PHP message files should return an array
-
-```php
-return [
-    'Hello world!' => '¡Hola Mundo!',
-    'You have {count} messages' => 'Tienes {count} mensaje(s)'
-];
-```
 
 ## Translator Middlewares
 

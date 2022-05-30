@@ -17,14 +17,13 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
+use Lightning\Translator\ResourceBundle;
 use Lightning\Http\Session\SessionInterface;
 use Lightning\DataMapper\DataSourceInterface;
-use Lightning\Translator\TranslatorInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Http\Auth\IdentityServiceInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
-use Lightning\Translator\MessageLoader\PhpMessageLoader;
 use Lightning\Http\Auth\IdentityService\PdoIdentityService;
 
 /**
@@ -60,10 +59,10 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
 
          return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
      },
-     TranslatorInterface::class => function (ContainerInterface $container) {
-         $loader = new PhpMessageLoader(__DIR__ .'/../app/Locales');
+     Translator::class => function (ContainerInterface $container) {
+         $bundle = ResourceBundle::create('en_US', __DIR__ .'/../app/Locales');
 
-         return new Translator($loader, 'en_US');
+         return new Translator($bundle);
      },
      DataSourceInterface::class => DatabaseDataSource::class,
      ResponseFactoryInterface::class => Psr17Factory::class,

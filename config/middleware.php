@@ -4,10 +4,10 @@ use Nyholm\Psr7\Response;
 use Lightning\Router\Router;
 use Psr\Log\LoggerInterface;
 use Lightning\Http\Cookie\Cookies;
+use Lightning\Translator\Translator;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\SessionInterface;
-use Lightning\Translator\TranslatorInterface;
 use Lightning\Http\Auth\IdentityServiceInterface;
 use Lightning\Http\ExceptionHandler\ErrorRenderer;
 use Lightning\Http\Cookie\Middleware\CookieMiddleware;
@@ -33,13 +33,13 @@ return function (Router $router, ContainerInterface $container) {
     // );
     $router->middleware(new SessionMiddleware($container->get(SessionInterface::class)));
     $router->middleware(new CookieMiddleware($container->get(Cookies::class)));
-    $router->middleware(new LocaleSetterMiddleware($container->get(TranslatorInterface::class)));
+    $router->middleware(new LocaleSetterMiddleware($container->get(Translator::class)));
     $router->middleware(new CsrfProtectionMiddleware($container->get(SessionInterface::class)));
-    $router->middleware(
-        (new FormAuthenticationMiddleware($container->get(IdentityServiceInterface::class), new BcryptPasswordHasher(), $container->get(SessionInterface::class), new Response()))
-            ->setLoginPath('/login')
-            ->setUsernameField('email')
-            ->setPasswordField('password')
-            ->setUnauthenticatedRedirect('/login')
-    );
+    // $router->middleware(
+    //     (new FormAuthenticationMiddleware($container->get(IdentityServiceInterface::class), new BcryptPasswordHasher(), $container->get(SessionInterface::class), new Response()))
+    //         ->setLoginPath('/login')
+    //         ->setUsernameField('email')
+    //         ->setPasswordField('password')
+    //         ->setUnauthenticatedRedirect('/login')
+    // );
 };

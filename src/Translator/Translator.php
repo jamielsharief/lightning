@@ -13,55 +13,27 @@
 
 namespace Lightning\Translator;
 
-use Locale;
 use MessageFormatter;
 use RuntimeException;
-use Lightning\Translator\Exception\MessageFileNotFound;
+use Lightning\Translator\Exception\ResourceNotFoundException;
 
 class Translator implements TranslatorInterface
 {
-    private MessageLoaderInterface $loader;
-    private string $locale;
-    private string $defaultLocale;
-    private string $domain;
-    private array $messages = [];
+    protected string $locale;
+    protected string $defaultLocale;
 
     /**
-     * Constrcutor
+     * Constructor
+     *
+     * @param ResourceBundle $resourceBundle the resource bundle for the default locale
      */
-    public function __construct(
-        MessageLoaderInterface $loader, string $locale, string $domain = 'default'
-        ) {
+    public function __construct(protected ResourceBundle $bundle)
+    {
         if (! extension_loaded('intl')) {
             throw new RuntimeException('Intl extension not installed');
         }
 
-        $this->locale = $this->defaultLocale = $locale;
-        $this->domain = $domain;
-
-        $this->setMessageLoader($loader);
-    }
-
-    /**
-     * Gets the message loader used by the translator
-     */
-    public function getMessageLoader(): MessageLoaderInterface
-    {
-        return $this->loader;
-    }
-
-    /**
-     * Sets the Message Loader
-     *
-     * @param MessageLoaderInterface $loader
-     */
-    public function setMessageLoader(MessageLoaderInterface $loader): static
-    {
-        $this->loader = $loader;
-
-        $this->loadMessages();
-
-        return $this;
+        $this->defaultLocale = $this->locale = $bundle->getLocale();
     }
 
     /**
@@ -76,7 +48,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Gets the locale
+     * Gets the Locale
      */
     public function getLocale(): string
     {
@@ -84,42 +56,22 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Sets the Locale
+     * Sets the Resource bundle
      */
-    public function setDefaultLocale(string $locale): static
+    public function setResourceBundle(ResourceBundle $bundle): static
     {
-        $this->defaultLocale = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Gets the locale
-     */
-    public function getDefaultLocale(): string
-    {
-        return $this->defaultLocale;
-    }
-
-    /**
-     * Set Domain
-     */
-    public function setDomain(string $domain): static
-    {
-        $this->domain = $domain;
+        $this->bundle = $bundle;
         $this->loadMessages();
 
         return $this;
     }
 
     /**
-     * Gets the Translator
-     *
-     * @return string
+     * Gets the Resource Bundle
      */
-    public function getDomain(): string
+    public function getResourceBundle(): ResourceBundle
     {
-        return $this->domain;
+        return $this->bundle;
     }
 
     /**
@@ -127,14 +79,22 @@ class Translator implements TranslatorInterface
      */
     private function loadMessages(): void
     {
-        $this->messages = $this->loader->load($this->domain, $this->defaultLocale);
-
-        foreach ([Locale::getPrimaryLanguage($this->locale),$this->locale] as $locale) {
+        foreach ([$this->locale,$this->defaultLocale] as $locale) {
             try {
-                $this->messages = array_merge($this->messages, $this->loader->load($this->domain, $locale));
-            } catch (MessageFileNotFound $exception) {
+                $this->bundle = $this->createResourceBundle($locale, $this->bundle->getPath());
+
+                break;
+            } catch (ResourceNotFoundException) {
             }
         }
+    }
+
+    /**
+     * Factory method
+     */
+    private function createResourceBundle(string $locale, string $bundle): ResourceBundle
+    {
+        return forward_static_call([get_class($this->bundle), 'create'], $locale, $bundle);
     }
 
     /**
@@ -148,7 +108,7 @@ class Translator implements TranslatorInterface
             return '';
         }
 
-        $message = $this->messages[$message] ?? $message;
+        $message = $this->bundle->has($message) ? $this->bundle->get($message) : $message;
 
         if (strpos($message, '|') !== false && isset($values['count'])) {
             $messages = explode('|', $message);

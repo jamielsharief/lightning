@@ -4,8 +4,8 @@ namespace Lightning\Test\Translator;
 
 use PHPUnit\Framework\TestCase;
 use Lightning\Translator\Translator;
-use Lightning\Translator\ResourceBundle;
 use Lightning\Translator\TranslatorInterface;
+use Lightning\Translator\ResourceBundleFactory;
 
 final class TranslatorTest extends TestCase
 {
@@ -13,40 +13,40 @@ final class TranslatorTest extends TestCase
 
     public function testTranslate(): void
     {
-        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'en_US');
 
         $this->assertEquals('Hello world!', $translator->translate('Hello world!'));
     }
 
     public function testTranslateDoesNotExist(): void
     {
-        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'en_US');
 
         $this->assertEquals('<-o->', $translator->translate('<-o->'));
     }
 
     public function testTranslateNull(): void
     {
-        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'en_US');
 
         $this->assertEquals('', $translator->translate(null));
     }
 
     public function testTranslateLocale(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
         $this->assertEquals('¡Hola Mundo!', $translator->translate('Hello world!'));
     }
 
     public function testTranslateWithChangeLocale(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
         $translator->setLocale('en_GB');
         $this->assertEquals('Monday morning', $translator->translate('when'));
@@ -54,55 +54,41 @@ final class TranslatorTest extends TestCase
 
     public function testTranslateSetLocale(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
         $this->assertEquals('xx_XX', $translator->setLocale('xx_XX')->getLocale());
     }
 
     public function testTranslateWithChangeLocaleDefaultFallback(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
         $translator->setLocale('xx_XX');
         $this->assertEquals('¡Hola Mundo!', $translator->translate('Hello world!'));
     }
 
-    /**
-     * @internal This should also be in a different locale, so can test messages are loaded.
-     */
-    public function testTranslateChangeResourceBundle(): void
+    public function testTranslateGetResourceBundleFactory(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
-        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/app'); //
-
-        $translator->setResourceBundle($bundle);
-        $this->assertEquals('Hola mundo', $translator->translate('hello_world'));
-    }
-
-    public function testTranslateGetBundle(): void
-    {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
-
-        $this->assertEquals($bundle, $translator->getResourceBundle());
+        $this->assertEquals($bundleFactory, $translator->getResourceBundleFactory());
     }
 
     public function testTranslateWithPlaceholders(): void
     {
-        $bundle = ResourceBundle::create('es_ES', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'es_ES');
 
         $this->assertEquals('Tienes 5 mensaje(s)', $translator->translate('You have {count} messages', ['count' => 5]));
     }
 
     public function testTranslateWithCustomPlural(): void
     {
-        $bundle = ResourceBundle::create('en_US', __DIR__ . '/resources/test');
-        $translator = new Translator($bundle);
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'en_US');
 
         $message = 'You have zero apples|You have one apple|You have {count} apples';
         $this->assertEquals('You have zero apples', $translator->translate($message, ['count' => 0]));

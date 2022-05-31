@@ -21,19 +21,23 @@ class Translator implements TranslatorInterface
 {
     protected string $locale;
     protected string $defaultLocale;
+    protected ResourceBundleInterface $bundle;
 
     /**
      * Constructor
      *
      * @param ResourceBundle $resourceBundle the resource bundle for the default locale
      */
-    public function __construct(protected ResourceBundle $bundle)
+    public function __construct(protected ResourceBundleFactoryInterface $bundleFactory, string $defaultLocale = 'en_US')
     {
         if (! extension_loaded('intl')) {
             throw new RuntimeException('Intl extension not installed');
         }
 
-        $this->defaultLocale = $this->locale = $bundle->getLocale();
+        $this->defaultLocale = $defaultLocale;
+
+        $this->locale = $defaultLocale;
+        $this->bundle = $this->bundleFactory->create($this->locale);
     }
 
     /**
@@ -56,22 +60,22 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Sets the Resource bundle
+     * Sets the Resource Bundle Factory
      */
-    public function setResourceBundle(ResourceBundle $bundle): static
+    public function setResourceBundleFactory(ResourceBundleFactoryInterface $bundleFactory): static
     {
-        $this->bundle = $bundle;
+        $this->bundleFactory = $bundleFactory;
         $this->loadMessages();
 
         return $this;
     }
 
     /**
-     * Gets the Resource Bundle
+     * Gets the Resource Bundle Factory
      */
-    public function getResourceBundle(): ResourceBundle
+    public function getResourceBundleFactory(): ResourceBundleFactoryInterface
     {
-        return $this->bundle;
+        return $this->bundleFactory;
     }
 
     /**
@@ -81,7 +85,7 @@ class Translator implements TranslatorInterface
     {
         foreach ([$this->locale,$this->defaultLocale] as $locale) {
             try {
-                $this->bundle = $this->createResourceBundle($locale, $this->bundle->getPath());
+                $this->bundle = $this->bundleFactory->create($locale);
 
                 break;
             } catch (ResourceNotFoundException) {
@@ -90,15 +94,8 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Factory method
-     */
-    private function createResourceBundle(string $locale, string $bundle): ResourceBundle
-    {
-        return forward_static_call([get_class($this->bundle), 'create'], $locale, $bundle);
-    }
-
-    /**
      * Translates a message
+     *
      * @param array $values Values to be interpolated, the `count` value is reserved for simple pluralization engine
      */
 

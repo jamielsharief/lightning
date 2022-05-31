@@ -30,9 +30,6 @@ class LocaleDetectorMiddleware implements MiddlewareInterface
 
     /**
      * Constructor
-     *
-     * @param string $defaultLocale
-     * @param array $locales
      */
     public function __construct(string $defaultLocale, array $locales = [])
     {
@@ -44,10 +41,6 @@ class LocaleDetectorMiddleware implements MiddlewareInterface
      * Detect the locale from the Request headers
      *
      * @see https://www.php.net/manual/en/locale.acceptfromhttp.php
-     *
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

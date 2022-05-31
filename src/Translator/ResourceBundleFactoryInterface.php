@@ -11,10 +11,12 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Translator\Exception;
+namespace Lightning\Translator;
 
-use RuntimeException;
-
-class MessageFileNotFound extends RuntimeException
+interface ResourceBundleFactoryInterface
 {
+    /**
+     * Creates the Resource Bundle
+     */
+    public function create(string $locale): ResourceBundleInterface;
 }

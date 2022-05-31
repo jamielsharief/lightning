@@ -8,12 +8,12 @@ use ArrayIterator;
 use IteratorAggregate;
 use Lightning\Translator\Exception\ResourceNotFoundException;
 
-class ResourceBundle implements IteratorAggregate, Countable
+class ResourceBundle implements ResourceBundleInterface, IteratorAggregate, Countable
 {
     /**
      * Constructor
      */
-    final public function __construct(protected string $locale, protected string $path, protected array $messages)
+    final public function __construct(protected array $messages)
     {
     }
 
@@ -37,35 +37,6 @@ class ResourceBundle implements IteratorAggregate, Countable
         }
 
         throw new ResourceNotFoundException(sprintf('No entry for `%s`', $key));
-    }
-
-    /**
-     * Gets the locale for the Resource Bundle [read only]
-     */
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    /**
-     * Gets the directory where the bundle files are stored
-     */
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Factory method
-     */
-    public static function create(string $locale, string $bundle): static
-    {
-        $path = sprintf('%s/%s.php', $bundle, $locale);
-        if (! file_exists($path)) {
-            throw new ResourceNotFoundException(sprintf('Resource bundle `%s` cannot be found', basename($path)));
-        }
-
-        return new static($locale,$bundle, include $path);
     }
 
     /**

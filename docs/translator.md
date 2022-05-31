@@ -1,19 +1,17 @@
 # Translator
 
-The `Translator` component provides an object that can be passed around your application to translate messages into different languages using the ICU message formatter. It also supports simple message formatting. The `Translator` package uses the `Locale` package includes the `ResourceBundle` object.
+The `Translator` component provides an object that can be passed around your application to translate messages into different languages using the ICU message formatter. It also supports simple message formatting.
 
 ## Usage
 
 Create the `Translator` object and add to your DI container and configure the object in your `Middleware` or `Controller`. 
 
 ```php
-$defaultLocale = new Locale('en_US');
-$bundle = ResourceBundle::create($defaultLocale, __DIR__ . '/resources/app'); 
-$translator = new Translator($bundle);
+$bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/app'); 
+$translator = new Translator($bundleFactory, 'en_US');
 ```
 
 Create your translation file
-
 
 ```php
 return [

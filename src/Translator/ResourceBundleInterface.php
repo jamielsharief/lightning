@@ -13,7 +13,15 @@
 
 namespace Lightning\Translator;
 
-interface MessageLoaderInterface
+interface ResourceBundleInterface
 {
-    public function load(string $domain, string $locale): array;
+    /**
+     * @throws ResourceNotFoundException if no entry for the key is found
+     */
+    public function get(string $key): string;
+
+    /**
+     * Checks if the resource bundle has an entry for the key
+     */
+    public function has(string $key): bool;
 }

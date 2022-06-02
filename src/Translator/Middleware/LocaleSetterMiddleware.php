@@ -29,8 +29,6 @@ class LocaleSetterMiddleware implements MiddlewareInterface
 
     /**
      * Constructor
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -38,11 +36,8 @@ class LocaleSetterMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Gets the locale attribute from the Request and sets thisn on the translator if available
-     *
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * Gets the locale attribute from the Request and sets this on the translator if available
+     * @TODO: Locale from URL Middleware
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -18,20 +18,13 @@ Create a `View` in your `views` folder
 To create a `View`, create the `ViewCompiler` first.
 
 ```php
-$compiler = ViewCompiler(
-    '/var/www/resources/views', 
-    '/var/www/tmp/views'
-);
+$compiler = ViewCompiler( '/var/www/tmp/views');
 ```
 
 Now create the `View` object
 
 ```php
-$view =  View(
-    $compiler,
-    '/var/www/resources/views'
-);
-
+$view =  View($compiler,'/var/www/resources/views');
 $output = $view->render('articles/index');
 ```
 

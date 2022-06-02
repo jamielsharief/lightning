@@ -32,9 +32,6 @@ class ViewCompiler implements ViewCompilerInterface
     /**
      * Gets the compiled view filename, if the view has been changed or the compiled version does not exist
      * then it will be compiled.
-     *
-     * @param string $path
-     * @return string
      */
     public function compile(string $path): string
     {

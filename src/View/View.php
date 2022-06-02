@@ -150,6 +150,7 @@ class View
      * @param array $payload
      * @param integer $jsonFlags
      * @return string
+     * @deprecated
      */
     public function renderJson(array $payload, int $jsonFlags = 0): string
     {

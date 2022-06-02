@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Lightning\View\View $this
+ * @var \Lightning\View\TemplateRenderer $this
  */
 ?>
 <h1>holder</h1>

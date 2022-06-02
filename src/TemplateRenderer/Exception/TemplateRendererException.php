@@ -11,15 +11,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\View;
+namespace Lightning\TemplateRenderer\Exception;
 
- interface ViewCompilerInterface
- {
-     /**
-      * Compiles a View and returns the compiled filename
-      *
-      * @param string $path
-      * @return string
-      */
-     public function compile(string $path): string;
- }
+use RuntimeException;
+
+class TemplateRendererException extends RuntimeException
+{
+}

@@ -4,17 +4,16 @@ namespace Lightning\Test\Controller;
 
 use Psr\Log\LogLevel;
 
-use Lightning\View\View;
 use Lightning\Logger\Logger;
 use InvalidArgumentException;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
-
-use Lightning\View\ViewCompiler;
 use Lightning\TestSuite\TestLogger;
+
 use Lightning\Event\EventDispatcher;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\Controller\Event\InitializeEvent;
+use Lightning\TemplateRenderer\TemplateRenderer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
@@ -230,7 +229,7 @@ final class AbstractControllerTest extends TestCase
         $path = __DIR__ .'/TestApp/templates';
 
         return new ArticlesController(
-            new View(new ViewCompiler($path, sys_get_temp_dir()), $path),
+            new TemplateRenderer($path, sys_get_temp_dir()),
             $eventDispatcher
         );
     }

@@ -13,17 +13,17 @@
 
 namespace Lightning\Controller;
 
-use Lightning\View\View;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Lightning\Controller\Event\InitializeEvent;
+use Lightning\TemplateRenderer\TemplateRenderer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 abstract class AbstractController
 {
-    protected View $view;
+    protected TemplateRenderer $templateRenderer;
     protected ?EventDispatcherInterface $eventDispatcher;
     protected ?LoggerInterface $logger;
     protected ?ServerRequestInterface $request;
@@ -38,9 +38,9 @@ abstract class AbstractController
     /**
      * Constructor
      */
-    public function __construct(View $view, ?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null)
+    public function __construct(TemplateRenderer $templateRenderer, ?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null)
     {
-        $this->view = $view;
+        $this->templateRenderer = $templateRenderer;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
 
@@ -56,14 +56,14 @@ abstract class AbstractController
     }
 
     /**
-     * Renders a view using the View package
+     * Renders a template using the View package
      *
-     * @param string $view e.g. articles/index
+     * @param string $template e.g. articles/index
      */
-    protected function render(string $view, array $data = [], int $statusCode = 200): ResponseInterface
+    protected function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
     {
         return $this->buildResponse(
-            $this->view->withLayout($this->layout ?? null)->render($view, $data), 'text/html', $statusCode
+            $this->templateRenderer->withLayout($this->layout ?? null)->render($template, $data), 'text/html', $statusCode
         );
     }
 

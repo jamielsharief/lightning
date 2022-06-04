@@ -18,7 +18,7 @@ Create a template in your `views` folder
 To create the `TemplateRenderer` object pass the template folder and temporary folder where the compiled templates are stored.
 
 ```php
-$templateRenderer = new TemplateRenderer('/var/www/resources/views', '/var/www/tmp/views');
+$templateRenderer = new TemplateRenderer('/var/www/resources/views');
 $output = $templateRenderer->render('articles/index');
 ```
 
@@ -36,9 +36,16 @@ To render a template using a specific file, make sure the template name starts w
 $output = $templateRenderer->render('/var/www/resources/views/articles/index.php');
 ```
 
+By default the `TemplateRenderer` caches the template compliation to the system temp directory, however if you to prefer to use somewhere else, then during the creation of the object set the cache path.
+
+```php
+$templateRenderer = new TemplateRenderer('/var/www/resources/views', '/var/www/tmp/views');
+```
+
+
 ## Layouts
 
-Create a template that you want to use as a layout, and make sure to echo the `$rendered` variable.
+Create a template that you want to use as a layout, and make sure to echo the `content` variable.
 
 ```php
 <!doctype html>
@@ -51,7 +58,7 @@ Create a template that you want to use as a layout, and make sure to echo the `$
     <title>Web Application</title>
   </head>
   <body>
-    <?= $rendered ?>
+    <?= $content ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
   

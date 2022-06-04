@@ -4,6 +4,6 @@
     <title>Web Application</title>
   </head>
   <body>
-    <?= $rendered ?>  
+    <?= $content ?>  
   </body>
 </html>

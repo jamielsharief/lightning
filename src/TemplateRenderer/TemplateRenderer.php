@@ -17,18 +17,27 @@ use Lightning\TemplateRenderer\Exception\TemplateRendererException;
 
 class TemplateRenderer
 {
-    protected ?string $layout = null;
+    private ?string $cachePath;
+
     private array $attributes = [];
 
     private bool $inRender = false;
     private string $encoding;
 
+    protected ?string $layout = null;
+
     /**
      * Constructor
      */
-    public function __construct(private string $path, private string $cachedPath)
+    public function __construct(private string $path, ?string $cachePath = null)
     {
         $this->encoding = mb_internal_encoding() ?: 'UTF-8';
+
+        $this->cachePath = $cachePath ?: sys_get_temp_dir() . '/templates';
+
+        if (! is_dir($this->cachePath)) {
+            mkdir($this->cachePath, 0775, true);
+        }
 
         $this->initialize();
     }
@@ -130,7 +139,7 @@ class TemplateRenderer
         if ($this->layout && ! $this->inRender) {
             $content = $this->renderTemplate(
                 $this->path . '/' . trim($this->layout, '/') . '.php',
-                ['rendered' => $content] + $variables
+                ['content' => $content] + $variables
             );
         }
 
@@ -184,7 +193,7 @@ class TemplateRenderer
      */
     private function compile(string $path): string
     {
-        $compiledFilename = $this->cachedPath . '/' . md5($path) . '.php';
+        $compiledFilename = $this->cachePath . '/' . md5($path) . '.php';
 
         $isCompiled = file_exists($compiledFilename) && filemtime($compiledFilename) > filemtime($path);
         if (! $isCompiled && file_put_contents($compiledFilename, $this->compileTemplate($path)) === false) {

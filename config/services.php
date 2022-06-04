@@ -1,14 +1,11 @@
 <?php
 
-use Lightning\View\View;
 use Nyholm\Psr7\Response;
-
 use Lightning\Router\Router;
+
 use Psr\Log\LoggerInterface;
-use App\View\ApplicationView;
 use Lightning\Autowire\Autowire;
 use Lightning\Logger\FileLogger;
-use Lightning\View\ViewCompiler;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Event\EventDispatcher;
@@ -17,10 +14,11 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
-use Lightning\Translator\ResourceBundle;
 use Lightning\Http\Session\SessionInterface;
 use Lightning\DataMapper\DataSourceInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Lightning\Translator\ResourceBundleFactory;
+use Lightning\TemplateRenderer\TemplateRenderer;
 use Lightning\Http\Auth\IdentityServiceInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
@@ -48,21 +46,20 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
      },
      ResponseInterface::class => Response::class,
 
-     View::class => function (ContainerInterface $container) {
-         $path = __DIR__ . '/../app/View';
-
-         return new ApplicationView(new ViewCompiler(__DIR__ . '/../tmp/cache'), $path);
-     },
-
      PDO::class => function (ContainerInterface $container) {
          $pdoFactory = new PdoFactory();
 
          return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
      },
-     Translator::class => function (ContainerInterface $container) {
-         $bundle = ResourceBundle::create('en_US', __DIR__ .'/../app/Locales');
+     TemplateRenderer::class => function (ContainerInterface $container) {
 
-         return new Translator($bundle);
+        // __DIR__ . '/../tmp/cache')
+         return new TemplateRenderer(__DIR__ . '/../app/View');
+     },
+     Translator::class => function (ContainerInterface $container) {
+         $bundleFactory = new ResourceBundleFactory(__DIR__ .'/../app/Locales');
+
+         return new Translator($bundleFactory, 'en_US');
      },
      DataSourceInterface::class => DatabaseDataSource::class,
      ResponseFactoryInterface::class => Psr17Factory::class,

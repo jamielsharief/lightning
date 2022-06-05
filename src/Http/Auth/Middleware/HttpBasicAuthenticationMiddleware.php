@@ -18,6 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Http\Auth\PasswordHasherInterface;
 use Lightning\Http\Auth\IdentityServiceInterface;
 use Lightning\Http\Exception\UnauthorizedException;
@@ -25,23 +26,19 @@ use Lightning\Http\Exception\UnauthorizedException;
 class HttpBasicAuthenticationMiddleware extends AbstractAuthenticationMiddleware implements MiddlewareInterface
 {
     private IdentityServiceInterface $identityService;
-    private ResponseInterface $response;
+    private ResponseFactoryInterface $responseFactory;
     private ?string $realm = null;
     private bool $challenge = true;
     private PasswordHasherInterface $passwordHasher;
 
     /**
      * Constructor
-     *
-     * @param IdentityServiceInterface $identityService
-     * @param PasswordHasherInterface $passwordHasher
-     * @param ResponseInterface $response
      */
-    public function __construct(IdentityServiceInterface $identityService, PasswordHasherInterface $passwordHasher, ResponseInterface $response)
+    public function __construct(IdentityServiceInterface $identityService, PasswordHasherInterface $passwordHasher, ResponseFactoryInterface $responseFactory)
     {
         $this->identityService = $identityService;
         $this->passwordHasher = $passwordHasher;
-        $this->response = $response;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -78,9 +75,8 @@ class HttpBasicAuthenticationMiddleware extends AbstractAuthenticationMiddleware
         if ($this->challenge) {
             $serverParams = $request->getServerParams();
 
-            return $this->response->withAddedHeader(
-                'WWW-Authenticate', sprintf('Basic realm="%s"', $this->realm ?: $serverParams['SERVER_NAME'] ?? '')
-            )->withStatus(401);
+            return $this->responseFactory->createResponse(401)->withAddedHeader(
+                'WWW-Authenticate', sprintf('Basic realm="%s"', $this->realm ?: $serverParams['SERVER_NAME'] ?? ''));
         }
 
         throw new UnauthorizedException();

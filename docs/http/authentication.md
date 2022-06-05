@@ -31,7 +31,7 @@ The `FormAuthenticationMiddleware` is for managing authentication and authorizat
 $identityService = $container->get(IdentityServiceInterface::class);
 $session = $container->get(SessionInterface::class);
 
-$middleware (new FormAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), $session, new Response()))
+$middleware (new FormAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), $session, new ResponseFactory()))
     ->setLoginPath('/login')
     ->setUsernameField('email')
     ->setPasswordField('password');
@@ -98,7 +98,7 @@ The `HttpBasicAuthenticationMiddleware` provides a method for the user to provid
 
 ```php
 $autenticationMiddleware = new HttpBasicAuthenticationMiddleware(
-    $container->get(IdentityServiceInterface::class), new BcryptPasswordHasher(), new Response()
+    $container->get(IdentityServiceInterface::class), new BcryptPasswordHasher(), new ResponseFactory()
 );
  ```
 

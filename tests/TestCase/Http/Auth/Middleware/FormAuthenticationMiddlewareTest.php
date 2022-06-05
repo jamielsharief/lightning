@@ -9,10 +9,11 @@ use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Fixture\FixtureManager;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
-use Lightning\TestSuite\TestRequestHandler;
 
+use Lightning\TestSuite\TestRequestHandler;
 use Lightning\Http\Session\SessionInterface;
 use Lightning\Test\Fixture\IdentitiesFixture;
 use Lightning\Http\Exception\UnauthorizedException;
@@ -51,7 +52,7 @@ final class FormAuthenticationMiddlewareTest extends TestCase
             ->setIdentifierName('username')
             ->setCredentialName('password');
 
-        return new FormAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), $this->session, new Response());
+        return new FormAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), $this->session, new Psr17Factory());
     }
 
     public function testGetSetPath(): void

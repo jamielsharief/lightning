@@ -19,6 +19,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Lightning\Http\Session\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Http\Auth\PasswordHasherInterface;
 use Lightning\Http\Auth\IdentityServiceInterface;
 use Lightning\Http\Exception\UnauthorizedException;
@@ -27,7 +28,7 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
 {
     private IdentityServiceInterface $identityService;
     private SessionInterface $session;
-    private ResponseInterface $response;
+    private ResponseFactoryInterface $responseFactory;
     private string $usernameField = 'email';
     private string $passwordField = 'password';
     private string $sessionKey = 'identity';
@@ -49,12 +50,12 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
      * @param SessionInterface $session
      * @param ResponseInterface $emptyResponse
      */
-    public function __construct(IdentityServiceInterface $identityService, PasswordHasherInterface $passwordHasher, SessionInterface $session, ResponseInterface $emptyResponse)
+    public function __construct(IdentityServiceInterface $identityService, PasswordHasherInterface $passwordHasher, SessionInterface $session, ResponseFactoryInterface $responseFactory)
     {
         $this->identityService = $identityService;
         $this->passwordHasher = $passwordHasher;
         $this->session = $session;
-        $this->response = $emptyResponse;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -156,9 +157,8 @@ class FormAuthenticationMiddleware extends AbstractAuthenticationMiddleware impl
         }
 
         if ($this->unauthenticatedRedirect) {
-            return $this->response = $this->response
-                ->withHeader('Location', $this->unauthenticatedRedirect)
-                ->withStatus(302);
+            return $this->responseFactory->createResponse(302)
+                ->withHeader('Location', $this->unauthenticatedRedirect);
         }
 
         throw new UnauthorizedException();

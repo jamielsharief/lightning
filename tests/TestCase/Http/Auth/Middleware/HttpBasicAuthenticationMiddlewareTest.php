@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Fixture\FixtureManager;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\TestSuite\TestRequestHandler;
 use Lightning\Test\Fixture\IdentitiesFixture;
@@ -40,7 +41,7 @@ final class HttpBasicAuthenticationMiddlewareTest extends TestCase
             ->setIdentifierName('username')
             ->setCredentialName('password');
 
-        return new HttpBasicAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), new Response());
+        return new HttpBasicAuthenticationMiddleware($identityService, new BcryptPasswordHasher(), new Psr17Factory());
     }
 
     public function testSetGetRealm(): void

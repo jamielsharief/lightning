@@ -68,6 +68,18 @@ $middleware = new LocaleDetectorMiddleware('en_US', ['en_US','en_GB','es_MX','es
 The `LocaleSetterMiddleware` quite simply sets the locale on the `Translator` using if the PSR 7 server request object has the  `locale` attribute  set. This allows you to use this when routing, where you want to take the locale from the url e.g. `/blog/en/some-post` or if you want to detect from the request headers or even maybe the session.
 
 ```php
-$translator = $container->get(Translator::class);
+$translator = $container->get(TranslatorInterface::class);
 $middleware = new LocaleSetterMiddleware($translator); 
+```
+
+## Translate Function
+
+For those who can't live without the `__` function, set the `Translator` object in the `TranslatorManager` then call the funtion.
+
+```php
+use function Lightning\Translator\__;
+
+TranslatorManager::set($translator);
+
+echo __('Hello world!');
 ```

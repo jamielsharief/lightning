@@ -16,6 +16,7 @@ use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Http\Session\SessionInterface;
 use Lightning\DataMapper\DataSourceInterface;
+use Lightning\Translator\TranslatorInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Translator\ResourceBundleFactory;
 use Lightning\TemplateRenderer\TemplateRenderer;
@@ -56,7 +57,7 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
         // __DIR__ . '/../tmp/cache')
          return new TemplateRenderer(__DIR__ . '/../app/View');
      },
-     Translator::class => function (ContainerInterface $container) {
+     TranslatorInterface::class => function (ContainerInterface $container) {
          $bundleFactory = new ResourceBundleFactory(__DIR__ .'/../app/Locales');
 
          return new Translator($bundleFactory, 'en_US');

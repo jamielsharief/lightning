@@ -98,7 +98,6 @@ class Translator implements TranslatorInterface
      *
      * @param array $values Values to be interpolated, the `count` value is reserved for simple pluralization engine
      */
-
     public function translate(?string $message, array $values = []): string
     {
         if (is_null($message)) {

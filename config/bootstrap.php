@@ -5,6 +5,8 @@ use Lightning\Router\Router;
 use function Lightning\Dotenv\env;
 use Lightning\Container\Container;
 use Lightning\Http\Emitter\ResponseEmitter;
+use Lightning\Translator\TranslatorManager;
+use Lightning\Translator\TranslatorInterface;
 use Lightning\Http\ExceptionHandler\ErrorHandler;
 
 ini_set('display_errors', 1);
@@ -28,6 +30,11 @@ if (filter_var(env('APP_DEBUG', true), FILTER_VALIDATE_BOOLEAN) === true) {
 $container = (new Container(include __DIR__ . '/services.php'))
     ->enableAutoConfigure()
     ->enableAutowiring();
+
+/**
+ * Configure the Translator manager so the __ function can be used
+ */
+TranslatorManager::set($container->get(TranslatorInterface::class));
 
 /*
 $config = new Config(include __DIR__ . '/config.php');

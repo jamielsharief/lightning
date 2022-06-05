@@ -47,7 +47,8 @@
           "Lightning\\": "src/"
         },
         "files": [
-          "src/Dotenv/functions.php"
+          "src/Dotenv/functions.php",
+          "src/Translator/functions.php"
         ]
       },
       "autoload-dev": {

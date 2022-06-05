@@ -65,6 +65,21 @@ final class AbstractControllerTest extends TestCase
         );
     }
 
+    public function testGetTemplateRenderer(): void
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf(TemplateRenderer::class, $this->createController()->getTemplateRenderer());
+    }
+
+    public function testSetTemplateRenderer(): void
+    {
+        $controller = $this->createController();
+        $templateRender = $this->createController()->getTemplateRenderer()->withLayout('layouts/foo');
+
+        $this->assertEquals($templateRender, $controller->setTemplateRenderer($templateRender)->getTemplateRenderer());
+    }
+
     public function testDispatch(): void
     {
         $controller = $this->createController();

@@ -216,4 +216,22 @@ abstract class AbstractController
             $this->logger->log($level, $message, $context);
         }
     }
+
+    /**
+     * Get the value of template renderer
+     */
+    public function getTemplateRenderer(): TemplateRenderer
+    {
+        return $this->templateRenderer;
+    }
+
+    /**
+     * Set the template renderer
+     */
+    public function setTemplateRenderer(TemplateRenderer $templateRenderer): static
+    {
+        $this->templateRenderer = $templateRenderer;
+
+        return $this;
+    }
 }

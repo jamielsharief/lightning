@@ -9,43 +9,28 @@ final class ResultTest extends TestCase
 {
     public function testIsSuccess(): void
     {
-        $this->assertTrue((new Result(true))->isSuccess());
-        $this->assertFalse((new Result(false))->isSuccess());
+        $this->assertTrue((new Result(true, []))->isSuccess());
+        $this->assertFalse((new Result(false, []))->isSuccess());
     }
 
-    public function testIsError(): void
-    {
-        $this->assertTrue((new Result(false))->isError());
-        $this->assertFalse((new Result(true))->isError());
-    }
-
-    public function testGetSuccess(): void
-    {
-        $this->assertTrue((new Result(true))->getSuccess());
-        $this->assertFalse((new Result(false))->getSuccess());
-    }
+    // public function testIsError(): void
+    // {
+    //     $this->assertTrue((new Result(false, []))->isError());
+    //     $this->assertFalse((new Result(true, []))->isError());
+    // }
 
     public function testWithSuccess(): void
     {
-        $result = new Result(false);
+        $result = new Result(false, []);
 
-        $this->assertFalse($result->getSuccess());
-        $this->assertTrue($result->withSuccess(true)->getSuccess());
-    }
-
-    public function testSetSuccess(): void
-    {
-        $result = new Result(true);
-        $result->setSuccess(false);
-        $this->assertFalse($result->getSuccess());
-        $result->setSuccess(true);
-        $this->assertTrue($result->getSuccess());
+        $this->assertFalse($result->isSuccess());
+        $this->assertTrue($result->withSuccess(true)->isSuccess());
     }
 
     public function testHasData(): void
     {
-        $this->assertTrue((new Result(true, ['foo']))->hasData());
-        $this->assertFalse((new Result(true))->hasData());
+        $this->assertTrue((new Result(true, ['foo' => 'bar']))->hasData());
+        $this->assertFalse((new Result(true, []))->hasData());
     }
 
     public function testGetData(): void
@@ -53,7 +38,7 @@ final class ResultTest extends TestCase
         $result = new Result(true, ['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $result->getData());
-        $this->assertEmpty((new Result(true))->getData());
+        $this->assertEmpty((new Result(true, []))->getData());
     }
 
     public function testGet(): void
@@ -63,13 +48,12 @@ final class ResultTest extends TestCase
         $this->assertNull($result->get('bar'));
     }
 
-    public function testSetData(): void
+    public function testWithData(): void
     {
-        $result = new Result(true);
-        $result->setData(['foo' => 'bar']);
-        $this->assertEquals(['foo' => 'bar'], $result->getData());
-        $result->setData(['bar' => 'foo']);
-        $this->assertEquals(['bar' => 'foo'], $result->getData());
+        $result = new Result(true, ['key' => 'value']);
+
+        $this->assertEquals(['key' => 'value'], $result->getData());
+        $this->assertEquals(['foo' => 'bar'], $result->withData(['foo' => 'bar'])->getData());
     }
 
     public function testToString(): void
@@ -92,8 +76,14 @@ final class ResultTest extends TestCase
     public function testToArray(): void
     {
         $result = new Result(true, ['foo' => 'bar']);
+
         $this->assertEquals(
-            ['success' => true,'data' => ['foo' => 'bar']],
+            [
+                'success' => true,
+                'data' => [
+                    'foo' => 'bar'
+                ]
+            ],
             $result->toArray()
         );
     }

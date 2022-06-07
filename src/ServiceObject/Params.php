@@ -19,15 +19,11 @@ class Params
 {
     /**
      * Container data
-     *
-     * @var array
      */
     protected array $data = [];
 
     /**
      * Constructor
-     *
-     * @param array $data data to set
      */
     public function __construct(array $data = [])
     {
@@ -36,9 +32,6 @@ class Params
 
     /**
      * Checks if a parameter exists
-     *
-     * @param string $name
-     * @return boolean
      */
     public function has(string $name): bool
     {
@@ -46,9 +39,7 @@ class Params
     }
 
     /**
-     * Gets the state
-     *
-     * @return array
+     * Gets the params as an array
      */
     public function toArray(): array
     {
@@ -58,9 +49,7 @@ class Params
     /**
      * Gets a param
      *
-     * @param string $name
      * @throws \Lightning\ServiceObject\Exception\UnknownParameterException
-     * @return mixed
      */
     public function get(string $name): mixed
     {
@@ -73,10 +62,6 @@ class Params
 
     /**
      * Set a value of a param
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return static
      */
     public function set(string $name, mixed $value): static
     {
@@ -87,9 +72,6 @@ class Params
 
     /**
      * Unset a param
-     *
-     * @param string $name
-     * @return static
      */
     public function unset(string $name): static
     {

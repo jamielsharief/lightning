@@ -18,7 +18,7 @@ namespace Lightning\ServiceObject;
  *
  * Command Pattern: "an object is used to encapsulate all information needed to perform an action or trigger an event"
  *
- * Idea for type hiting, create an extra method
+ * IDEA: for type hinting, create an extra method
  *
  * public function with(string $name, string $url): static
  * {
@@ -26,28 +26,35 @@ namespace Lightning\ServiceObject;
  *
  *     return $this->withParams($params);
  *  }
- *
- *
  */
 abstract class AbstractServiceObject implements ServiceObjectInterface
 {
-    private ?Params $params = null;
+    private array $params = [];
 
     /**
      * A hook that is called before execute when the Service Object is run.
-     *
-     * @return void
      */
     protected function initialize(): void
     {
     }
+
     /**
-     * Returns a new instance with the Params object set
-     *
-     * @param Params $params
-     * @return static
+     * The Service Object logic that will be executed when it is run
      */
-    public function withParams(Params $params): static
+    abstract protected function execute(Params $params): ResultInterface;
+
+    /**
+     * Gets the params that will be passed when run
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * Returns a new instance with the parameters set
+     */
+    public function withParams(array $params): static
     {
         $service = clone $this;
         $service->params = $params;
@@ -57,25 +64,18 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
 
     /**
      * Runs the Service Object
-     *
-     * @return Result
      */
-    public function run(): Result
+    public function run(): ResultInterface
     {
         $this->initialize();
 
-        $params = $this->params ?? new Params();
-        $result = new Result();
-
-        return call_user_func_array([$this,'execute'], [$params,$result]);
+        return $this->execute(new Params($this->params));
     }
 
     /**
      * Make this a callable
-     *
-     * @return Result
      */
-    public function __invoke(): Result
+    public function __invoke(): ResultInterface
     {
         return $this->run();
     }

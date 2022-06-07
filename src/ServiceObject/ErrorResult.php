@@ -13,10 +13,20 @@
 
 namespace Lightning\ServiceObject;
 
- interface ServiceObjectInterface
- {
-     /**
-      * Runs the Service object
-      */
-     public function run(): ResultInterface;
- }
+use LogicException;
+
+class ErrorResult extends Result
+{
+    /**
+     * Constructor
+     */
+    public function __construct(array $data = [])
+    {
+        parent::__construct(false, $data);
+    }
+
+    public function withSuccess(bool $success): static
+    {
+        throw new LogicException('The success status cannot be changed on ErrorResult');
+    }
+}

@@ -13,30 +13,20 @@
 
 namespace Lightning\ServiceObject;
 
-use Stringable;
-use JsonSerializable;
-
-class Result implements JsonSerializable, Stringable
+/**
+ * Result [immutable]
+ */
+class Result implements ResultInterface
 {
-    private bool $success;
-    private array $data;
-
     /**
      * Constructor
-     *
-     * @param boolean $success
-     * @param array $data
      */
-    public function __construct(bool $success = true, array $data = [])
+    public function __construct(private bool $success = true, private array $data = [])
     {
-        $this->success = $success;
-        $this->data = $data;
     }
 
     /**
-     * Checks if the result is a success
-     *
-     * @return boolean
+     * Is the a Result a success?
      */
     public function isSuccess(): bool
     {
@@ -44,53 +34,7 @@ class Result implements JsonSerializable, Stringable
     }
 
     /**
-     * Gets the success success
-     *
-     * @return boolean
-     */
-    public function getSuccess(): bool
-    {
-        return $this->success;
-    }
-
-    /**
-     * Sets the
-     *
-     * @param boolean $success
-     * @return static
-     */
-    public function setSuccess(bool $success): static
-    {
-        $this->success = $success;
-
-        return $this;
-    }
-
-    /**
-     * Returns a new Result object with sucess set to this
-     *
-     * @param boolean $success
-     * @return static
-     */
-    public function withSuccess(bool $success): static
-    {
-        return (clone $this)->setSuccess($success);
-    }
-
-    /**
-     * Checks if the result is an error
-     *
-     * @return boolean
-     */
-    public function isError(): bool
-    {
-        return $this->success === false;
-    }
-
-    /**
      * Checks if the result has data
-     *
-     * @return boolean
      */
     public function hasData(): bool
     {
@@ -98,9 +42,7 @@ class Result implements JsonSerializable, Stringable
     }
 
     /**
-     * Gets the data for this result or data from a specific property
-     *
-     * @return array
+     * Gets the data for this result
      */
     public function getData(): array
     {
@@ -108,45 +50,45 @@ class Result implements JsonSerializable, Stringable
     }
 
     /**
-     * Gets the data for this result or data from a specific property
-     *
-     * @param string $property
-     * @param string|null $default
-     * @return mixed
+     * Gets the data for a specific key
      */
-    public function get(string $property, ?string $default = null): mixed
+    public function get(string $name, mixed $default = null): mixed
     {
-        return $this->data[$property] ?? $default;
+        return $this->data[$name] ?? $default;
     }
 
     /**
-     * Sets the Data
-     *
-     * @param array $data
-     * @return static
+     * Checks if the key exists in the data
      */
-    public function setData(array $data): static
+    public function has(string $name): bool
     {
-        $this->data = $data;
-
-        return $this;
+        return isset($this->data[$name]);
     }
 
     /**
      * Returns a new instance with this data
-     *
-     * @param array $data
-     * @return static
      */
     public function withData(array $data): static
     {
-        return (clone $this)->setData($data);
+        $cloned = clone $this;
+        $cloned->data = $data;
+
+        return $cloned;
+    }
+
+    /**
+     * Returns a new instance with success changed
+     */
+    public function withSuccess(bool $success): static
+    {
+        $cloned = clone $this;
+        $cloned->success = $success;
+
+        return $cloned;
     }
 
     /**
      * Returns the data to be serialized to JSON
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {
@@ -155,18 +97,14 @@ class Result implements JsonSerializable, Stringable
 
     /**
      * PHP Stringable interface
-     *
-     * @return string
      */
     public function __toString(): string
     {
-        return $this->toString();
+        return json_encode($this->toArray());
     }
 
     /**
-     * Converts this result to JSOn
-     *
-     * @return string
+     * Converts this result to JSON
      */
     public function toString(): string
     {
@@ -175,8 +113,6 @@ class Result implements JsonSerializable, Stringable
 
     /**
      * Converts this result to an array
-     *
-     * @return array
      */
     public function toArray(): array
     {

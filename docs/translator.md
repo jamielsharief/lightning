@@ -43,6 +43,12 @@ To change the locale run the folloing method, if you try to set a `locale` which
 $translator->setLocale('en_GB');
 ```
 
+You can also get a new instance of the `Translator` object with a different locale.
+
+```php
+$spanishTranslator = $translator->withLocale('es_ES');
+```
+
 The translator will always return a message, if no message is found it will return the original message sent.
 
 ## Translator Middlewares

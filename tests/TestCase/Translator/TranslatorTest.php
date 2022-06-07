@@ -60,6 +60,18 @@ final class TranslatorTest extends TestCase
         $this->assertEquals('xx_XX', $translator->setLocale('xx_XX')->getLocale());
     }
 
+    public function testTranslateWithLocale(): void
+    {
+        $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');
+        $translator = new Translator($bundleFactory, 'en_US');
+
+        $translator2 = $translator->withLocale('es_ES');
+
+        $this->assertInstanceOf(Translator::class, $translator2);
+        $this->assertNotEquals($translator2, $translator);
+        $this->assertEquals('es_ES', $translator2->getLocale());
+    }
+
     public function testTranslateWithChangeLocaleDefaultFallback(): void
     {
         $bundleFactory = new ResourceBundleFactory(__DIR__ . '/resources/test');

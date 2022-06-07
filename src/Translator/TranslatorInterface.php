@@ -26,6 +26,11 @@ interface TranslatorInterface
     public function getLocale(): string;
 
     /**
+     * Gets an instance of the translator with a different locale
+     */
+    public function withLocale(string $locale): static;
+
+    /**
      * The translate method MUST always return a string
      */
     public function translate(?string $message, array $values = []): string;

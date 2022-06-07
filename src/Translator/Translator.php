@@ -60,6 +60,14 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * Sets the Locale
+     */
+    public function withLocale(string $locale): static
+    {
+        return (clone $this)->setLocale($locale);
+    }
+
+    /**
      * Sets the Resource Bundle Factory
      */
     public function setResourceBundleFactory(ResourceBundleFactoryInterface $bundleFactory): static

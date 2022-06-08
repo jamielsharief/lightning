@@ -41,7 +41,7 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
     /**
      * The Service Object logic that will be executed when it is run
      */
-    abstract protected function execute(Params $params): ResultInterface;
+    abstract protected function execute(Params $params): Result;
 
     /**
      * Gets the params that will be passed when run
@@ -65,7 +65,7 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
     /**
      * Runs the Service Object
      */
-    public function run(): ResultInterface
+    public function run(): Result
     {
         $this->initialize();
 
@@ -75,7 +75,7 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
     /**
      * Make this a callable
      */
-    public function __invoke(): ResultInterface
+    public function __invoke(): Result
     {
         return $this->run();
     }

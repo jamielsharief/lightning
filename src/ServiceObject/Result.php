@@ -13,10 +13,13 @@
 
 namespace Lightning\ServiceObject;
 
+use Stringable;
+use JsonSerializable;
+
 /**
  * Result [immutable]
  */
-class Result implements ResultInterface
+class Result implements JsonSerializable, Stringable
 {
     /**
      * Constructor

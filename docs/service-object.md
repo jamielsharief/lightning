@@ -17,7 +17,7 @@ class RegisterUserService extends AbstractServiceObject
     {
     }
 
-    protected function execute(Params $params) : ResultInterface
+    protected function execute(Params $params) : Result
     {
         $user = $params->get('user');
 
@@ -33,8 +33,8 @@ class RegisterUserService extends AbstractServiceObject
 To run the service
 
 ```php
-$result = (new RegisterUserService ($model,$logger))
-    ->withParams(['name'=>'fred', 'email'=>'fred@example.com']) // pass a params object or an array
+$result = (new RegisterUserService ($model, $logger))
+    ->withParams(['name' => 'fred', 'email' => 'fred@example.com'])
     ->run();
 ```
 
@@ -43,7 +43,7 @@ $result = (new RegisterUserService ($model,$logger))
 The `Params` object is passed to the execute method when the `ServiceObject` is `run`. If `get` is called and the parameter was not supplied it will throw `UnkownParameterException`, therefore, for optional parameters check with `has` first.
 
 ```php
-$params = new Params(['name'=>'fred', 'email'=>'fred@example.com']);
+$params = new Params(['name' => 'fred', 'email' => 'fred@example.com']);
 $name = $params->get('name');
 $bool = $params->has('surname');
 ```
@@ -53,7 +53,7 @@ $bool = $params->has('surname');
 Depending what the service layer is doing sometimes you will need to just return a simple `true` or `false` and other times you will need a richer result. 
 
 ```php
-$result = new ErrorResult(['message'=>'This is an error']);
+$result = new ErrorResult(['message' => 'This is an error']);
 $result = new SuccessResult(['id'=> 1234]); 
 ```
 

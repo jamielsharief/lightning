@@ -18,5 +18,5 @@ namespace Lightning\ServiceObject;
      /**
       * Runs the Service object
       */
-     public function run(): ResultInterface;
+     public function run(): Result;
  }

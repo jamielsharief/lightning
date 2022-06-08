@@ -22,10 +22,10 @@ class RegisterUserService extends AbstractServiceObject
         $user = $params->get('user');
 
         if(!$user){
-            return new ErrorResult(['foo' =>'bar']);
+            return new Result(false, ['message' =>'User not found']);
         }
         // do some stuff
-        return new SuccessResult(['status'=>'ok']);
+        return new Result(true, ['user'=>$user]);
     }
 }
 ```
@@ -48,15 +48,9 @@ $name = $params->get('name');
 $bool = $params->has('surname');
 ```
 
-## Result Objects
+## Result Object
 
 Depending what the service layer is doing sometimes you will need to just return a simple `true` or `false` and other times you will need a richer result. 
-
-```php
-$result = new ErrorResult(['message' => 'This is an error']);
-$result = new SuccessResult(['id'=> 1234]); 
-```
-
 Some of the methods available on `Result` object:
 
 ```php
@@ -66,6 +60,7 @@ $result->isError();
 
 // work with data
 $result->hasData();
+$result->getData();
 $result->get('message');
 $string = (string) $result;
 $result = $result->withSuccess(false); // 

@@ -156,6 +156,22 @@ class Validator
     }
 
     /**
+     * Gets a rule for a property field
+     */
+    public function getRuleFor(string $property): ?ValidationSet
+    {
+        return $this->validate[$property] ?? null;
+    }
+
+    /**
+     * Checks if a rule exists for
+     */
+    public function hasRuleFor(string $property): bool
+    {
+        return key_exists($property, $this->validate);
+    }
+
+    /**
      * Returns a new validator without validators for a property
      */
     public function withoutRuleFor(string $property): static

@@ -325,4 +325,29 @@ final class ValidatorTest extends TestCase
         $this->assertFalse($validator->validate([]));
         $this->assertCount(2, $validator->getErrors()); // NotBlank and Email error, lengthBetween should not be run
     }
+
+    public function testHasRuleFor(): void
+    {
+        $validator = new Validator();
+        $this->assertFalse($validator->hasRuleFor('email'));
+
+        $validator->createRuleFor('email')->notBlank();
+
+        $this->assertTrue($validator->hasRuleFor('email'));
+    }
+
+    public function testGetRuleFor(): void
+    {
+        $validator = new Validator();
+
+        $this->assertNull($validator->getRuleFor('email'));
+
+        $emailRule = $validator->createRuleFor('email')
+            ->notBlank()
+            ->email()
+            ->stopIfFailure()
+            ->lengthBetween(5, 255);
+
+        $this->assertEquals($emailRule, $validator->getRuleFor('email'));
+    }
 }

@@ -262,8 +262,6 @@ class ConsoleArgumentParser
 
     /**
      * Generates the argument info for help
-     *
-     * @return array
      */
     public function generateArguments(): array
     {

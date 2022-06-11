@@ -19,56 +19,35 @@ abstract class AbstractCommand implements CommandInterface
 {
     /**
      * Default error code.
-     *
-     * @var int
      */
     public const ERROR = 1;
 
     /**
      * Default success code.
-     *
-     * @var int
      */
     public const SUCCESS = 0;
-
-    protected ConsoleArgumentParser $parser;
-    protected ConsoleIo $io;
 
     /**
      * Name of this command, when working with sub commands you can use spaces for example
      * `migrate up` this will then show up in the help and allow you to use this properly
-     *
-     * @var string
      */
     protected string $name = 'unkown';
 
     /**
      * Description for this command
-     *
-     * @var string
      */
     protected string $description = '';
 
     /**
-     * Constructor, which sets depdencies and calls the initialize hook. If you overide the constructor with additional
-     * dependencies, remember to call the parent.
-     *
-     * @param ConsoleArgumentParser $parser
-     * @param ConsoleIo $io
+     * Constructor
+     * @internal changed to more DI friendly
      */
-    public function __construct(ConsoleArgumentParser $parser, ConsoleIo $io)
+    public function __construct(protected ConsoleArgumentParser $parser, protected ConsoleIo $io)
     {
-        $this->parser = $parser;
-        $this->io = $io;
-
-        $this->addDefaultOptions();
-        $this->initialize();
     }
 
     /**
      * Adds the default options to the argument parser
-     *
-     * @return void
      */
     private function addDefaultOptions(): void
     {
@@ -97,9 +76,7 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * This is a hook that is called when the Command is created
-     *
-     * @return void
+     * This is a hook that is called when the Command is run
      */
     protected function initialize(): void
     {
@@ -107,8 +84,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
     * Gets the name of this Command
-    *
-    * @return string
     */
     public function getName(): string
     {
@@ -117,8 +92,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Gets the description for this Command
-     *
-     * @return string
      */
     public function getDescription(): string
     {
@@ -127,8 +100,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Factory method
-     *
-     * @return ConsoleHelpFormatter
      */
     private function createHelpFormatter(): ConsoleHelpFormatter
     {
@@ -137,10 +108,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Adds an option for this command
-     *
-     * @param string $name
-     * @param array $options
-     * @return static
      */
     public function addOption(string $name, array $options = []): static
     {
@@ -151,10 +118,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Adds a argument for this command
-     *
-     * @param string $name
-     * @param array $options
-     * @return static
      */
     public function addArgument(string $name, array $options = []): static
     {
@@ -165,15 +128,13 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Place your command logic here
-     *
-     * @return never|int
      */
     abstract protected function execute(Arguments $args, ConsoleIo $io);
 
     /**
-     * Causes for the command
+     * Exits the command without an error
+     *
      * @throws StopException
-     * @return void
      */
     public function exit(): void
     {
@@ -182,10 +143,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Aborts this command
-     *
-     * @param int $code
-     * @throws StopException
-     * @return void
      */
     public function abort(int $code = self::ERROR): void
     {
@@ -194,12 +151,12 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Runs the command
-     *
-     * @param array $args
-     * @return integer
      */
     public function run(array $args): int
     {
+        $this->addDefaultOptions();
+        $this->initialize();
+
         array_shift($args);
 
         // Parse arguments
@@ -220,10 +177,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Outputs a message or array of messages to stdout
-     *
-     * @param string|array $message
-     * @param int $newLines
-     * @return static
      */
     public function out($message = '', int $newLines = 1): static
     {
@@ -234,10 +187,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Outputs a message or array of messages to stderr
-     *
-     * @param string|array $message
-     * @param int $newLines
-     * @return static
      */
     public function error($message = '', int $newLines = 1): static
     {
@@ -248,10 +197,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Outputs a message or array of messages to stdout when verbose option is provided
-     *
-     * @param string|array $message
-     * @param int $newLines
-     * @return static
      */
     public function verbose($message = '', int $newLines = 1): static
     {
@@ -262,10 +207,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Outputs a message or array of messages to stdout even if quiet option is provided
-     *
-     * @param string|array $message
-     * @param int $newLines
-     * @return static
      */
     public function quiet($message = '', int $newLines = 1): static
     {
@@ -276,8 +217,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Displays the help for this Command
-     *
-     * @return void
      */
     private function displayHelp(): void
     {
@@ -286,20 +225,15 @@ abstract class AbstractCommand implements CommandInterface
             $help->setDescription($this->description);
         }
 
-        $help->setUsage([$this->parser->generateUsage($this->name)]);
-        $help->setOptions($this->parser->generateOptions());
-        $help->setArguments($this->parser->generateArguments());
+        $help->setUsage([$this->parser->generateUsage($this->name)])
+            ->setOptions($this->parser->generateOptions())
+            ->setArguments($this->parser->generateArguments());
 
         $this->out($help->generate());
     }
 
     /**
      * Displays a formatted error message and stops the execution
-     *
-     * @param string $title
-     * @param string|null $message
-     * @param int $code
-     * @return void
      */
     public function throwError(string $title, string $message = null, int $code = self::ERROR): void
     {
@@ -310,8 +244,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Get the ConsoleIO object
-     *
-     * @return ConsoleIo
      */
     public function getConsoleIo(): ConsoleIo
     {

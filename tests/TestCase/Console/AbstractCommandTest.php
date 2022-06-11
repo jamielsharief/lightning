@@ -64,6 +64,7 @@ final class AbstractCommandTest extends TestCase
     {
         $parser = new ConsoleArgumentParser();
         $command = new HelloCommand($parser, new TestConsoleIo());
+        $command->addOption('uppercase', ['description' => 'change name to uppercase', 'short' => 'u']);
 
         $this->assertEquals(
             'change name to uppercase',
@@ -75,6 +76,7 @@ final class AbstractCommandTest extends TestCase
     {
         $parser = new ConsoleArgumentParser();
         $command = new HelloCommand($parser, new TestConsoleIo());
+        $command->addArgument('name', ['description' => 'name to use', 'default' => 'world']);
 
         $this->assertEquals(
             'name to use (default: "world")',

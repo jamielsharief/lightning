@@ -28,34 +28,15 @@ use Lightning\DataMapper\DataSourceInterface;
  */
 abstract class AbstractRepository
 {
-    protected AbstractDataMapper $mapper;
-
     /**
      * Constructor
-     *
-     * @param AbstractDataMapper $mapper
      */
-    public function __construct(AbstractDataMapper $mapper)
-    {
-        $this->mapper = $mapper;
-
-        $this->initialize();
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return void
-     */
-    protected function initialize(): void
+    public function __construct(protected AbstractDataMapper $mapper)
     {
     }
 
     /**
      * Finds a single Entity
-     *
-     * @param QueryObject|null $query
-     * @return EntityInterface|null
      */
     public function find(?QueryObject $query = null): ?EntityInterface
     {
@@ -73,10 +54,6 @@ abstract class AbstractRepository
 
     /**
      * Finds the count of Entities that match the query
-     *
-     *
-     * @param QueryObject|null $query
-     * @return integer
      */
     public function findCount(?QueryObject $query = null): int
     {
@@ -86,7 +63,6 @@ abstract class AbstractRepository
     /**
      * Finds a list using the query
      *
-     * @param QueryObject|null $query
      * @param array $fields
      *  - keyField: defaults to primary key if it is a string
      *  - valueField: optional
@@ -100,10 +76,6 @@ abstract class AbstractRepository
 
     /**
      * Returns a single instance
-     *
-     * @param array $criteria
-     * @param array $options
-     * @return EntityInterface|null
      */
     public function findBy(array $criteria, array $options = []): ?EntityInterface
     {
@@ -113,8 +85,6 @@ abstract class AbstractRepository
     /**
      * Finds multiple instances
      *
-     * @param array $criteria
-     * @param array $options
      * @return Collection|EntityInterface[]
      */
     public function findAllBy(array $criteria, array $options = []): Collection
@@ -124,10 +94,6 @@ abstract class AbstractRepository
 
     /**
      * Finds the count of the number of instances
-     *
-     * @param array $criteria
-     * @param array $options
-     * @return integer
      */
     public function findCountBy(array $criteria, array $options = []): int
     {
@@ -137,13 +103,10 @@ abstract class AbstractRepository
     /**
      * Finds a list
      *
-     * @param array $criteria
      * @param array $fields
      *  - keyField: defaults to primary key if it is a string
      *  - valueField: optional
      *  - groupField: optional
-     * @param array $options
-     * @return array
      */
     public function findListBy(array $criteria, array $fields = [], array $options = []): array
     {
@@ -152,9 +115,6 @@ abstract class AbstractRepository
 
     /**
      * Saves an Entity
-     *
-     * @param EntityInterface $entity
-     * @return boolean
      */
     public function save(EntityInterface $entity): bool
     {
@@ -163,9 +123,6 @@ abstract class AbstractRepository
 
     /**
      * Saves multiple Entities
-     *
-     * @param iterable $entities
-     * @return boolean
      */
     public function saveMany(iterable $entities): bool
     {
@@ -174,9 +131,6 @@ abstract class AbstractRepository
 
     /**
      * Deletes an Entity
-     *
-     * @param EntityInterface $entity
-     * @return boolean
      */
     public function delete(EntityInterface $entity): bool
     {
@@ -185,9 +139,6 @@ abstract class AbstractRepository
 
     /**
      * Deletes multiple entities
-     *
-     * @param iterable $entities
-     * @return boolean
      */
     public function deleteMany(iterable $entities): bool
     {
@@ -196,9 +147,6 @@ abstract class AbstractRepository
 
     /**
      * Deletes all Entities that match the query
-     *
-     * @param QueryObject $query
-     * @return integer
      */
     public function deleteAll(QueryObject $query): int
     {
@@ -207,10 +155,6 @@ abstract class AbstractRepository
 
     /**
      * Deletes all Entities that match the criteria
-     *
-     * @param array $criteria
-     * @param array $options
-     * @return integer
      */
     public function deleteAllBy(array $criteria, array $options = []): int
     {
@@ -219,10 +163,6 @@ abstract class AbstractRepository
 
     /**
      * Updates all the entities that match the query
-     *
-     * @param QueryObject $query
-     * @param array $data
-     * @return integer
      */
     public function updateAll(QueryObject $query, array $data): int
     {
@@ -231,10 +171,6 @@ abstract class AbstractRepository
 
     /**
      * Updates all entities that match the criteria
-     *
-     * @param array $data
-     * @param array $criteria =[], array $options = []
-     * @return integer
      */
     public function updateAllBy(array $criteria, array $data, array $options = []): int
     {
@@ -243,10 +179,6 @@ abstract class AbstractRepository
 
     /**
      * Creates a new Query object
-     *
-     * @param array $criteria
-     * @param array $options
-     * @return QueryObject
      */
     public function createQueryObject(array $criteria = [], array $options = []): QueryObject
     {
@@ -255,11 +187,17 @@ abstract class AbstractRepository
 
     /**
      * Gets the DataSource for this Repository
-     *
-     * @return DataSourceInterface
      */
     public function getDataSource(): DataSourceInterface
     {
         return $this->mapper->getDataSource();
+    }
+
+    /**
+     * Gets the Data Mapper
+     */
+    public function getDataMapper(): AbstractDataMapper
+    {
+        return $this->mapper;
     }
 }

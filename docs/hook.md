@@ -35,3 +35,5 @@ class MyObject
     }
 }
 ```
+
+Differences between `Hook` and  `Event`, hooks are only triggered on the object itself, as opposed to any callable and there is a standard way to register a hook, making it more extendable.

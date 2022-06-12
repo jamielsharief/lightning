@@ -38,8 +38,7 @@ trait HookTrait
     }
 
     /**
-     * Trigger a hook and calls the register hooks method the first time, avoid having to use
-     * in the constructor method.
+     * Trigger a hook
      */
     public function triggerHook(string $name, array $arguments = [], bool $isStoppable = true): bool
     {

@@ -18,5 +18,13 @@ namespace Lightning\Hook;
  */
 interface HookInterface
 {
+    /**
+     * Registers a hook on the object
+     */
+    public function registerHook(string $name, string $method): static;
+
+    /**
+     * Triggers a hook on the object
+     */
     public function triggerHook(string $name, array $arguments = [], bool $isStoppable = true): bool;
 }

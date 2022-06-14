@@ -1,6 +1,6 @@
 # Controller
 
-A PSR-7 `Controller` with `View`,and a couple of important methods `render`, `renderJson` ,`renderFile` and `redirect` to keep code dry when working with `ResponseInterface`.
+A PSR-7 `Controller` with `TemplateRenderer`, and a couple of important methods `render`, `renderJson` ,`renderFile` and `redirect` to keep code dry when working with `ResponseInterface`.
 
 Create your application controller with the factory method `createResponse`
 
@@ -66,28 +66,14 @@ return $this->renderFile('/var/www/downloads/2021.txt',['download' => 'false']);
 return $this->renderFile('/var/www/downloads/2021.pdf',['name' =>'important.pdf']); // To give the file a different name
 ```
 
-## PSR 3 Logger
+## Hooks
 
+The `Controller` has various hook methods which are called at different parts of the life cycle, for example if you want to create a `Controller` that uses `PSR-14 Events`, you can override these methods to trigger and process those events.
 
-If you provide a PSR-3 `Logger` to the constructor or configure this in your DI container or use the `setLogger` method, then when you call the `log` method you can log to that logger instance.
+Hook methods
 
-```php
-public function index()
-{
-    $this->log(LogLevel::DEBUG,'This is a test');
-}
-```
-
-## PSR 14 Event Dispatcher
-
-If you provide a PSR-14 `EventDispatcher` to the constructor or configure this in your DI container or use the `setEventDispatcher` method, then when you call the `dispatch` method you can dispatch events easily from the controller.
-
-
-```php
-public function thanks(ServerRequestInterface $request)
-{
-    $this->dispatchEvent(new OrderCompletedEvent($request));
-}
-```
-
-If the PSR 14 Event Dispatcher is provided, then when the `controller` is created it will dispatch the `InitializeEvent`.
+- `initialize`
+- `beforeRender`
+- `afterRender`
+- `beforeRedirect`
+- `afterRedirect`

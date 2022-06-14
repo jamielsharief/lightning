@@ -8,13 +8,6 @@ use Lightning\Controller\AbstractController as BaseController;
 
 class ArticlesController extends BaseController
 {
-    public function addListener(string $event, callable $callable): self
-    {
-        $this->eventCallables[$event] = $callable;
-
-        return $this;
-    }
-
     public function index(): ResponseInterface
     {
         return $this->render('articles/index', [
@@ -40,5 +33,37 @@ class ArticlesController extends BaseController
     protected function createResponse(): ResponseInterface
     {
         return new Response();
+    }
+
+    /**
+     * Before render hook
+     */
+    protected function beforeRender(): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After render hook
+     */
+    protected function afterRender(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+
+    /**
+     * Before Redirect hook
+     */
+    protected function beforeRedirect(string $url): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After Direct hook
+     */
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
     }
 }

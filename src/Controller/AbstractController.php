@@ -13,20 +13,22 @@
 
 namespace Lightning\Controller;
 
-use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Lightning\Controller\Event\InitializeEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Abstract Controller
+ *
+ * @internal design has been changed with hook methods added rather than hard coding events etc, these can be overridden with a trait to get
+ * the behavior that you want, eg. PSR-14 events
+ */
 abstract class AbstractController
 {
     protected TemplateRenderer $templateRenderer;
-    protected ?EventDispatcherInterface $eventDispatcher;
-    protected ?LoggerInterface $logger;
     protected ?ServerRequestInterface $request;
+    protected ?ResponseInterface $response;
 
     protected ?string $layout = null;
 
@@ -38,21 +40,50 @@ abstract class AbstractController
     /**
      * Constructor
      */
-    public function __construct(TemplateRenderer $templateRenderer, ?EventDispatcherInterface $eventDispatcher = null, ?LoggerInterface $logger = null)
+    public function __construct(TemplateRenderer $templateRenderer)
     {
         $this->templateRenderer = $templateRenderer;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
 
         $this->initialize();
-        $this->dispatchEvent(new InitializeEvent($this));
     }
 
     /**
-     * This is called when the Controller is created, so that you don't have to overide the constructor
+     * Hook is called when the Controller object is created
      */
     protected function initialize(): void
     {
+    }
+
+    /**
+     * Before render hook
+     */
+    protected function beforeRender(): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After render hook
+     */
+    protected function afterRender(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+
+    /**
+     * Before Redirect hook
+     */
+    protected function beforeRedirect(string $url): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After Direct hook
+     */
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
     }
 
     /**
@@ -62,9 +93,15 @@ abstract class AbstractController
      */
     protected function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
     {
-        return $this->buildResponse(
+        if ($response = $this->beforeRender()) {
+            return $response;
+        }
+
+        $response = $this->buildResponse(
             $this->templateRenderer->withLayout($this->layout ?? null)->render($template, $data), 'text/html', $statusCode
         );
+
+        return $this->afterRender($response);
     }
 
     /**
@@ -72,9 +109,15 @@ abstract class AbstractController
      */
     protected function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
     {
-        return $this->buildResponse(
+        if ($response = $this->beforeRender()) {
+            return $response;
+        }
+
+        $response = $this->buildResponse(
             json_encode($payload, $jsonFlags), 'application/json', $statusCode
         );
+
+        return $this->afterRender($response);
     }
 
     /**
@@ -82,7 +125,13 @@ abstract class AbstractController
      */
     protected function renderFile(string $path, array $options = []): ResponseInterface
     {
-        return $this->buildFileResponse($path, $options['download'] ?? true);
+        if ($response = $this->beforeRender()) {
+            return $response;
+        }
+
+        $response = $this->buildFileResponse($path, $options['download'] ?? true);
+
+        return $this->afterRender($response);
     }
 
     /*
@@ -92,9 +141,15 @@ abstract class AbstractController
      */
     protected function redirect(string $uri, int $status = 302): ResponseInterface
     {
-        return $this->createResponse()
+        if ($response = $this->beforeRedirect($uri)) {
+            return $response;
+        }
+
+        $response = $this->createResponse()
             ->withHeader('Location', $uri)
             ->withStatus($status);
+
+        return $this->afterRedirect($response);
     }
 
     /**
@@ -164,61 +219,7 @@ abstract class AbstractController
     abstract protected function createResponse(): ResponseInterface;
 
     /**
-     * Get the value of eventDispatcher
-     */
-    public function getEventDispatcher(): ?EventDispatcherInterface
-    {
-        return $this->eventDispatcher;
-    }
-
-    /**
-     * Set the value of eventDispatcher
-     */
-    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): static
-    {
-        $this->eventDispatcher = $eventDispatcher;
-
-        return $this;
-    }
-
-    /**
-     * Dispatches an Event if the EventDispatcher is available
-     */
-    public function dispatchEvent(object $event): ?object
-    {
-        return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
-    }
-
-    /**
-     * Get the value of logger
-     */
-    public function getLogger(): ?LoggerInterface
-    {
-        return $this->logger;
-    }
-
-    /**
-     * Set the value of logger
-     */
-    public function setLogger(?LoggerInterface $logger): static
-    {
-        $this->logger = $logger;
-
-        return $this;
-    }
-
-    /**
-     * Logs with an arbitrary level if the Logger is available
-     */
-    public function log(string $level, string $message, array $context = []): void
-    {
-        if ($this->logger) {
-            $this->logger->log($level, $message, $context);
-        }
-    }
-
-    /**
-     * Get the value of template renderer
+     * Get the Template Renderer
      */
     public function getTemplateRenderer(): TemplateRenderer
     {
@@ -226,11 +227,29 @@ abstract class AbstractController
     }
 
     /**
-     * Set the template renderer
+     * Set the Template Renderer
      */
     public function setTemplateRenderer(TemplateRenderer $templateRenderer): static
     {
         $this->templateRenderer = $templateRenderer;
+
+        return $this;
+    }
+
+    /**
+     * Get the Response object if generated
+     */
+    public function getResponse(): ?ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * Set the Response object to be returned
+     */
+    public function setResponse(?ResponseInterface $response): static
+    {
+        $this->response = $response;
 
         return $this;
     }

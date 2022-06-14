@@ -2,23 +2,89 @@
 
 namespace Lightning\Test\Controller;
 
-use Psr\Log\LogLevel;
-
-use Lightning\Logger\Logger;
+use Nyholm\Psr7\Response;
 use InvalidArgumentException;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use Lightning\TestSuite\TestLogger;
 
-use Lightning\Event\EventDispatcher;
-use Lightning\TestSuite\TestEventDispatcher;
-use Lightning\Controller\Event\InitializeEvent;
+use Psr\Http\Message\ResponseInterface;
+use Lightning\Controller\AbstractController;
 use Lightning\TemplateRenderer\TemplateRenderer;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
-class TestEvent
+class ApiController extends AbstractController
 {
+    private array $called = [];
+
+    public function index(): ResponseInterface
+    {
+        return $this->render('articles/index', [
+            'title' => 'Articles'
+        ]);
+    }
+
+    public function indexJson(): ResponseInterface
+    {
+        return $this->renderJson(['status' => 'ok']);
+    }
+
+    public function old(): ResponseInterface
+    {
+        return $this->redirect('/new');
+    }
+
+    public function download(): ResponseInterface
+    {
+        return $this->renderFile(__DIR__ . '/TestApp/downloads/sample.xml');
+    }
+
+    protected function createResponse(): ResponseInterface
+    {
+        return new Response();
+    }
+
+    protected function initialize(): void
+    {
+        $this->wasCalled('initialize');
+    }
+
+    protected function beforeRender(): ?ResponseInterface
+    {
+        $this->wasCalled('beforeRender');
+
+        return null;
+    }
+
+    protected function afterRender(ResponseInterface $response): ResponseInterface
+    {
+        $this->wasCalled('afterRender');
+
+        return $response;
+    }
+
+    protected function beforeRedirect(string $url): ?ResponseInterface
+    {
+        $this->wasCalled('beforeRedirect');
+
+        return null;
+    }
+
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
+    {
+        $this->wasCalled('afterRedirect');
+
+        return $response;
+    }
+
+    private function wasCalled(string $method): void
+    {
+        $this->called[] = $method;
+    }
+
+    public function getCalled(): array
+    {
+        return $this->called;
+    }
 }
 
 final class AbstractControllerTest extends TestCase
@@ -40,31 +106,6 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals($request, $controller->getRequest());
     }
 
-    public function testSetEventDispatcher(): void
-    {
-        $this->assertInstanceOf(
-            ArticlesController::class, $this->createController()->setEventDispatcher(new EventDispatcher())
-        );
-
-        $this->assertInstanceOf(
-            ArticlesController::class, $this->createController()->setEventDispatcher(null)
-        );
-    }
-
-    public function testGetEventDispatcher(): void
-    {
-        $controller = $this->createController();
-        $eventDispatcher = new EventDispatcher();
-
-        $this->assertNull($controller->getEventDispatcher());
-
-        $controller->setEventDispatcher($eventDispatcher);
-
-        $this->assertEquals(
-            $eventDispatcher, $controller->getEventDispatcher()
-        );
-    }
-
     public function testGetTemplateRenderer(): void
     {
         $controller = $this->createController();
@@ -78,72 +119,6 @@ final class AbstractControllerTest extends TestCase
         $templateRender = $this->createController()->getTemplateRenderer()->withLayout('layouts/foo');
 
         $this->assertEquals($templateRender, $controller->setTemplateRenderer($templateRender)->getTemplateRenderer());
-    }
-
-    public function testDispatch(): void
-    {
-        $controller = $this->createController();
-        $eventDispatcher = new TestEventDispatcher();
-
-        $controller->setEventDispatcher(null);
-        $event = new TestEvent();
-
-        $this->assertNull($controller->dispatchEvent($event));
-        $this->assertFalse($eventDispatcher->hasDispatchedEvent(TestEvent::class));
-
-        $controller->setEventDispatcher($eventDispatcher);
-        $this->assertEquals($event, $controller->dispatchEvent($event));
-
-        $this->assertTrue($eventDispatcher->hasDispatchedEvent(TestEvent::class));
-    }
-
-    public function testDispatchInitialize(): void
-    {
-        $request = new ServerRequest('GET', '/articles/index');
-        $eventDispatcher = new TestEventDispatcher();
-
-        $controller = $this->createController($eventDispatcher);
-
-        $this->assertTrue($eventDispatcher->hasDispatchedEvent(InitializeEvent::class));
-    }
-
-    public function testSetLogger(): void
-    {
-        $this->assertInstanceOf(
-            ArticlesController::class, $this->createController()->setLogger(new Logger())
-        );
-        $this->assertInstanceOf(
-            ArticlesController::class, $this->createController()->setLogger(null)
-        );
-    }
-
-    public function testGetLogger(): void
-    {
-        $controller = $this->createController();
-        $logger = new Logger();
-
-        $this->assertNull($controller->getLogger());
-
-        $controller->setLogger($logger);
-
-        $this->assertEquals(
-            $logger, $controller->getLogger()
-        );
-    }
-
-    public function testLog(): void
-    {
-        $controller = $this->createController();
-        $logger = new TestLogger();
-
-        $controller->setLogger(null);
-        $controller->log(LogLevel::DEBUG, 'this is a test');
-        $this->assertFalse($logger->hasMessage('this is a test', LogLevel::DEBUG));
-
-        $controller->setLogger($logger);
-        $controller->log(LogLevel::DEBUG, 'this is a test');
-
-        $this->assertTrue($logger->hasMessage('this is a test', LogLevel::DEBUG));
     }
 
     public function testRender(): void
@@ -239,13 +214,54 @@ final class AbstractControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    private function createController(?EventDispatcherInterface $eventDispatcher = null): ArticlesController
+    public function testRenderHooks(): void
+    {
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+
+        $controller->index();
+
+        $this->assertEquals([
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
+    }
+
+    public function testRenderHooksJson(): void
+    {
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+
+        $controller->indexJson();
+
+        $this->assertEquals([
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
+    }
+
+    public function testRenderHooksFile(): void
+    {
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+
+        $controller->download();
+
+        $this->assertEquals([
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
+    }
+
+    public function testRedirectHooks(): void
+    {
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+
+        $controller->old();
+
+        $this->assertEquals([
+            'initialize','beforeRedirect','afterRedirect'
+        ], $controller->getCalled());
+    }
+
+    private function createController(): ArticlesController
     {
         $path = __DIR__ .'/TestApp/templates';
 
-        return new ArticlesController(
-            new TemplateRenderer($path, sys_get_temp_dir()),
-            $eventDispatcher
-        );
+        return new ArticlesController(new TemplateRenderer($path, sys_get_temp_dir()));
     }
 }

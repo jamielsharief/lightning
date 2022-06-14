@@ -8,30 +8,20 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
+use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Entity\AbstractEntity;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
-use Lightning\Fixture\FixtureManager;
 
+use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\Test\Fixture\ArticlesFixture;
 use Lightning\DataMapper\AbstractDataMapper;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\DataMapper\DataSourceInterface;
-use Lightning\DataMapper\Event\AfterFindEvent;
-use Lightning\DataMapper\Event\AfterSaveEvent;
-use Lightning\DataMapper\Event\BeforeFindEvent;
-use Lightning\DataMapper\Event\BeforeSaveEvent;
-use Lightning\DataMapper\Event\InitializeEvent;
-use Lightning\DataMapper\Event\AfterCreateEvent;
-use Lightning\DataMapper\Event\AfterDeleteEvent;
-use Lightning\DataMapper\Event\AfterUpdateEvent;
-use Lightning\DataMapper\Event\BeforeCreateEvent;
-use Lightning\DataMapper\Event\BeforeDeleteEvent;
-use Lightning\DataMapper\Event\BeforeUpdateEvent;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
 use Lightning\Test\TestCase\DataMapper\Entity\TagEntity;
@@ -159,9 +149,128 @@ class Article extends AbstractDataMapper
         return $this->$property;
     }
 
-    public function hookFail()
+    protected array $called = [];
+    protected ?string $stopOn = null;
+
+    protected function wasCalled(string $method): void
     {
-        return false;
+        $this->called[] = $method;
+    }
+
+    public function getCalled(): array
+    {
+        return $this->called;
+    }
+
+    public function stopOn(string $method): void
+    {
+        $this->stopOn = $method;
+    }
+
+    /**
+     * Before create hook
+     */
+    protected function beforeCreate(EntityInterface $entity): bool
+    {
+        parent::beforeCreate($entity);
+
+        $this->wasCalled('beforeCreate');
+
+        return $this->stopOn === 'beforeCreate' ? false : true;
+    }
+
+    /**
+     * After create hook
+     */
+    protected function afterCreate(EntityInterface $entity): void
+    {
+        parent::afterCreate($entity);
+
+        $this->wasCalled('afterCreate');
+    }
+
+    /**
+     * Before update hook
+     */
+    protected function beforeUpdate(EntityInterface $entity): bool
+    {
+        parent::beforeUpdate($entity);
+
+        $this->wasCalled('beforeUpdate');
+
+        return $this->stopOn === 'beforeUpdate' ? false : true;
+    }
+
+    /**
+     * after update hook
+     */
+    protected function afterUpdate(EntityInterface $entity): void
+    {
+        parent::afterUpdate($entity);
+
+        $this->wasCalled('afterUpdate');
+    }
+
+    /**
+     * Before save hook
+     */
+    protected function beforeSave(EntityInterface $entity): bool
+    {
+        parent::beforeSave($entity);
+
+        $this->wasCalled('beforeSave');
+
+        return $this->stopOn === 'beforeSave' ? false : true;
+    }
+
+    /**
+     * After save hook
+     */
+    protected function afterSave(EntityInterface $entity): void
+    {
+        parent::afterSave($entity);
+        $this->wasCalled('afterSave');
+    }
+
+    /**
+     * Before delete hook
+     */
+    protected function beforeDelete(EntityInterface $entity): bool
+    {
+        parent::beforeDelete($entity);
+
+        $this->wasCalled('beforeDelete');
+
+        return $this->stopOn === 'beforeDelete' ? false : true;
+    }
+
+    /**
+     * after delete hook
+     */
+    protected function afterDelete(EntityInterface $entity): void
+    {
+        parent::afterDelete($entity); // code cover friendly
+        $this->wasCalled('afterDelete');
+    }
+
+    /**
+     * before find hook
+     */
+    protected function beforeFind(QueryObject $query): bool
+    {
+        parent::beforeFind($query);// code cover friendly
+        $this->wasCalled('beforeFind');
+
+        return $this->stopOn === 'beforeFind' ? false : true;
+    }
+
+    /**
+     * After find hook
+     */
+    protected function afterFind(Collection $collection, QueryObject $query): void
+    {
+        parent::afterFind($collection, $query); // code coverage friendly
+        $this->wasCalled('afterFind');
     }
 }
 
@@ -193,12 +302,6 @@ final class AbstractDataMapperTest extends TestCase
         $mapper = new Article($this->storage);
 
         $this->assertInstanceOf(DataSourceInterface::class, $mapper->getDataSource());
-    }
-
-    public function testInitializeEventIsCalled(): void
-    {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
-        $this->assertEventDispatched(InitializeEvent::class);
     }
 
     public function testCreateEntity(): void
@@ -280,9 +383,16 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindCount(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
         $this->assertEquals(3, $mapper->findCount());
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeFindEvent::class]);
+        $this->assertEquals(['beforeFind'], $mapper->getCalled());
+    }
+
+    public function testFindCountHookCalled(): void
+    {
+        $mapper = new Article($this->storage);
+        $mapper->findCount();
+        $this->assertEquals(['beforeFind'], $mapper->getCalled());
     }
 
     public function testFindCountWithQuery(): void
@@ -294,10 +404,24 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFind(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
         $entity = $mapper->find(new QueryObject());
         $this->assertEquals('Article #1', $entity->getTitle());
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeFindEvent::class,AfterFindEvent::class]);
+    }
+
+    public function testFindHookCalled(): void
+    {
+        $mapper = new Article($this->storage);
+        $this->assertInstanceOf(EntityInterface::class, $mapper->find(new QueryObject()));
+        $this->assertEquals(['beforeFind','afterFind'], $mapper->getCalled());
+    }
+
+    public function testFindHookCalledAndCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+        $mapper->stopOn('beforeFind');
+        $this->assertNull($mapper->find(new QueryObject()));
+        $this->assertEquals(['beforeFind'], $mapper->getCalled());
     }
 
     public function testFindWithCondition(): void
@@ -309,9 +433,8 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindNoResult(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
         $this->assertNull($mapper->findBy(['id' => 1234]));
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeFindEvent::class]);
     }
 
     public function testFindAll(): void
@@ -337,7 +460,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testCreate(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
 
         $article = $mapper->createEntity([
             'title' => 'test',
@@ -353,12 +476,48 @@ final class AbstractDataMapperTest extends TestCase
         $expected = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 1 : 1003;
         $this->assertEquals($expected, $article->getId());
 
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeSaveEvent::class, BeforeCreateEvent::class,AfterCreateEvent::class,AfterSaveEvent::class]);
+        $this->assertEquals(['beforeSave','beforeCreate','afterCreate','afterSave'], $mapper->getCalled());
+    }
+
+    public function testCreateBeforeSaveHookCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+
+        $article = $mapper->createEntity([
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $mapper->stopOn('beforeSave');
+        $this->assertFalse($mapper->save($article));
+
+        $this->assertEquals(['beforeSave'], $mapper->getCalled());
+    }
+
+    public function testBeforeCreateHookCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+
+        $article = $mapper->createEntity([
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $mapper->stopOn('beforeCreate');
+        $this->assertFalse($mapper->save($article));
+
+        $this->assertEquals(['beforeSave','beforeCreate'], $mapper->getCalled());
     }
 
     public function testUpdate(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
 
         $article = ArticleEntity::fromState([
             'id' => 1000,
@@ -371,7 +530,48 @@ final class AbstractDataMapperTest extends TestCase
         $article->markPersisted(true);
 
         $this->assertTrue($mapper->save($article));
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeSaveEvent::class, BeforeUpdateEvent::class,AfterUpdateEvent::class,AfterSaveEvent::class]);
+
+        $this->assertEquals(['beforeSave','beforeUpdate','afterUpdate','afterSave'], $mapper->getCalled());
+    }
+
+    public function testUpdateBeforeSaveHookCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+
+        $article = ArticleEntity::fromState([
+            'id' => 1000,
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        $article->markPersisted(true);
+
+        $mapper->stopOn('beforeSave');
+        $this->assertFalse($mapper->save($article));
+
+        $this->assertEquals(['beforeSave'], $mapper->getCalled());
+    }
+
+    public function testUpdateBeforeUpdateHookCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+
+        $article = ArticleEntity::fromState([
+            'id' => 1000,
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        $article->markPersisted(true);
+
+        $mapper->stopOn('beforeUpdate');
+        $this->assertFalse($mapper->save($article));
+
+        $this->assertEquals(['beforeSave','beforeUpdate'], $mapper->getCalled());
     }
 
     public function testUpdateWithNoPrimaryKey(): void
@@ -395,7 +595,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testUpdateFail(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
 
         $article = ArticleEntity::fromState([
             'id' => 1234,
@@ -407,7 +607,6 @@ final class AbstractDataMapperTest extends TestCase
         ]);
         $article->markPersisted(true);
         $this->assertFalse($mapper->save($article));
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeSaveEvent::class, BeforeUpdateEvent::class]);
     }
 
     public function testSaveMany(): void
@@ -422,7 +621,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testSaveManyFail(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
 
         $article = ArticleEntity::fromState([
             'id' => 1234,
@@ -479,7 +678,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testDelete(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
 
         $article = ArticleEntity::fromState([
             'id' => 1000,
@@ -492,12 +691,30 @@ final class AbstractDataMapperTest extends TestCase
         $article->markPersisted(true);
 
         $this->assertTrue($mapper->delete($article));
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeDeleteEvent::class,AfterDeleteEvent::class]);
+        $this->assertEquals(['beforeDelete','afterDelete'], $mapper->getCalled());
+    }
+
+    public function testDeleteHookCancelled(): void
+    {
+        $mapper = new Article($this->storage);
+
+        $article = ArticleEntity::fromState([
+            'id' => 1000,
+            'title' => 'test',
+            'body' => 'none',
+            'author_id' => 1234,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+        $article->markPersisted(true);
+        $mapper->stopOn('beforeDelete');
+        $this->assertFalse($mapper->delete($article));
+        $this->assertEquals(['beforeDelete'], $mapper->getCalled());
     }
 
     public function testDeleteFail(): void
     {
-        $mapper = new Article($this->storage, $this->getEventDispatcher());
+        $mapper = new Article($this->storage);
         $article = ArticleEntity::fromState([
             'id' => 1234,
             'title' => 'test',
@@ -508,7 +725,6 @@ final class AbstractDataMapperTest extends TestCase
         ]);
 
         $this->assertFalse($mapper->delete($article));
-        $this->assertEventsDispatchedEquals([InitializeEvent::class,BeforeDeleteEvent::class]);
     }
 
     public function testDeleteMany(): void

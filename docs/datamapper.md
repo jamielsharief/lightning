@@ -71,23 +71,19 @@ $mapper->deleteAll($query);
 $mapper->updateAll($query, ['status'=> 'approved']);
 ```
 
-## Collection
+## Hooks
 
-The `Utility\Collection` object is used to store the results from find operations and this is passed to the `Event` objects.
+The following hooks are triggered
 
-## PSR-14 Events
-
-You can also use PSR-14 Events, the following events are triggered:
-
-- `initialize` - This is triggered when the data mapper is constructed
-- `BeforeSave`  - triggered before beforeCreate or beforeUpdate
-- `BeforeCreate` - triggered on save if the operation is a create
-- `BeforeUpdate` - triggered on save if the operation is an update
-- `BeforeDelete`
-- `AfterCreate` - triggered on save if the operation was a create
-- `AterUpdate` - triggered on save if the operation was an update
-- `AfterSave` - triggered after afterCreate or afterUpdate
-- `AfterDelete`
-- `BeforeFind`
-- `BeforeFind` - triggered on find, findCount and findList
-- `AfterFind` - triggered on find and findList
+- `initialize` - This is triggered when the `DataMapper` is constructed
+- `beforeSave`  - triggered before beforeCreate or beforeUpdate
+- `beforeCreate` - triggered on save if the operation is a create
+- `beforeUpdate` - triggered on save if the operation is an update
+- `beforeDelete`
+- `afterCreate` - triggered on save if the operation was a create
+- `aterUpdate` - triggered on save if the operation was an update
+- `afterSave` - triggered after afterCreate or afterUpdate
+- `afterDelete`
+- `beforeFind`
+- `beforeFind` - triggered on find, findCount and findList
+- `afterFind` - triggered on find and findList

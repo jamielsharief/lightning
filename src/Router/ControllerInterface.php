@@ -11,19 +11,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Router\Event;
+namespace Lightning\Router;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AfterFilterEvent extends AbstractFilterEvent
+interface ControllerInterface
 {
-    /**
-     * Constructor
-     */
-    public function __construct(ServerRequestInterface $request, ResponseInterface $response)
-    {
-        $this->request = $request;
-        $this->response = $response;
-    }
+    public function beforeFilter(ServerRequestInterface $request): ?ResponseInterface;
+
+    public function afterFilter(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface;
 }

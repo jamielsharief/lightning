@@ -1,6 +1,6 @@
 # Lightning Router
 
-A lightweight PSR-7 and PSR-15 router with support for PSR-11, PSR-14.
+A lightweight PSR-7 and PSR-15 router with support for PSR-11.
 
 ## Usage
 
@@ -123,14 +123,26 @@ $router->patch('/articles/:id', [ArticlesController::class,'update'], ['id' => '
 $router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' => '[0-9]+']);
 ```
 
-## PSR-14: Event Dispatcher
+## Action Filters
 
-When you create the `Router` object, if you supply a `EventDispatcher` object, the following events will be called
+By implementing the `ControllerInterface` on your controller, the `beforeFilter` and `afterFilter` methods will be called.
 
-- `BeforeDispatch`
-- `BeforeFilter`
-- `AfterFilter`
-- `AfterDispatch`
+```php
+class PostsController implements ControllerInterface
+{
+    public function beforeFilter(ServerRequestInterface $request): ?ResponseInterface
+    {
+        return null;
+    }
+
+    public function afterFilter(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+}
+```
+
+
 
 ## PSR-11: DI Container
 

@@ -34,36 +34,4 @@ class ArticlesController extends BaseController
     {
         return new Response();
     }
-
-    /**
-     * Before render hook
-     */
-    protected function beforeRender(): ?ResponseInterface
-    {
-        return null;
-    }
-
-    /**
-     * After render hook
-     */
-    protected function afterRender(ResponseInterface $response): ResponseInterface
-    {
-        return $response;
-    }
-
-    /**
-     * Before Redirect hook
-     */
-    protected function beforeRedirect(string $url): ?ResponseInterface
-    {
-        return null;
-    }
-
-    /**
-     * After Direct hook
-     */
-    protected function afterRedirect(ResponseInterface $response): ResponseInterface
-    {
-        return $response;
-    }
 }

@@ -47,6 +47,19 @@ final class HookTraitTest extends TestCase
         );
     }
 
+    public function testUnRegister(): void
+    {
+        $controller = new ArticlesController();
+
+        $controller->registerHook('before', 'beforeFilter');
+
+        $controller->unregisterHook('before', 'beforeFilter');
+        $this->assertEquals(
+            [],
+            $controller->getRegisteredHooks('before')
+        );
+    }
+
     public function testRegisterException(): void
     {
         $controller = new ArticlesController();

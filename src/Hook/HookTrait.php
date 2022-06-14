@@ -15,8 +15,16 @@ namespace Lightning\Hook;
 
 use InvalidArgumentException;
 
+/**
+ * Hook Trait
+ *
+ * Goals: register and unregister hooks programatically on object
+ */
 trait HookTrait
 {
+    /**
+     * Registered hooks
+     */
     protected array $registeredHooks = [];
 
     /**
@@ -38,14 +46,22 @@ trait HookTrait
     }
 
     /**
+     * Unregisters a hook that was registered
+     */
+    public function unregisterHook(string $name, string $method): static
+    {
+        unset($this->registeredHooks[$name]);
+
+        return $this;
+    }
+
+    /**
      * Trigger a hook
      */
     public function triggerHook(string $name, array $arguments = [], bool $isStoppable = true): bool
     {
-        $hooks = $this->registeredHooks[$name] ?? [];
-
-        foreach ($hooks as $method) {
-            if (call_user_func_array([$this,$method], $arguments) === false && $isStoppable) {
+        foreach ($this->registeredHooks[$name] ?? [] as $method) {
+            if ($this->$method(...$arguments) === false && $isStoppable) {
                 return false;
             }
         }

@@ -51,3 +51,9 @@ $ vendor/bin/phpunit
 - setters and getters, set,Get. If setter does not return a bool, instead of void return the object.
 - accesibility, main methods on object should be public even if they are not supposed to be called from outside. e.g. controller render, console command output.
 - GET should be used for single items
+
+
+To think about
+- interfaces, use getEventName or eventName(), getSubscribedEvents() or subscribedEvents();
+- hooks should be public not protected, e.g. initialize
+- methods should be public even if they were not suppose to be called from the outside, e.g. Controller::render, only functions it calls can then be hidden.

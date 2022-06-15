@@ -21,6 +21,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
  * TestEventDispatcher
  *
  * A test PSR-14 Event Dispatcher
+ *
+ * @todo: needs to be rethought as some sort of adapater, decorator, needs to register events as well.
  */
 class TestEventDispatcher implements Countable, EventDispatcherInterface
 {
@@ -136,6 +138,6 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      */
     private function getEventName(object $event): string
     {
-        return $event instanceof EventWithNameInterface ? $event->getEventName() : get_class($event);
+        return $event instanceof EventWithNameInterface ? $event->eventName() : get_class($event);
     }
 }

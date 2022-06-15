@@ -10,7 +10,7 @@ class GenericEvent implements EventWithNameInterface
 {
     public $name = 'Generic.Event';
 
-    public function getEventName(): string
+    public function eventName(): string
     {
         return $this->name;
     }

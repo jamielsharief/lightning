@@ -14,6 +14,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\PhpSession;
 use Psr\Http\Message\ResponseInterface;
+use Lightning\Event\EventManagerInterface;
 use Lightning\Http\Session\SessionInterface;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Translator\TranslatorInterface;
@@ -21,7 +22,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Lightning\Translator\ResourceBundleFactory;
 use Lightning\TemplateRenderer\TemplateRenderer;
 use Lightning\Http\Auth\IdentityServiceInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\DatabaseDataSource;
 use Lightning\Http\Auth\IdentityService\PdoIdentityService;
 
@@ -30,12 +30,12 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
  */
 
  return [
-     EventDispatcherInterface::class => function (ContainerInterface $container) {
+     EventManagerInterface::class => function (ContainerInterface $container) {
          return new EventDispatcher();
      },
 
      Router::class => function (ContainerInterface $container) {
-         $router = new Router($container, $container->get(EventDispatcherInterface::class), new Autowire($container), new Response());
+         $router = new Router($container, $container->get(EventManagerInterface::class), new Autowire($container), new Response());
 
          $function = include __DIR__ . '/routes.php';
          $function($router);

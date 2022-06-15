@@ -8,9 +8,31 @@ use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 
 use Psr\Http\Message\ResponseInterface;
+use Lightning\Event\EventManagerInterface;
 use Lightning\Controller\AbstractController;
+use Lightning\TestSuite\TestEventDispatcher;
+use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
+use Lightning\Controller\Event\BeforeRenderEvent;
+use Lightning\Controller\Event\AfterRedirectEvent;
+use Lightning\Controller\Event\BeforeRedirectEvent;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
+
+/**
+ * @todo how to deal with this, the event manager was designed for reasons as such.
+ */
+class TestEventManager extends TestEventDispatcher implements EventManagerInterface
+{
+    public function addListener(string $eventName, callable $callable, int $priority = 10): static
+    {
+        return $this;
+    }
+
+    public function removeListener(string $eventName, callable $callable): static
+    {
+        return $this;
+    }
+}
 
 class ApiController extends AbstractController
 {
@@ -43,7 +65,7 @@ class ApiController extends AbstractController
         return new Response();
     }
 
-    protected function initialize(): void
+    public function initialize(): void
     {
         $this->wasCalled('initialize');
     }
@@ -89,6 +111,13 @@ class ApiController extends AbstractController
 
 final class AbstractControllerTest extends TestCase
 {
+    protected TestEventManager $eventDispatcher;
+
+    public function setUp(): void
+    {
+        $this->eventDispatcher = new TestEventManager();
+    }
+
     public function testSetRequest(): void
     {
         $controller = $this->createController();
@@ -216,52 +245,51 @@ final class AbstractControllerTest extends TestCase
 
     public function testRenderHooks(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
 
         $controller->index();
 
         $this->assertEquals([
-            'initialize','beforeRender','afterRender'
-        ], $controller->getCalled());
+            BeforeRenderEvent::class, AfterRenderEvent::class
+        ], $this->eventDispatcher->getDispatchedEvents());
     }
 
     public function testRenderHooksJson(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
 
         $controller->indexJson();
 
         $this->assertEquals([
-            'initialize','beforeRender','afterRender'
-        ], $controller->getCalled());
+            BeforeRenderEvent::class, AfterRenderEvent::class
+        ], $this->eventDispatcher->getDispatchedEvents());
     }
 
     public function testRenderHooksFile(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
 
         $controller->download();
 
         $this->assertEquals([
-            'initialize','beforeRender','afterRender'
-        ], $controller->getCalled());
+            BeforeRenderEvent::class, AfterRenderEvent::class
+        ], $this->eventDispatcher->getDispatchedEvents());
     }
 
     public function testRedirectHooks(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
 
         $controller->old();
-
         $this->assertEquals([
-            'initialize','beforeRedirect','afterRedirect'
-        ], $controller->getCalled());
+            BeforeRedirectEvent::class, AfterRedirectEvent::class
+        ], $this->eventDispatcher->getDispatchedEvents());
     }
 
     private function createController(): ArticlesController
     {
         $path = __DIR__ .'/TestApp/templates';
 
-        return new ArticlesController(new TemplateRenderer($path, sys_get_temp_dir()));
+        return new ArticlesController(new TemplateRenderer($path, sys_get_temp_dir()), $this->eventDispatcher);
     }
 }

@@ -18,7 +18,10 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Lightning\Router\Event\AfterDispatchEvent;
 use Lightning\Http\Exception\NotFoundException;
+use Lightning\Router\Event\BeforeDispatchEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Router\Middleware\DispatcherMiddleware;
 
 /**
@@ -39,6 +42,7 @@ class Router implements RequestHandlerInterface, RoutesInterface
     public const NUMERIC = '[0-9]+';
 
     protected ?ContainerInterface $container;
+    protected ?EventDispatcherInterface $eventDispatcher;
     protected ?ResponseInterface $emptyResponse ;
     protected ?Autowire $autowire;
 
@@ -50,10 +54,12 @@ class Router implements RequestHandlerInterface, RoutesInterface
      */
     public function __construct(
         ?ContainerInterface $container = null,
+        ?EventDispatcherInterface $eventDispatcher = null,
         ?Autowire $autowire = null,
         ?ResponseInterface $emptyResponse = null
         ) {
         $this->container = $container;
+        $this->eventDispatcher = $eventDispatcher;
         $this->emptyResponse = $emptyResponse;
         $this->autowire = $autowire;
         $this->routes = $this->createRouteCollection();
@@ -113,6 +119,14 @@ class Router implements RequestHandlerInterface, RoutesInterface
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
+        if ($this->eventDispatcher) {
+            $event = $this->eventDispatcher->dispatch(new BeforeDispatchEvent($request));
+            if ($response = $event->getResponse()) {
+                return $response;
+            }
+            $request = $event->getRequest();
+        }
+
         $route = $this->match($request);
 
         // Add vars to request
@@ -131,13 +145,17 @@ class Router implements RequestHandlerInterface, RoutesInterface
 
         $response = (new RequestHandler($this->createMiddlewareStack($route, $callable)))->handle($request);
 
+        if ($this->eventDispatcher) {
+            $response = $this->eventDispatcher->dispatch(new AfterDispatchEvent($request, $response))->getResponse();
+        }
+
         return $response;
     }
 
     private function createMiddlewareStack(?Route $route, callable $callable): array
     {
         $middleware = $route ? $route->getMiddlewares() : $this->middlewares; # Important: to add Router main middlewares
-        array_push($middleware, new DispatcherMiddleware($callable, $this->emptyResponse, $this->autowire));
+        array_push($middleware, new DispatcherMiddleware($callable, $this->emptyResponse, $this->eventDispatcher, $this->autowire));
 
         return $middleware;
     }

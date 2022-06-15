@@ -1,85 +1,67 @@
 # PSR-14 Event Dispatcher 
 
-Use the Event Dispatcher (PSR-14) to easily inject logic into an application, for more information on the standard see [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/).
-
+A lightweight [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/), with an additional interface to facilate adding and removing listeners.
 
 ## Usage
+
+Create the `EventDispatcher`
+
+```php
+$eventDispatcher = new EventDispatcher();
+```
 
 To add any `callable` use the `addListener` method.
 
 ```php
-$eventDispatcher = new EventDispatcher();
-$eventDispatcher->addListener(AfterOrder::class, [$this,'afterOrder']);
+$eventDispatcher->addListener(AfterOrder::class, [$this, 'afterOrder']);
+```
+
+Then to dispatch
+
+```php
 $eventDispatcher->dispatch(new AfterOrder);
 ```
 
-If you want to listen to multiple events then implement `EventSubscriberInterface` on the object that
-you want to do the listening
+You can remove like so
 
 ```php
-class OrderListener implements EventSubscriberInterface
-{
-    public function getSubscribedEvents() : array
-    {
-        return [
-            NewOrder::class => 'newOrder',
-            AfterOrder::class => ['afterOrder', 5]
-            PaymentComplete::class => [
-                ['logPayment'],
-                ['sendSms', 100]
-            ]
-        ];
-    }
-
-    public function newOrder(NewOrder $event)
-    {
-        
-    }
-}
-```
-
-Then you would subscribe using the `addSubscriber` and then dispatch.
-
-```php
-$eventDispatcher = new EventDispatcher();
-$eventDispatcher->addSubscriber(new OrderListener);
-$eventDispatcher->dispatch(new AfterOrder);
+$eventDispatcher->removeListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
 
 ## Priority
 
-You can also pass a third argument, the priority, the default number is `10`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
+The `addListener` method has an optional third argument, the priority, the default number is `10`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
 
 ```php
 $eventDispatcher->addListener(AfterOrder::class, function(AfterOrder $order){
     // do something
-},50);
+}, 50);
 ```
 
-## Generic Events
+## Subscribers
 
-There is also a generic `Event` class.
-
-```php
-$eventDispatcher = new EventDispatcher();
-$eventDispatcher->addListener('Order.afterPayment', [$this, 'afterPayment']);
-
-# To dispatch normally
-$event = new Event('Order.afterPayment', $this, ['order' => $order]);
-$eventDispatcher->dispatch($event);
-```
-
-Subscribers also work nicely with the `Event` class
+Add the `EventSubscriberInterface` to the object
 
 ```php
-class OrderListener implements EventSubscriberInterface
+class Controller implements EventSubscriberInterface
 {
-    public function getSubscribedEvents() : array
+    public function subscribedEvents(): array
     {
         return [
-            'Order.new' = 'newOrder',
-            'Order.after' => 'afterOrder'
+            SomethingHappened::class => 'foo',
+            SomethingElseHappened::class => ['bar', 5]
         ];
     }
-}
+```
+
+then  call the `addSubscriber` method
+
+```php
+$eventDispatcher->addSubscriber(new Controller());
+```
+
+To remove
+
+```php
+$eventDispatcher->removeSubscriber(new Controller());
 ```

@@ -3,14 +3,14 @@
 namespace Lightning\Test\TestSuite;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\Event\GenericEventInterface;
+use Lightning\Event\EventWithNameInterface;
 use Lightning\TestSuite\TestEventDispatcher;
 
-class GenericEvent implements GenericEventInterface
+class GenericEvent implements EventWithNameInterface
 {
     public $name = 'Generic.Event';
 
-    public function getName(): string
+    public function getEventName(): string
     {
         return $this->name;
     }

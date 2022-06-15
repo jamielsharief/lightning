@@ -14,7 +14,7 @@
 namespace Lightning\TestSuite;
 
 use Countable;
-use Lightning\Event\GenericEventInterface;
+use Lightning\Event\EventWithNameInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -136,6 +136,6 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
      */
     private function getEventName(object $event): string
     {
-        return $event instanceof GenericEventInterface ? $event->getName() : get_class($event);
+        return $event instanceof EventWithNameInterface ? $event->getEventName() : get_class($event);
     }
 }

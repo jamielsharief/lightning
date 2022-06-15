@@ -14,20 +14,20 @@
 namespace Lightning\Event;
 
 use Psr\EventDispatcher\StoppableEventInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
-class EventDispatcher implements EventDispatcherInterface, ListenerProviderInterface
+/**
+ * EventDispatcher
+ */
+class EventDispatcher implements EventManagerInterface, ListenerProviderInterface
 {
-    public const DEFAULT_PRIORITY = 10;
-
     private array $listeners = [];
     private array $sorted = [];
 
     /**
-     * Adds a Listener
+     * Adds an event listener
      */
-    public function addListener(string $eventType, callable $callable, int $priority = self::DEFAULT_PRIORITY): static
+    public function addListener(string $eventType, callable $callable, int $priority = 10): static
     {
         $this->listeners[$eventType][$priority][] = $callable;
         unset($this->sorted[$eventType]);
@@ -36,59 +36,20 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     }
 
     /**
-     * Adds a subscriber
+     * Adds an event Subscriber
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): static
+    public function addSubscriber(EventSubscriberInterface $subscriber, int $defaultPriority = 10): static
     {
-        foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
-            foreach ($this->normalizeEvents($params) as $method) {
-                $this->addListener($eventType, [$subscriber,$method[0]], $method[1]);
-            }
+        foreach ($subscriber->subscribedEvents() as $eventType => $params) {
+            $params = (array) $params;
+            $this->addListener($eventType, [$subscriber, $params[0]], $params[1] ?? $defaultPriority);
         }
 
         return $this;
     }
 
     /**
-     * Standardize the array
-     */
-    private function normalizeEvents($method): array
-    {
-        $methods = [];
-
-        if (is_string($method)) {
-            $methods[] = [$method,self::DEFAULT_PRIORITY];
-        } elseif (is_array($method)) {
-            if (is_int($method[1] ?? null)) {
-                $methods[] = [$method[0],$method[1] ?? self::DEFAULT_PRIORITY];
-            } else {
-                foreach ($method as $m) {
-                    $methods[] = [$m[0], $m[1] ?? self::DEFAULT_PRIORITY];
-                }
-            }
-        }
-
-        return $methods;
-    }
-
-    public function getListenersForEvent(object $event): iterable
-    {
-        $eventType = $event instanceof Event ? $event->getName() : $event::class;
-
-        if (empty($this->listeners[$eventType])) {
-            return [];
-        }
-
-        if (! isset($this->sorted[$eventType])) {
-            ksort($this->listeners[$eventType]);
-            $this->sorted[$eventType] = true;
-        }
-
-        return array_merge(...$this->listeners[$eventType]);
-    }
-
-    /**
-     * Removes a listener
+     * Removes an event listener
      */
     public function removeListener(string $eventType, callable $callable): static
     {
@@ -104,21 +65,38 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     }
 
     /**
-     * Removes a subscriber
+     * Removes an event Subscriber
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber): static
     {
-        foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
-            foreach ($this->normalizeEvents($params) as $method) {
-                $this->removeListener($eventType, [$subscriber,$method[0]]);
-            }
+        foreach ($subscriber->subscribedEvents() as $eventType => $params) {
+            $params = (array) $params;
+            $this->removeListener($eventType, [$subscriber, $params[0]]);
         }
 
         return $this;
     }
 
     /**
-     * Dispatches an event
+     * Gets the Listeners for an Event
+     */
+    public function getListenersForEvent(object $event): iterable
+    {
+        $eventType = $event instanceof EventWithNameInterface ? $event->eventName() : $event::class;
+        if (empty($this->listeners[$eventType])) {
+            return [];
+        }
+
+        if (! isset($this->sorted[$eventType])) {
+            ksort($this->listeners[$eventType]);
+            $this->sorted[$eventType] = true;
+        }
+
+        return array_merge(...$this->listeners[$eventType]);
+    }
+
+    /**
+     * Dispatches an Event
      */
     public function dispatch(object $event): object
     {

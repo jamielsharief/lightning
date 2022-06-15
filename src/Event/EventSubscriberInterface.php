@@ -20,14 +20,10 @@ interface EventSubscriberInterface
      *
      * [
      *  'Order.complete' => 'sendEmail'
-     *  'Order.newCustomer' => ['sendSMS',100],
-     *   AfterFindEvent::class => [
-     *      ['addThis'],
-     *      ['addThat',100]
-     *   ]
+     *  'Order.newCustomer' => ['sendSMS',100]
      * ]
      *
      * @return array
      */
-    public function getSubscribedEvents(): array;
+    public function subscribedEvents(): array;
 }

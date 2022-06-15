@@ -13,7 +13,7 @@
 
 namespace Lightning\Event;
 
-interface GenericEventInterface
+interface EventWithNameInterface
 {
-    public function getName(): string;
+    public function eventName(): string;
 }

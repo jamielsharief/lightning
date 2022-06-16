@@ -19,6 +19,18 @@ use Lightning\Database\Row;
 use InvalidArgumentException;
 use Lightning\Utility\Collection;
 use Lightning\Entity\EntityInterface;
+use Lightning\DataMapper\Event\AfterFindEvent;
+use Lightning\DataMapper\Event\AfterSaveEvent;
+use Lightning\DataMapper\Event\BeforeFindEvent;
+use Lightning\DataMapper\Event\BeforeSaveEvent;
+use Lightning\DataMapper\Event\InitializeEvent;
+use Lightning\DataMapper\Event\AfterCreateEvent;
+use Lightning\DataMapper\Event\AfterDeleteEvent;
+use Lightning\DataMapper\Event\AfterUpdateEvent;
+use Lightning\DataMapper\Event\BeforeCreateEvent;
+use Lightning\DataMapper\Event\BeforeDeleteEvent;
+use Lightning\DataMapper\Event\BeforeUpdateEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\Exception\EntityNotFoundException;
 
 abstract class AbstractDataMapper
@@ -39,13 +51,22 @@ abstract class AbstractDataMapper
     protected array $fields = [];
 
     /**
+      * PSR-14 Event Dispatcher
+      *
+      * @var EventDispatcherInterface|null
+      */
+    protected ?EventDispatcherInterface $eventDispatcher = null;
+
+    /**
      * Constructor
      */
-    public function __construct(DataSourceInterface $dataSource)
+    public function __construct(DataSourceInterface $dataSource, ?EventDispatcherInterface $eventDispatcher = null)
     {
         $this->dataSource = $dataSource;
+        $this->eventDispatcher = $eventDispatcher;
 
         $this->initialize();
+        $this->dispatchEvent(new InitializeEvent($this));
     }
 
     /**
@@ -72,91 +93,15 @@ abstract class AbstractDataMapper
     }
 
     /**
-     * Before create hook
-     */
-    protected function beforeCreate(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * After create hook
-     */
-    protected function afterCreate(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * Before update hook
-     */
-    protected function beforeUpdate(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * after update hook
-     */
-    protected function afterUpdate(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * Before save hook
-     */
-    protected function beforeSave(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * After save hook
-     */
-    protected function afterSave(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * Before delete hook
-     */
-    protected function beforeDelete(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * after delete hook
-     */
-    protected function afterDelete(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * before find hook
-     */
-    protected function beforeFind(QueryObject $query): bool
-    {
-        return true;
-    }
-
-    /**
-     * After find hook
-     */
-    protected function afterFind(Collection $collection, QueryObject $query): void
-    {
-    }
-
-    /**
      * Inserts an Entity into the database
      */
     protected function create(EntityInterface $entity): bool
     {
-        if (! $this->beforeCreate($entity)) {
-            return false;
-        }
+        $this->dispatchEvent(new BeforeCreateEvent($this, $entity));
 
-        $row = array_intersect_key($this->mapEntityToData($entity), array_flip($this->fields));;
-        $result = $this->dataSource->create($this->table, $row);
+        $data = array_intersect_key($this->mapEntityToData($entity), array_flip($this->fields));
+
+        $result = $this->dataSource->create($this->table, $data);
 
         if ($result) {
             $entity->markPersisted(true);
@@ -171,7 +116,7 @@ abstract class AbstractDataMapper
                 $reflectionProperty->setValue($entity, $id);
             }
 
-            $this->afterCreate($entity);
+            $this->dispatchEvent(new AfterCreateEvent($this, $entity));
         }
 
         return $result;
@@ -182,14 +127,12 @@ abstract class AbstractDataMapper
      */
     public function save(EntityInterface $entity): bool
     {
-        if (! $this->beforeSave($entity)) {
-            return false;
-        }
+        $this->dispatchEvent(new BeforeSaveEvent($this, $entity));
 
         $result = $entity->isNew() ? $this->create($entity) : $this->update($entity);
 
         if ($result) {
-            $this->afterSave($entity);
+            $this->dispatchEvent(new AfterSaveEvent($this, $entity));
         }
 
         return $result;
@@ -238,7 +181,9 @@ abstract class AbstractDataMapper
     {
         $query = $query ?? $this->createQueryObject();
 
-        return $this->beforeFind($query) === false ? 0 : $this->dataSource->count($this->table, $query);
+        $this->dispatchEvent(new BeforeFindEvent($this, $query));
+
+        return $this->dataSource->count($this->table, $query);
     }
 
     /**
@@ -367,9 +312,7 @@ abstract class AbstractDataMapper
      */
     protected function read(QueryObject $query, bool $mapResult = true): Collection
     {
-        if (! $this->beforeFind($query)) {
-            return $this->createCollection();
-        }
+        $this->dispatchEvent(new BeforeFindEvent($this, $query));
 
         if ($this->fields && ! $query->getOption('fields')) {
             $query->setOption('fields', $this->fields);
@@ -380,7 +323,7 @@ abstract class AbstractDataMapper
             return $collection;
         }
 
-        $this->afterFind($collection, $query);
+        $this->dispatchEvent(new AfterFindEvent($this, $collection, $query));
 
         if ($mapResult) {
             foreach ($collection as $index => $row) {
@@ -398,17 +341,14 @@ abstract class AbstractDataMapper
      */
     public function update(EntityInterface $entity): bool
     {
-        if (! $this->beforeUpdate($entity)) {
-            return false;
-        }
+        $this->dispatchEvent(new BeforeUpdateEvent($this, $entity));
 
         $row = array_intersect_key($this->mapEntityToData($entity), array_flip($this->fields));
         $query = $this->createQueryObject($this->getConditionsFromState($row));
 
         $result = $this->dataSource->update($this->table, $query, $row) === 1;
-
         if ($result) {
-            $this->afterUpdate($entity);
+            $this->dispatchEvent(new AfterUpdateEvent($this, $entity));
         }
 
         return $result;
@@ -471,13 +411,11 @@ abstract class AbstractDataMapper
     }
 
     /**
-     * Deletes an entity
+     * Updates an Entity
      */
     public function delete(EntityInterface $entity): bool
     {
-        if (! $this->beforeDelete($entity)) {
-            return false;
-        }
+        $this->dispatchEvent(new BeforeDeleteEvent($this, $entity));
 
         $row = $this->mapEntityToData($entity);
         $query = $this->createQueryObject($this->getConditionsFromState($row));
@@ -485,7 +423,7 @@ abstract class AbstractDataMapper
         $result = $this->dataSource->delete($this->table, $query) === 1;
 
         if ($result) {
-            $this->afterDelete($entity);
+            $this->dispatchEvent(new AfterDeleteEvent($this, $entity));
         }
 
         return $result;
@@ -561,5 +499,13 @@ abstract class AbstractDataMapper
         }
 
         return $conditions;
+    }
+
+    /**
+     * Dispatches an Event using the PSR-14 Event Dispatcher if available
+     */
+    protected function dispatchEvent(object $event): ?object
+    {
+        return $this->eventDispatcher ? $this->eventDispatcher->dispatch($event) : null;
     }
 }

@@ -28,11 +28,41 @@ use Lightning\DataMapper\DataSourceInterface;
  */
 abstract class AbstractRepository
 {
+    protected AbstractDataMapper $mapper;
+
     /**
      * Constructor
+     *
+     * @internal as the mappers are extended to prevent DI problems, these cant be defined as class properties through the constructo.
+     * This is no the case with an object that is not extended.
      */
-    public function __construct(protected AbstractDataMapper $mapper)
+    public function __construct(AbstractDataMapper $mapper)
     {
+        $this->mapper = $mapper;
+
+        $this->initialize();
+    }
+
+    protected function initialize(): void
+    {
+    }
+
+    /**
+     * Gets an Entity or throws an exception
+     *
+     * @throws EntityNotFoundException
+     */
+    public function get(QueryObject $query): EntityInterface
+    {
+        return $this->mapper->get($query);
+    }
+
+    /**
+     * Gets an Entity or throws an exception
+     */
+    public function getBy(array $criteria = [], array $options = []): EntityInterface
+    {
+        return $this->mapper->getBy($criteria, $options);
     }
 
     /**
@@ -183,6 +213,14 @@ abstract class AbstractRepository
     public function createQueryObject(array $criteria = [], array $options = []): QueryObject
     {
         return new QueryObject($criteria, $options);
+    }
+
+    /**
+     * Creates an Entity
+     */
+    public function createEntity(array $data = [], array $options = []): EntityInterface
+    {
+        return $this->mapper->createEntity($data, $options);
     }
 
     /**

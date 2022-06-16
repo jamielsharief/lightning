@@ -11,10 +11,11 @@ use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Entity\AbstractEntity;
+use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
-use Lightning\Fixture\FixtureManager;
 
+use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\Test\Fixture\ArticlesFixture;
@@ -185,12 +186,12 @@ final class AbstractDataMapperTest extends TestCase
             TagsFixture::class,
         ]);
 
-        $this->setEventDispatcher(new TestEventDispatcher());
+        $this->setEventDispatcher(new TestEventDispatcher(new EventDispatcher()));
     }
 
     public function testGetDataSource(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $this->assertInstanceOf(DataSourceInterface::class, $mapper->getDataSource());
     }
@@ -203,7 +204,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testCreateEntity(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $data = [
             'title' => 'test',
@@ -220,7 +221,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testCreateEntities(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $data = [
             'title' => 'test',
@@ -237,12 +238,12 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testGetPrimaryKey(): void
     {
-        $this->assertEquals(['id'], (new Article($this->storage))->getPrimaryKey());
+        $this->assertEquals(['id'], (new Article($this->storage, $this->getEventDispatcher()))->getPrimaryKey());
     }
 
     public function testGet(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         /** @var ArticleEntity $article */
         $article = $mapper->getBy(['id' => 1000]);
@@ -256,7 +257,7 @@ final class AbstractDataMapperTest extends TestCase
      */
     public function testGetFields(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $mapper->setProperty('fields', [
             'id', 'title','body','author_id'
         ]);
@@ -269,7 +270,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testGetNotFound(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $this->expectException(EntityNotFoundException::class);
         $this->expectExceptionMessage('Entity Not Found');
@@ -287,7 +288,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindCountWithQuery(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(1, $mapper->findCountBy(['id' => 1000]));
         $this->assertEquals(0, $mapper->findCountBy(['id' => 1234]));
     }
@@ -302,7 +303,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindWithCondition(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $entity = $mapper->findBy(['id' => 1000]);
         $this->assertEquals('Article #1', $entity->getTitle());
     }
@@ -316,20 +317,20 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindAll(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $result = $mapper->findAll();
         $this->assertCount(3, $result);
     }
 
     public function testFindAllBy(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertCount(2, $mapper->findAllBy(['id !=' => 1000]));
     }
 
     public function testFindAllNoResults(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $items = $mapper->findAll();
 
         $this->assertEmpty($mapper->findAllBy(['id' => 123456789]));
@@ -376,7 +377,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testUpdateWithNoPrimaryKey(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Primary key `id` has no value');
@@ -412,7 +413,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testSaveMany(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $entities = $mapper->findAll();
         foreach ($entities as $entity) {
             $entity->setUpdatedAt(date('Y-m-d H:i:s'));
@@ -435,14 +436,14 @@ final class AbstractDataMapperTest extends TestCase
         $article->markPersisted(true);
         $this->assertFalse($mapper->save($article));
 
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $entities = $mapper->createCollection([$article]);
         $this->assertFalse($mapper->saveMany($entities));
     }
 
     public function testUpdateAll(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $this->assertEquals(2, $mapper->updateAll(new QueryObject(['id !=' => 1001]), ['author_id' => 1111]));
         $this->assertEquals(0, $mapper->updateAll(new QueryObject(['id' => 1234]), ['author_id' => 1111]));
@@ -450,7 +451,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testUpdateAllException(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Data cannot be empty');
 
@@ -459,21 +460,21 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testUpdateAllBy(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $this->assertEquals(2, $mapper->updateAllBy(['id !=' => 1001], ['author_id' => 1111]));
     }
 
     public function testDeleteAll(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(2, $mapper->deleteAll(new QueryObject(['id !=' => 1001])));
         $this->assertEquals(0, $mapper->deleteAll(new QueryObject(['id' => 1234])));
     }
 
     public function testDeleteAllBy(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(2, $mapper->deleteAllBy(['id !=' => 1001]));
     }
 
@@ -513,7 +514,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testDeleteMany(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $articles = $mapper->findAll();
 
         $this->assertTrue($mapper->deleteMany($articles));
@@ -522,7 +523,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testDeleteManyFail(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $article = ArticleEntity::fromState([
             'id' => 1234,
             'title' => 'test',
@@ -543,7 +544,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindList(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(
             [1000,1001,1002],
             $mapper->findList()
@@ -552,7 +553,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindListWithNoPrimaryKey(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $reflection = new ReflectionClass($mapper);
         $property = $reflection->getProperty('primaryKey');
         $property->setAccessible(true);
@@ -566,7 +567,7 @@ final class AbstractDataMapperTest extends TestCase
     public function testFindListWithQuery(): void
     {
         $query = new QueryObject(['id !=' => 1001]);
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(
             [1000,1002],
             $mapper->findList($query)
@@ -575,7 +576,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindListBy(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(
             [1000,1002],
             $mapper->findListBy(['id !=' => 1001])
@@ -584,7 +585,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindListWithValues(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
         $this->assertEquals(
             [1000 => 'Article #1',1001 => 'Article #2',1002 => 'Article #3'],
             $mapper->findList(null, ['idField' => 'id','valueField' => 'title'])
@@ -593,7 +594,7 @@ final class AbstractDataMapperTest extends TestCase
 
     public function testFindListGrouped(): void
     {
-        $mapper = new Article($this->storage);
+        $mapper = new Article($this->storage, $this->getEventDispatcher());
 
         $mapper->updateAll(new QueryObject(), ['author_id' => 2000]);
         $mapper->updateAll(new QueryObject(['id !=' => 1001]), ['author_id' => 4000]);
@@ -615,7 +616,7 @@ final class AbstractDataMapperTest extends TestCase
 
     // public function testBeforeFindHookFail(): void
     // {
-    //     $mapper = new Article($this->storage);
+    //     $mapper = new Article($this->storage, $this->getEventDispatcher());
 
     //     $this->assertNull($mapper->find());
     //     $this->assertTrue($mapper->findAll()->isEmpty());
@@ -625,7 +626,7 @@ final class AbstractDataMapperTest extends TestCase
 
     // public function testBeforeCreateHookFail(): void
     // {
-    //     $mapper = new Article($this->storage);
+    //     $mapper = new Article($this->storage, $this->getEventDispatcher());
 
     //     $article = $mapper->createEntity([
     //         'title' => 'test',
@@ -640,7 +641,7 @@ final class AbstractDataMapperTest extends TestCase
 
     // public function testBeforeSaveHookFail(): void
     // {
-    //     $mapper = new Article($this->storage);
+    //     $mapper = new Article($this->storage, $this->getEventDispatcher());
 
     //     $article = $mapper->createEntity([
     //         'title' => 'test',
@@ -655,7 +656,7 @@ final class AbstractDataMapperTest extends TestCase
 
     // public function testBeforeDeleteHookFail(): void
     // {
-    //     $mapper = new Article($this->storage);
+    //     $mapper = new Article($this->storage, $this->getEventDispatcher());
     //     $mapper->registerHook('beforeDelete', 'hookFail');
 
     //     $article = $mapper->find();
@@ -665,7 +666,7 @@ final class AbstractDataMapperTest extends TestCase
 
     // public function testBeforeUpdateHookFail(): void
     // {
-    //     $mapper = new Article($this->storage);
+    //     $mapper = new Article($this->storage, $this->getEventDispatcher());
     //     $mapper->registerHook('beforeUpdate', 'hookFail');
 
     //     $article = $mapper->find();

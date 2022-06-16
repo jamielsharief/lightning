@@ -26,4 +26,8 @@ interface EventManagerInterface extends EventDispatcherInterface
     public function addListener(string $eventName, callable $callable, int $priority = 10): static;
 
     public function removeListener(string $eventName, callable $callable): static;
+
+    public function addSubscriber(EventSubscriberInterface $subscriber, int $defaultPriority = 10): static;
+
+    public function removeSubscriber(EventSubscriberInterface $subscriber): static;
 }

@@ -5,8 +5,9 @@ namespace Lightning\Test\DataMapper\Event;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Entity\EntityInterface;
+use Lightning\Event\EventDispatcher;
 
+use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
@@ -52,10 +53,10 @@ final class AbstractBeforeWriteEventTest extends TestCase
         $this->datasource = new DatabaseDataSource($pdo, new QueryBuilder());
 
         return [
-            [new BeforeCreateEvent(new TagWriteDataMapper($this->datasource), new TagEntity())],
-            [new BeforeUpdateEvent(new TagWriteDataMapper($this->datasource), new TagEntity())],
-            [new BeforeSaveEvent(new TagWriteDataMapper($this->datasource), new TagEntity())],
-            [new BeforeDeleteEvent(new TagWriteDataMapper($this->datasource), new TagEntity())]
+            [new BeforeCreateEvent(new TagWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new BeforeUpdateEvent(new TagWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new BeforeSaveEvent(new TagWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new BeforeDeleteEvent(new TagWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())]
         ];
     }
 

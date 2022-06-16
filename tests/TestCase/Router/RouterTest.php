@@ -9,6 +9,7 @@ use Lightning\Cache\ApcuCache;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\Autowire\Autowire;
+use Lightning\Event\EventDispatcher;
 use Lightning\Router\RouteCollection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -284,7 +285,7 @@ final class RouterTest extends TestCase
 
     public function testProcessEventsWereCalled(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
         $router = new Router(null, $eventDispatcher);
         $router->get('/articles', ['Lightning\Test\Router\DummyController','index']);
 
@@ -330,8 +331,8 @@ final class RouterTest extends TestCase
 
     public function testBeforeDispatchResponseChanged(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
-        $eventDispatcher->on(BeforeDispatchEvent::class, function (BeforeDispatchEvent $event) {
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
+        $eventDispatcher->addListener(BeforeDispatchEvent::class, function (BeforeDispatchEvent $event) {
             $event->setResponse(new Response(200, [], 'foo'));
         });
 

@@ -152,8 +152,8 @@ $manager->add(new ArticleMapper(new MemoryDataSource()));
 To create one when it is needed aka lazy load, you can use a factory callable.
 
 ```php
-$manager->configure(ArticleMapper::class, function(DataSourceInterface $dataSource, MapperManager $manager){
-    return new ArticleMapper($dataSource, $manager, new SomeDependency());
+$manager->configure(ArticleMapper::class, function(DataSourceInterface $dataSource, EventDispatcherInterface $eventDispatcher, MapperManager $manager){
+    return new ArticleMapper($dataSource, $eventDispatcher, $manager, new SomeDependency());
 });
 ```
 

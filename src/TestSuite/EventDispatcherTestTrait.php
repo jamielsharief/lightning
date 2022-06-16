@@ -23,20 +23,7 @@ trait EventDispatcherTestTrait
     protected ?TestEventDispatcher $testEventDispatcher = null;
 
     /**
-     * Factory method to create the test version of a Event Dispatcher
-     *
-     * @return TestEventDispatcher
-     */
-    public function createEventDispatcher(): TestEventDispatcher
-    {
-        return new TestEventDispatcher();
-    }
-
-    /**
      * Sets the Event Dispatcher for testing
-     *
-     * @param TestEventDispatcher $testEventDispatcher
-     * @return static
      */
     public function setEventDispatcher(TestEventDispatcher $testEventDispatcher): static
     {
@@ -47,8 +34,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Gets the TestEventDispatcher
-     *
-     * @return TestEventDispatcher
      */
     public function getEventDispatcher(): TestEventDispatcher
     {
@@ -61,9 +46,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that a particular event was dispached
-     *
-     * @param string $event
-     * @return void
      */
     public function assertEventDispatched(string $event): void
     {
@@ -72,9 +54,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that an Event was dispatched
-     *
-     * @param string $event
-     * @return void
      */
     public function assertEventNotDispatched(string $event): void
     {
@@ -83,9 +62,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that a group of events were dispatched
-     *
-     * @param array $events
-     * @return void
      */
     public function assertEventsDispatched(array $events): void
     {
@@ -96,9 +72,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that a group of events were not dispatched
-     *
-     * @param array $events
-     * @return void
      */
     public function assertEventsNotDispatched(array $events): void
     {
@@ -109,9 +82,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that only these events were called in a particular order
-     *
-     * @param array $events
-     * @return void
      */
     public function assertEventsDispatchedEquals(array $events): void
     {
@@ -120,9 +90,6 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts that the dispatched events do not match this list of events
-     *
-     * @param array $events
-     * @return void
      */
     public function assertEventsDispatchedNotEquals(array $events): void
     {
@@ -131,12 +98,9 @@ trait EventDispatcherTestTrait
 
     /**
      * Asserts how many Events were caught
-     *
-     * @param integer $count
-     * @return void
      */
     public function assertEventsDispatchedCount(int $count): void
     {
-        $this->assertCount($count, $this->getEventDispatcher());
+        $this->assertCount($count, $this->getEventDispatcher()->getDispatchedEvents());
     }
 }

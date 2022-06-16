@@ -30,7 +30,7 @@ class ArticlesController extends BaseController
         return $this->renderFile($path, $options);
     }
 
-    protected function createResponse(): ResponseInterface
+    public function createResponse(): ResponseInterface
     {
         return new Response();
     }

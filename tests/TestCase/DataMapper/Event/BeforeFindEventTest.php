@@ -6,9 +6,10 @@ use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 
+use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
-use Lightning\Entity\EntityInterface;
 
+use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
@@ -49,7 +50,7 @@ final class BeforeFindEventTest extends TestCase
 
     private function createBeforeFindEvent(): BeforeFindEvent
     {
-        $dataMapper = new TagBeforeFindDataMapper($this->datasource);
+        $dataMapper = new TagBeforeFindDataMapper($this->datasource, new EventDispatcher());
         $queryObject = new QueryObject(['foo' => 'bar']);
 
         return new BeforeFindEvent($dataMapper, $queryObject);

@@ -5,8 +5,9 @@ namespace Lightning\Test\DataMapper\Event;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Entity\EntityInterface;
+use Lightning\Event\EventDispatcher;
 
+use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
@@ -53,10 +54,10 @@ final class AbstractAfterWriteEventTest extends TestCase
         $this->datasource = new DatabaseDataSource($pdo, new QueryBuilder());
 
         return [
-            [new AfterCreateEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
-            [new AfterUpdateEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
-            [new AfterSaveEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())],
-            [new AfterDeleteEvent(new TagAfterWriteDataMapper($this->datasource), new TagEntity())]
+            [new AfterCreateEvent(new TagAfterWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new AfterUpdateEvent(new TagAfterWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new AfterSaveEvent(new TagAfterWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())],
+            [new AfterDeleteEvent(new TagAfterWriteDataMapper($this->datasource, new EventDispatcher()), new TagEntity())]
         ];
     }
 

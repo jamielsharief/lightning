@@ -95,20 +95,19 @@ $this->setSession([
 
 ### TestEventDispatcher
 
-The `TestEventDispatcher` is PSR event dispatcher which is for testing.
+The `TestEventDispatcher` is PSR 14 Event Dispatcher which is for testing wether `Events` where triggered or not.
 
 It comes with the additional methods
 
 ```php
-$eventDispatcher = new TestEventDispatcher();
+$eventDispatcher = new TestEventDispatcher(new EventDispatcher);
 
 $events = $eventDispatcher->getDispatchedEvents(); // [BeforeFind::class]
 $event = $eventDispatcher->getDispatchedEvent(BeforeFind::class);
 $bool = $eventDispatcher->hasDispatchedEvent(BeforeFind::class);
 ```
 
-Sometimes you might want to do something on an event during a test, which you can use the `on` method which will register
-a single listener to an `Event`.
+You can call 
 
 ```php
 $eventDispatcher->on(BeforeFind::class, function(BeforeFind $event){

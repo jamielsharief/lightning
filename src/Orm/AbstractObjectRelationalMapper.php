@@ -19,6 +19,7 @@ use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\DataMapper\AbstractDataMapper;
 use Lightning\DataMapper\DataSourceInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * AbstractORM
@@ -92,11 +93,11 @@ abstract class AbstractObjectRelationalMapper extends AbstractDataMapper
      *
      * @param DataSourceInterface $dataSource
      */
-    public function __construct(DataSourceInterface $dataSource, MapperManager $mapperManager)
+    public function __construct(DataSourceInterface $dataSource, EventDispatcherInterface $eventDispatcher, MapperManager $mapperManager)
     {
         $this->mapperManager = $mapperManager;
+        parent::__construct($dataSource, $eventDispatcher);
 
-        parent::__construct($dataSource);
         $this->initializeOrm();
     }
 

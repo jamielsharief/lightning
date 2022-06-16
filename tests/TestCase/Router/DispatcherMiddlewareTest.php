@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 use Lightning\Autowire\Autowire;
 use Lightning\Utility\RandomString;
+use Lightning\Event\EventDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Router\Event\AfterFilterEvent;
 use Lightning\TestSuite\TestEventDispatcher;
@@ -89,8 +90,8 @@ final class DispatcherMiddlewareTest extends TestCase
             return new Response(200);
         });
         $route->match('GET', '/articles/1234');
-        $eventDispatcher = new TestEventDispatcher();
-        $eventDispatcher->on(BeforeFilterEvent::class, function (BeforeFilterEvent $event) {
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
+        $eventDispatcher->addListener(BeforeFilterEvent::class, function (BeforeFilterEvent $event) {
             $event->setRequest($event->getRequest()->withAttribute('foo', 'bar'));
         });
 
@@ -106,8 +107,8 @@ final class DispatcherMiddlewareTest extends TestCase
             return new Response(200);
         });
         $route->match('GET', '/articles/1234');
-        $eventDispatcher = new TestEventDispatcher();
-        $eventDispatcher->on(BeforeFilterEvent::class, function (BeforeFilterEvent $event) {
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
+        $eventDispatcher->addListener(BeforeFilterEvent::class, function (BeforeFilterEvent $event) {
             $event->setResponse(new Response(418));
         });
 
@@ -123,8 +124,8 @@ final class DispatcherMiddlewareTest extends TestCase
             return new Response(200);
         });
         $route->match('GET', '/articles/1234');
-        $eventDispatcher = new TestEventDispatcher();
-        $eventDispatcher->on(AfterFilterEvent::class, function (AfterFilterEvent $event) {
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
+        $eventDispatcher->addListener(AfterFilterEvent::class, function (AfterFilterEvent $event) {
             $event->setResponse(new Response(418));
         });
 

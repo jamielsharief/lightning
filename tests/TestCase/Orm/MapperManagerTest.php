@@ -6,8 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
 use App\Controllers\EntityInterface;
 use Lightning\Entity\AbstractEntity;
+use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Orm\AbstractObjectRelationalMapper;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\DataMapper\DataSource\MemoryDataSource;
 use Lightning\Entity\EntityInterface as EntityEntityInterface;
 
@@ -113,7 +115,8 @@ final class MapperManagerTest extends TestCase
     public function testGet(): void
     {
         $dataSource = new MemoryDataSource();
-        $manager = new MapperManager($dataSource);
+        $eventDispatcher = new EventDispatcher();
+        $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
             DummyArticle::class, $manager->get(DummyArticle::class)
@@ -122,9 +125,10 @@ final class MapperManagerTest extends TestCase
     public function testAdd(): void
     {
         $dataSource = new MemoryDataSource();
-        $manager = new MapperManager($dataSource);
+        $eventDispatcher = new EventDispatcher();
+        $manager = new MapperManager($dataSource, $eventDispatcher);
 
-        $mapper = new DummyArticle($dataSource, new MapperManager($dataSource));
+        $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);
         $this->assertInstanceOf(
           MapperManager::class, $manager->add($mapper)
         );
@@ -133,11 +137,12 @@ final class MapperManagerTest extends TestCase
     public function testConfigure(): void
     {
         $dataSource = new MemoryDataSource();
-        $manager = new MapperManager($dataSource);
+        $eventDispatcher = new EventDispatcher();
+        $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
-            MapperManager::class, $manager->configure(DummyArticle::class, function (DataSourceInterface $dataSource, MapperManager $manager) {
-                $mapper = new DummyArticle($dataSource, new MapperManager($dataSource));
+            MapperManager::class, $manager->configure(DummyArticle::class, function (DataSourceInterface $dataSource, EventDispatcherInterface $eventDispatcher, MapperManager $manager) {
+                $mapper = new DummyArticle($dataSource, $eventDispatcher, new MapperManager($dataSource, $eventDispatcher));
                 $mapper->foo = 'bar'; // ensure its callback
 
                 return $mapper;
@@ -153,8 +158,10 @@ final class MapperManagerTest extends TestCase
     public function testGetExisting(): void
     {
         $dataSource = new MemoryDataSource();
-        $manager = new MapperManager($dataSource);
-        $mapper = new DummyArticle($dataSource, new MapperManager($dataSource));
+        $eventDispatcher = new EventDispatcher();
+        $manager = new MapperManager($dataSource, $eventDispatcher);
+
+        $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);
 
         $mapper->foo = 'bar'; // test its not being created
 

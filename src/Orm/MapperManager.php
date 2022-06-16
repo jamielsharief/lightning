@@ -14,6 +14,7 @@
 namespace Lightning\Orm;
 
 use Lightning\DataMapper\DataSourceInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * MapperManager
@@ -21,6 +22,7 @@ use Lightning\DataMapper\DataSourceInterface;
 class MapperManager
 {
     private DataSourceInterface $dataSource;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * @var AbstractObjectRelationalMapper[]
@@ -34,12 +36,11 @@ class MapperManager
 
     /**
      * Constructor
-     *
-     * @param DataSourceInterface $dataSource
      */
-    public function __construct(DataSourceInterface $dataSource)
+    public function __construct(DataSourceInterface $dataSource, EventDispatcherInterface $eventDispatcher)
     {
         $this->dataSource = $dataSource;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -47,10 +48,6 @@ class MapperManager
      *
      * @internal Its not uncommon for to have many data mappers, this method can be used instead of Add so mappers are only created
      * when needed.
-     *
-     * @param string $class
-     * @param callable $callback
-     * @return static
      */
     public function configure(string $class, callable $callback): static
     {
@@ -64,9 +61,6 @@ class MapperManager
      *
      * @internal this is ideal to configure from DI container, problem is its not lazy loaded, so all mappers will be stored even if they
      * are not used.
-     *
-     * @param AbstractObjectRelationalMapper $dataMapper
-     * @return static
      */
     public function add(AbstractObjectRelationalMapper $dataMapper): static
     {
@@ -77,9 +71,6 @@ class MapperManager
 
     /**
      * Gets a DataMapper, creates it if needed
-     *
-     * @param string $class
-     * @return AbstractObjectRelationalMapper
      */
     public function get(string $class): AbstractObjectRelationalMapper
     {
@@ -92,19 +83,15 @@ class MapperManager
 
     /**
      * Creates the DataMapper object
-     *
-     * @param string $class
-     * @param DataSourceInterface $dataSource
-     * @return AbstractObjectRelationalMapper
      */
     protected function createDataMapper(string $class, DataSourceInterface $dataSource): AbstractObjectRelationalMapper
     {
         if (isset($this->factoryCallables[$class])) {
             $callback = $this->factoryCallables[$class];
 
-            return $callback($dataSource, $this);
+            return $callback($dataSource, $this->eventDispatcher, $this);
         }
 
-        return new $class($dataSource, $this);
+        return new $class($dataSource, $this->eventDispatcher, $this);
     }
 }

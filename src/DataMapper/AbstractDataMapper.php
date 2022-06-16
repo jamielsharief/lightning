@@ -51,16 +51,14 @@ abstract class AbstractDataMapper
     protected array $fields = [];
 
     /**
-      * PSR-14 Event Dispatcher
-      *
-      * @var EventDispatcherInterface|null
-      */
+     * PSR-14 Event Dispatcher
+     */
     protected ?EventDispatcherInterface $eventDispatcher = null;
 
     /**
      * Constructor
      */
-    public function __construct(DataSourceInterface $dataSource, ?EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(DataSourceInterface $dataSource, EventDispatcherInterface $eventDispatcher)
     {
         $this->dataSource = $dataSource;
         $this->eventDispatcher = $eventDispatcher;

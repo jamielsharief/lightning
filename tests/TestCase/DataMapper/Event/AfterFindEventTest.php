@@ -6,8 +6,9 @@ use PHPUnit\Framework\TestCase;
 use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\DataMapper\QueryObject;
+use Lightning\Event\EventDispatcher;
 
+use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
@@ -49,7 +50,7 @@ final class AfterFindEventTest extends TestCase
 
     private function createAfterFindEvent(): AfterFindEvent
     {
-        $dataMapper = new TagAfterFindDataMapper($this->datasource);
+        $dataMapper = new TagAfterFindDataMapper($this->datasource, new EventDispatcher());
         $queryObject = new QueryObject(['foo' => 'bar']);
         $collection = new Collection([]);
 

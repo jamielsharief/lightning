@@ -7,32 +7,17 @@ use InvalidArgumentException;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 
+use Lightning\Event\EventDispatcher;
 use Psr\Http\Message\ResponseInterface;
-use Lightning\Event\EventManagerInterface;
 use Lightning\Controller\AbstractController;
 use Lightning\TestSuite\TestEventDispatcher;
+use Lightning\Controller\Event\InitializeEvent;
 use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
 use Lightning\Controller\Event\BeforeRenderEvent;
 use Lightning\Controller\Event\AfterRedirectEvent;
 use Lightning\Controller\Event\BeforeRedirectEvent;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
-
-/**
- * @todo how to deal with this, the event manager was designed for reasons as such.
- */
-class TestEventManager extends TestEventDispatcher implements EventManagerInterface
-{
-    public function addListener(string $eventName, callable $callable, int $priority = 10): static
-    {
-        return $this;
-    }
-
-    public function removeListener(string $eventName, callable $callable): static
-    {
-        return $this;
-    }
-}
 
 class ApiController extends AbstractController
 {
@@ -60,7 +45,7 @@ class ApiController extends AbstractController
         return $this->renderFile(__DIR__ . '/TestApp/downloads/sample.xml');
     }
 
-    protected function createResponse(): ResponseInterface
+    public function createResponse(): ResponseInterface
     {
         return new Response();
     }
@@ -111,11 +96,11 @@ class ApiController extends AbstractController
 
 final class AbstractControllerTest extends TestCase
 {
-    protected TestEventManager $eventDispatcher;
+    protected TestEventDispatcher $eventDispatcher;
 
     public function setUp(): void
     {
-        $this->eventDispatcher = new TestEventManager();
+        $this->eventDispatcher = new TestEventDispatcher(new EventDispatcher());
     }
 
     public function testSetRequest(): void
@@ -250,7 +235,7 @@ final class AbstractControllerTest extends TestCase
         $controller->index();
 
         $this->assertEquals([
-            BeforeRenderEvent::class, AfterRenderEvent::class
+            InitializeEvent::class, BeforeRenderEvent::class, AfterRenderEvent::class
         ], $this->eventDispatcher->getDispatchedEvents());
     }
 
@@ -261,7 +246,7 @@ final class AbstractControllerTest extends TestCase
         $controller->indexJson();
 
         $this->assertEquals([
-            BeforeRenderEvent::class, AfterRenderEvent::class
+            InitializeEvent::class, BeforeRenderEvent::class, AfterRenderEvent::class
         ], $this->eventDispatcher->getDispatchedEvents());
     }
 
@@ -272,7 +257,7 @@ final class AbstractControllerTest extends TestCase
         $controller->download();
 
         $this->assertEquals([
-            BeforeRenderEvent::class, AfterRenderEvent::class
+            InitializeEvent::class,BeforeRenderEvent::class, AfterRenderEvent::class
         ], $this->eventDispatcher->getDispatchedEvents());
     }
 
@@ -282,7 +267,7 @@ final class AbstractControllerTest extends TestCase
 
         $controller->old();
         $this->assertEquals([
-            BeforeRedirectEvent::class, AfterRedirectEvent::class
+            InitializeEvent::class,BeforeRedirectEvent::class, AfterRedirectEvent::class
         ], $this->eventDispatcher->getDispatchedEvents());
     }
 

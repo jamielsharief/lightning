@@ -15,11 +15,12 @@ namespace Lightning\Controller;
 
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
-use Lightning\Event\EventManagerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Lightning\Controller\Event\InitializeEvent;
 use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
 use Lightning\Controller\Event\BeforeRenderEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Lightning\Controller\Event\AfterRedirectEvent;
 use Lightning\Controller\Event\BeforeRedirectEvent;
 
@@ -32,7 +33,7 @@ use Lightning\Controller\Event\BeforeRedirectEvent;
 abstract class AbstractController
 {
     protected TemplateRenderer $templateRenderer;
-    protected EventManagerInterface $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
     protected ?ServerRequestInterface $request = null;
 
     protected ?string $layout = null;
@@ -45,12 +46,13 @@ abstract class AbstractController
     /**
      * Constructor
      */
-    public function __construct(TemplateRenderer $templateRenderer, EventManagerInterface $eventDispatcher)
+    public function __construct(TemplateRenderer $templateRenderer, EventDispatcherInterface $eventDispatcher)
     {
         $this->templateRenderer = $templateRenderer;
         $this->eventDispatcher = $eventDispatcher;
 
         $this->initialize();
+        $this->eventDispatcher->dispatch(new InitializeEvent($this));
     }
 
     /**
@@ -65,7 +67,7 @@ abstract class AbstractController
      *
      * @param string $template e.g. articles/index
      */
-    protected function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
+    public function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
     {
         if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
             if ($response = $event->getResponse()) {
@@ -85,7 +87,7 @@ abstract class AbstractController
     /**
      * Renders a JSON response
      */
-    protected function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
+    public function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
     {
         if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
             if ($response = $event->getResponse()) {
@@ -105,7 +107,7 @@ abstract class AbstractController
     /**
      * Sends a file as a Response
      */
-    protected function renderFile(string $path, array $options = []): ResponseInterface
+    public function renderFile(string $path, array $options = []): ResponseInterface
     {
         if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
             if ($response = $event->getResponse()) {
@@ -125,7 +127,7 @@ abstract class AbstractController
      *
      * @param string $uri e.g /articles or https://app.test/articles
      */
-    protected function redirect(string $uri, int $status = 302): ResponseInterface
+    public function redirect(string $uri, int $status = 302): ResponseInterface
     {
         if ($event = $this->eventDispatcher->dispatch(new BeforeRedirectEvent($this, $uri, $this->request))) {
             if ($response = $event->getResponse()) {
@@ -224,5 +226,5 @@ abstract class AbstractController
     /**
      * Factory method
      */
-    abstract protected function createResponse(): ResponseInterface;
+    abstract public function createResponse(): ResponseInterface;
 }

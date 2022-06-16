@@ -14,79 +14,69 @@
 namespace Lightning\TestSuite;
 
 use Countable;
-use Lightning\Event\EventWithNameInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
- * TestEventDispatcher
- *
- * A test PSR-14 Event Dispatcher
- *
- * @todo: needs to be rethought as some sort of adapater, decorator, needs to register events as well.
+ * EventDispatcher
  */
-class TestEventDispatcher implements Countable, EventDispatcherInterface
+class TestEventDispatcher implements EventDispatcherInterface, Countable
 {
-    /**
-     * @var array
-     */
-    protected array $dispatchedEvents = [];
-    protected array $listeners = [];
+    private EventDispatcherInterface $eventDispatcher;
+    private array $dispatchedEvents = [];
 
     /**
-     * Dispatches an Event
-     *
-     * @param object $event
-     * @return object
+     * Constructor
      */
-    public function dispatch(object $event)
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
-        $this->dispatchedEvents[] = $event;
-
-        $callable = $this->listeners[$event::class] ?? null;
-
-        if ($callable) {
-            $callable($event);
-        }
-
-        return $event;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * Registers a callable that will be called on a particular event
-     *
-     * @internal this is for testing, only one per event
-     *
-     * @param string $event
-     * @param callable $callable
-     * @return static
+     * Forward all method calls to real event dispatcher (e.g. registering listeners)
      */
-    public function on(string $event, callable $callable): static
+    public function __call(string $method, array $args): mixed
     {
-        $this->listeners[$event] = $callable;
-
-        return $this;
+        return call_user_func_array([$this->eventDispatcher,$method], $args);
     }
 
     /**
-     * Gets the Events that were dispatched
-     *
-     * @return array
+     * Dispatches the event
+     */
+    public function dispatch(object $event): object
+    {
+        return $this->dispatchedEvents[] = $this->eventDispatcher->dispatch($event) ;
+    }
+
+    /**
+     * Gets the dispatched events
+     * @return string[]
      */
     public function getDispatchedEvents(): array
     {
-        $result = [];
-        foreach ($this->dispatchedEvents as $event) {
-            $result[] = $this->getEventName($event);
-        }
-
-        return $result;
+        return array_map(function (object $event) {
+            return $event::class;
+        }, $this->dispatchedEvents);
     }
 
     /**
-     * Gets an event that was dispached
-     *
-     * @param string $class
-     * @return object|null
+     * Checks if an event was dispatched (using class name).
+     * @internal some implementations have interface for getting name, this does not and will not
+     * check those
+     */
+    public function hasDispatchedEvent(string $class): bool
+    {
+        foreach ($this->dispatchedEvents as $event) {
+            if ($this->getEventName($event) === $class) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the DispatchedEvent by class name
      */
     public function getDispatchedEvent(string $class): ?object
     {
@@ -100,44 +90,18 @@ class TestEventDispatcher implements Countable, EventDispatcherInterface
     }
 
     /**
-     * Checks if a Event was dispatched
-     *
-     * @param string $class
-     * @return boolean
+     * Override this method if you are using generic events
      */
-    public function hasDispatchedEvent(string $class): bool
+    public function getEventName(object $event): string
     {
-        return $this->getDispatchedEvent($class) !== null;
+        return $event::class;
     }
 
     /**
-     * Undocumented function
-     *
-     * @return integer
+     * Countable
      */
     public function count(): int
     {
         return count($this->dispatchedEvents);
-    }
-
-    /**
-     * Resets the Event dispatcher
-     *
-     * @return void
-     */
-    public function reset(): void
-    {
-        $this->dispatchedEvents = [];
-    }
-
-    /**
-     * Determine the Event name
-     *
-     * @param object $event
-     * @return string
-     */
-    private function getEventName(object $event): string
-    {
-        return $event instanceof EventWithNameInterface ? $event->eventName() : get_class($event);
     }
 }

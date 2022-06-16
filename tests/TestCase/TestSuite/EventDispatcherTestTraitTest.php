@@ -4,6 +4,7 @@ namespace Lightning\Test\TestSuite;
 
 use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
+use Lightning\Event\EventDispatcher;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 
@@ -19,20 +20,22 @@ final class EventDispatcherTestTraitTest extends TestCase
 {
     use EventDispatcherTestTrait;
 
-    public function testCreateEventDispatcher(): void
+    public function createEventDispatcher(): TestEventDispatcher
     {
-        $this->assertInstanceOf(TestEventDispatcher::class, $this->createEventDispatcher());
+        return new TestEventDispatcher(new EventDispatcher());
     }
 
     public function testSet(): void
     {
-        $this->assertInstanceOf(TestCase::class, $this->setEventDispatcher(new TestEventDispatcher()));
+        $testEventDispatcher = $this->createEventDispatcher();
+
+        $this->assertInstanceOf(TestCase::class, $this->setEventDispatcher($testEventDispatcher));
         $this->assertInstanceOf(TestEventDispatcher::class, $this->testEventDispatcher);
     }
 
     public function testGet(): void
     {
-        $this->testEventDispatcher = new TestEventDispatcher();
+        $this->testEventDispatcher = $this->createEventDispatcher();
         $this->assertInstanceOf(TestEventDispatcher::class, $this->getEventDispatcher());
     }
 
@@ -46,7 +49,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventDispatched(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $eventDispatcher->dispatch(new FooEvent());
         $this->setEventDispatcher($eventDispatcher);
 
@@ -55,7 +58,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventNotDispatched(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $this->setEventDispatcher($eventDispatcher);
 
         $this->assertEventNotDispatched(FooEvent::class);
@@ -63,7 +66,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventsDispatched(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $eventDispatcher->dispatch(new FooEvent());
         $eventDispatcher->dispatch(new BarEvent());
 
@@ -74,7 +77,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventsNotDispatched(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $this->setEventDispatcher($eventDispatcher);
 
         $this->assertEventsNotDispatched([BarEvent::class,FooEvent::class]);
@@ -82,7 +85,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventsDispatchedEquals(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $eventDispatcher->dispatch(new FooEvent());
         $eventDispatcher->dispatch(new BarEvent());
 
@@ -93,7 +96,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventsDispatchedNotEquals(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $eventDispatcher->dispatch(new FooEvent());
         $eventDispatcher->dispatch(new BarEvent());
 
@@ -104,7 +107,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function testAssertEventdsDispatchedCount(): void
     {
-        $eventDispatcher = new TestEventDispatcher();
+        $eventDispatcher = $this->createEventDispatcher();
         $this->setEventDispatcher($eventDispatcher);
 
         $this->assertEventsDispatchedCount(0);

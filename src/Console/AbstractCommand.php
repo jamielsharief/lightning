@@ -40,7 +40,6 @@ abstract class AbstractCommand implements CommandInterface
 
     /**
      * Constructor
-     * @internal changed to more DI friendly
      */
     public function __construct(protected ConsoleArgumentParser $parser, protected ConsoleIo $io)
     {

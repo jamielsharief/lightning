@@ -33,11 +33,13 @@ class TestEventDispatcher implements EventDispatcherInterface, Countable
     }
 
     /**
-     * Forward all method calls to real event dispatcher (e.g. registering listeners)
+     * Forward any dispatcher methods calls to the real dispatcher
      */
     public function __call(string $method, array $args): mixed
     {
-        return call_user_func_array([$this->eventDispatcher,$method], $args);
+        $result = call_user_func_array([$this->eventDispatcher,$method], $args);
+
+        return $result instanceof EventDispatcherInterface ? $this : $result;
     }
 
     /**

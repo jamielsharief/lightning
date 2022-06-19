@@ -20,7 +20,7 @@ interface CommandInterface
      *
      * @return string
      */
-    public function getName(): string ;
+    public function getName(): string;
 
     /**
      * Gets the description of the command

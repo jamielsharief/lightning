@@ -13,7 +13,7 @@
 
 namespace Lightning\Event;
 
-interface EventSubscriberInterface
+interface SubscriberInterface
 {
     /**
      * Return an array of eventTypes and methods

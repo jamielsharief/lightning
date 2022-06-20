@@ -9,18 +9,12 @@ use Lightning\Cache\ApcuCache;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Lightning\Autowire\Autowire;
-use Lightning\Event\EventDispatcher;
 use Lightning\Router\RouteCollection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Lightning\Router\Event\AfterFilterEvent;
-use Lightning\TestSuite\TestEventDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Psr\Http\Server\RequestHandlerInterface;
-use Lightning\Router\Event\BeforeFilterEvent;
-use Lightning\Router\Event\AfterDispatchEvent;
-use Lightning\Router\Event\BeforeDispatchEvent;
 use Lightning\Router\Exception\RouterException;
 
 class DummyController
@@ -283,19 +277,6 @@ final class RouterTest extends TestCase
         $router->match(new ServerRequest('GET', '/articles'));
     }
 
-    public function testProcessEventsWereCalled(): void
-    {
-        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
-        $router = new Router(null, $eventDispatcher);
-        $router->get('/articles', ['Lightning\Test\Router\DummyController','index']);
-
-        $router->dispatch(new ServerRequest('GET', '/articles'));
-
-        $this->assertEquals([
-            BeforeDispatchEvent::class, BeforeFilterEvent::class,AfterFilterEvent::class, AfterDispatchEvent::class
-        ], $eventDispatcher->getDispatchedEvents());
-    }
-
     public function testNoResponse(): void
     {
         $router = new Router();
@@ -311,7 +292,7 @@ final class RouterTest extends TestCase
     // Test with ResponseObject params as well
     public function testAutowireMethod(): void
     {
-        $router = new Router(null, null, new Autowire(), new Response());
+        $router = new Router(null, new Autowire(), new Response());
         $router->get('/articles', ['Lightning\Test\Router\DummyController','autowire']);
 
         $response = $router->dispatch(new ServerRequest('GET', '/articles'));
@@ -320,28 +301,13 @@ final class RouterTest extends TestCase
 
     public function testAutowireFunction(): void
     {
-        $router = new Router(null, null, new Autowire(), new Response());
+        $router = new Router(null, new Autowire(), new Response());
         $router->get('/articles', function (ServerRequestInterface $request, ResponseInterface $response, ApcuCache $class) {
             return new Response(200, [], 'ok');
         });
 
         $response = $router->dispatch(new ServerRequest('GET', '/articles'));
         $this->assertInstanceOf(ResponseInterface::class, $response);
-    }
-
-    public function testBeforeDispatchResponseChanged(): void
-    {
-        $eventDispatcher = new TestEventDispatcher(new EventDispatcher());
-        $eventDispatcher->addListener(BeforeDispatchEvent::class, function (BeforeDispatchEvent $event) {
-            $event->setResponse(new Response(200, [], 'foo'));
-        });
-
-        $router = new Router(null, $eventDispatcher, new Autowire());
-        $router->get('/articles', ['Lightning\Test\Router\DummyController','index']);
-
-        $response = $router->dispatch(new ServerRequest('GET', '/articles'));
-
-        $this->assertEquals('foo', (string) $response->getBody());
     }
 
     public function testVariablesWereAdded(): void

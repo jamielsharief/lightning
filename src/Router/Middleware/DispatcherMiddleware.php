@@ -16,28 +16,24 @@ namespace Lightning\Router\Middleware;
 use Lightning\Autowire\Autowire;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Lightning\Router\Event\AfterFilterEvent;
+use Lightning\Router\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Lightning\Router\Event\BeforeFilterEvent;
 use Lightning\Router\Exception\RouterException;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class DispatcherMiddleware implements MiddlewareInterface
 {
     private $callable;
     private ?ResponseInterface $response;
-    private ?EventDispatcherInterface $eventDispatcher;
     private ?Autowire $autowire;
 
     /**
      * Constructor
      */
-    public function __construct(callable $callable, ?ResponseInterface $response = null, ?EventDispatcherInterface $eventDispatcher = null, ?Autowire $autowire = null)
+    public function __construct(callable $callable, ?ResponseInterface $response = null, ?Autowire $autowire = null)
     {
         $this->callable = $callable;
         $this->response = $response;
-        $this->eventDispatcher = $eventDispatcher;
         $this->autowire = $autowire;
     }
 
@@ -49,13 +45,10 @@ class DispatcherMiddleware implements MiddlewareInterface
         $callable = $this->callable;
         $params = [ServerRequestInterface::class => $request,ResponseInterface::class => $this->response];
 
-        if ($this->eventDispatcher) {
-            $event = $this->eventDispatcher->dispatch(new BeforeFilterEvent($request));
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
+        $isController = is_array($callable) && $callable[0] instanceof ControllerInterface;
 
-            $request = $event->getRequest();
+        if ($isController && $response = $callable[0]->beforeFilter($request)) {
+            return $response;
         }
 
         if ($this->autowire) {
@@ -68,10 +61,6 @@ class DispatcherMiddleware implements MiddlewareInterface
             throw new RouterException('No response was returned');
         }
 
-        if ($this->eventDispatcher) {
-            $response = $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
-        }
-
-        return $response;
+        return $isController ? $callable[0]->afterFilter($request, $response) : $response;
     }
 }

@@ -7,16 +7,9 @@ use InvalidArgumentException;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 
-use Lightning\Event\EventDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Lightning\Controller\AbstractController;
-use Lightning\TestSuite\TestEventDispatcher;
-use Lightning\Controller\Event\InitializeEvent;
-use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
-use Lightning\Controller\Event\BeforeRenderEvent;
-use Lightning\Controller\Event\AfterRedirectEvent;
-use Lightning\Controller\Event\BeforeRedirectEvent;
 use Lightning\Test\TestCase\Controller\TestApp\ArticlesController;
 
 class ApiController extends AbstractController
@@ -55,28 +48,28 @@ class ApiController extends AbstractController
         $this->wasCalled('initialize');
     }
 
-    protected function beforeRender(): ?ResponseInterface
+    public function beforeRender(): ?ResponseInterface
     {
         $this->wasCalled('beforeRender');
 
         return null;
     }
 
-    protected function afterRender(ResponseInterface $response): ResponseInterface
+    public function afterRender(ResponseInterface $response): ResponseInterface
     {
         $this->wasCalled('afterRender');
 
         return $response;
     }
 
-    protected function beforeRedirect(string $url): ?ResponseInterface
+    public function beforeRedirect(string $url): ?ResponseInterface
     {
         $this->wasCalled('beforeRedirect');
 
         return null;
     }
 
-    protected function afterRedirect(ResponseInterface $response): ResponseInterface
+    public function afterRedirect(ResponseInterface $response): ResponseInterface
     {
         $this->wasCalled('afterRedirect');
 
@@ -96,13 +89,6 @@ class ApiController extends AbstractController
 
 final class AbstractControllerTest extends TestCase
 {
-    protected TestEventDispatcher $eventDispatcher;
-
-    public function setUp(): void
-    {
-        $this->eventDispatcher = new TestEventDispatcher(new EventDispatcher());
-    }
-
     public function testSetRequest(): void
     {
         $controller = $this->createController();
@@ -230,51 +216,52 @@ final class AbstractControllerTest extends TestCase
 
     public function testRenderHooks(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
 
         $controller->index();
 
         $this->assertEquals([
-            InitializeEvent::class, BeforeRenderEvent::class, AfterRenderEvent::class
-        ], $this->eventDispatcher->getDispatchedEvents());
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
     }
 
     public function testRenderHooksJson(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
 
         $controller->indexJson();
 
         $this->assertEquals([
-            InitializeEvent::class, BeforeRenderEvent::class, AfterRenderEvent::class
-        ], $this->eventDispatcher->getDispatchedEvents());
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
     }
 
     public function testRenderHooksFile(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
 
         $controller->download();
 
         $this->assertEquals([
-            InitializeEvent::class,BeforeRenderEvent::class, AfterRenderEvent::class
-        ], $this->eventDispatcher->getDispatchedEvents());
+            'initialize','beforeRender','afterRender'
+        ], $controller->getCalled());
     }
 
     public function testRedirectHooks(): void
     {
-        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'), $this->eventDispatcher);
+        $controller = new ApiController(new TemplateRenderer(__DIR__ .'/TestApp/templates'));
 
         $controller->old();
+
         $this->assertEquals([
-            InitializeEvent::class,BeforeRedirectEvent::class, AfterRedirectEvent::class
-        ], $this->eventDispatcher->getDispatchedEvents());
+            'initialize','beforeRedirect','afterRedirect'
+        ], $controller->getCalled());
     }
 
     private function createController(): ArticlesController
     {
         $path = __DIR__ .'/TestApp/templates';
 
-        return new ArticlesController(new TemplateRenderer($path, sys_get_temp_dir()), $this->eventDispatcher);
+        return new ArticlesController(new TemplateRenderer($path, sys_get_temp_dir()));
     }
 }

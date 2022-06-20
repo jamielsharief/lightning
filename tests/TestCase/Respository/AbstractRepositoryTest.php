@@ -9,6 +9,7 @@ use Lightning\Database\PdoFactory;
 use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
+use Lightning\Event\ListenerProvider;
 use Lightning\Fixture\FixtureManager;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\Test\Entity\ArticleEntity;
@@ -250,6 +251,6 @@ final class AbstractRepositoryTest extends TestCase
     {
         $datasource = new DatabaseDataSource($this->pdo, new QueryBuilder());
 
-        return new ArticleRepository(new ArticleMapper($datasource, new EventDispatcher()));
+        return new ArticleRepository(new ArticleMapper($datasource, new EventDispatcher(new ListenerProvider())));
     }
 }

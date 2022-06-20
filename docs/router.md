@@ -123,15 +123,6 @@ $router->patch('/articles/:id', [ArticlesController::class,'update'], ['id' => '
 $router->delete('/articles/:id', [ArticlesController::class,'destroy'], ['id' => '[0-9]+']);
 ```
 
-## PSR-14: Event Dispatcher
-
-When you create the `Router` object, if you supply a `EventDispatcher` object, the following events will be called
-
-- `BeforeDispatch`
-- `BeforeFilter`
-- `AfterFilter`
-- `AfterDispatch`
-
 ## PSR-11: DI Container
 
 When creating the Router object add a `Container` object to use when creating the object from the matched route proxy.
@@ -139,3 +130,24 @@ When creating the Router object add a `Container` object to use when creating th
 ## Autowiring
 
 You can also use autowiring of methods or closures, simply supply the `Autowire` object when creating the Router object.
+
+
+## ControllerInterface
+
+You can add the `ControllerInterface` add life cycle callbacks to your `Controller` which will be called before and after the action is invoked.
+
+```php
+class ArticlesController implements ControllerInterface
+{
+    public function beforeFilter(ServerRequestInterface $request): ?ResponseInterface
+    {
+        $this->request = $request;
+        return $this->eventDispatcher->dispatch(new BeforeFilterEvent($request))->getResponse();
+    }
+
+    public function afterFilter(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+       return $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
+    }
+}
+```

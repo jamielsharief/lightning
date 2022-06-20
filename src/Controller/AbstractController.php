@@ -16,13 +16,7 @@ namespace Lightning\Controller;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Lightning\Controller\Event\InitializeEvent;
-use Lightning\Controller\Event\AfterRenderEvent;
 use Lightning\TemplateRenderer\TemplateRenderer;
-use Lightning\Controller\Event\BeforeRenderEvent;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Lightning\Controller\Event\AfterRedirectEvent;
-use Lightning\Controller\Event\BeforeRedirectEvent;
 
 /**
  * Abstract Controller
@@ -33,8 +27,8 @@ use Lightning\Controller\Event\BeforeRedirectEvent;
 abstract class AbstractController
 {
     protected TemplateRenderer $templateRenderer;
-    protected EventDispatcherInterface $eventDispatcher;
-    protected ?ServerRequestInterface $request = null;
+    protected ?ServerRequestInterface $request;
+    protected ?ResponseInterface $response;
 
     protected ?string $layout = null;
 
@@ -46,13 +40,11 @@ abstract class AbstractController
     /**
      * Constructor
      */
-    public function __construct(TemplateRenderer $templateRenderer, EventDispatcherInterface $eventDispatcher)
+    public function __construct(TemplateRenderer $templateRenderer)
     {
         $this->templateRenderer = $templateRenderer;
-        $this->eventDispatcher = $eventDispatcher;
 
         $this->initialize();
-        $this->eventDispatcher->dispatch(new InitializeEvent($this));
     }
 
     /**
@@ -63,63 +55,83 @@ abstract class AbstractController
     }
 
     /**
+     * Before render hook
+     */
+    public function beforeRender(): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After render hook
+     */
+    public function afterRender(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+
+    /**
+     * Before Redirect hook
+     */
+    public function beforeRedirect(string $url): ?ResponseInterface
+    {
+        return null;
+    }
+
+    /**
+     * After Direct hook
+     */
+    public function afterRedirect(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+
+    /**
      * Renders a template using the View package
      *
      * @param string $template e.g. articles/index
      */
-    public function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
+    protected function render(string $template, array $data = [], int $statusCode = 200): ResponseInterface
     {
-        if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
+        if ($response = $this->beforeRender()) {
+            return $response;
         }
 
         $response = $this->buildResponse(
             $this->templateRenderer->withLayout($this->layout ?? null)->render($template, $data), 'text/html', $statusCode
         );
 
-        $event = $this->eventDispatcher->dispatch(new AfterRenderEvent($this, $this->request, $response));
-
-        return $event ? $event->getResponse() : $response;
+        return $this->response = $this->afterRender($response);
     }
 
     /**
      * Renders a JSON response
      */
-    public function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
+    protected function renderJson($payload, int $statusCode = 200, int $jsonFlags = self::JSON_FLAGS): ResponseInterface
     {
-        if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
+        if ($response = $this->beforeRender()) {
+            return $response;
         }
 
         $response = $this->buildResponse(
             json_encode($payload, $jsonFlags), 'application/json', $statusCode
         );
 
-        $event = $this->eventDispatcher->dispatch(new AfterRenderEvent($this, $this->request, $response));
-
-        return $event ? $event->getResponse() : $response;
+        return $this->response = $this->afterRender($response);
     }
 
     /**
      * Sends a file as a Response
      */
-    public function renderFile(string $path, array $options = []): ResponseInterface
+    protected function renderFile(string $path, array $options = []): ResponseInterface
     {
-        if ($event = $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))) {
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
+        if ($response = $this->beforeRender()) {
+            return $response;
         }
 
         $response = $this->buildFileResponse($path, $options['download'] ?? true);
 
-        $event = $this->eventDispatcher->dispatch(new AfterRenderEvent($this, $this->request, $response));
-
-        return $event ? $event->getResponse() : $response;
+        return $this->response = $this->afterRender($response);
     }
 
     /*
@@ -127,21 +139,17 @@ abstract class AbstractController
      *
      * @param string $uri e.g /articles or https://app.test/articles
      */
-    public function redirect(string $uri, int $status = 302): ResponseInterface
+    protected function redirect(string $uri, int $status = 302): ResponseInterface
     {
-        if ($event = $this->eventDispatcher->dispatch(new BeforeRedirectEvent($this, $uri, $this->request))) {
-            if ($response = $event->getResponse()) {
-                return $response;
-            }
+        if ($response = $this->beforeRedirect($uri)) {
+            return $response;
         }
 
         $response = $this->createResponse()
             ->withHeader('Location', $uri)
             ->withStatus($status);
 
-        $event = $this->eventDispatcher->dispatch(new AfterRedirectEvent($this, $uri, $this->request, $response));
-
-        return $event ? $event->getResponse() : $response;
+        return $this->response = $this->afterRedirect($response);
     }
 
     /**
@@ -200,10 +208,15 @@ abstract class AbstractController
     /**
      * Gets the Request object
      */
-    public function getRequest(): ?ServerRequestInterface
+    public function getRequest(): ServerRequestInterface
     {
-        return $this->request ?? null;
+        return $this->request;
     }
+
+    /**
+     * Factory method
+     */
+    abstract public function createResponse(): ResponseInterface;
 
     /**
      * Get the Template Renderer
@@ -224,7 +237,20 @@ abstract class AbstractController
     }
 
     /**
-     * Factory method
+     * Get the Response object if generated
      */
-    abstract public function createResponse(): ResponseInterface;
+    public function getResponse(): ?ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * Set the Response object to be returned
+     */
+    public function setResponse(?ResponseInterface $response): static
+    {
+        $this->response = $response;
+
+        return $this;
+    }
 }

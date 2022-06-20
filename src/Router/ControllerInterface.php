@@ -11,8 +11,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\DataMapper\Event;
+namespace Lightning\Router;
 
-class AfterCreateEvent extends AbstractAfterWriteEvent
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+interface ControllerInterface
 {
+    public function beforeFilter(ServerRequestInterface $request): ?ResponseInterface;
+
+    public function afterFilter(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface;
 }

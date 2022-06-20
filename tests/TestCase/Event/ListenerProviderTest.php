@@ -25,7 +25,7 @@ class Controller implements SubscriberInterface
     {
         return [
             SomethingHappened::class => 'foo',
-            SomethingElseHappened::class => ['bar',5]
+            SomethingElseHappened::class => 'bar'
         ];
     }
 
@@ -40,7 +40,7 @@ class Controller implements SubscriberInterface
     }
 }
 
-final class ListenerProviderTest extends TestCase
+class ListenerProviderTest extends TestCase
 {
     public function testAddListener(): void
     {

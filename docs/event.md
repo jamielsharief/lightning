@@ -4,7 +4,7 @@ A lightweight [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/) im
 
 ## Usage
 
-Create the `EventDispatcher` object with the desired `ListenerProvider`.
+Create the `EventDispatcher` object with the desired listener provider, we provide the `ListenerProvider` and the `PrioritizedListenerProvider` providers.
 
 ```php
 $listenerProvider  = new ListenerProvider();
@@ -28,8 +28,6 @@ $provider  = new ListenerProvider();
 $provider->addListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
 
-The `addListener` method has an optional third argument, the priority, the default number is `10`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
-
 ```php
 $provider->addListener(AfterOrder::class, function(AfterOrder $order){
     // do something
@@ -51,7 +49,7 @@ class Controller implements EventSubscriberInterface
     {
         return [
             SomethingHappened::class => 'foo',
-            SomethingElseHappened::class => ['bar', 5]
+            SomethingElseHappened::class => 'bar'
         ];
     }
 }
@@ -67,4 +65,13 @@ To remove
 
 ```php
 $provider->removeSubscriber(new Controller());
+```
+
+## PrioritizedListenerProvider
+
+The `PrioritizedListenerProvider` methods `addListener` and `addSubscriber` have an optional third argument, the priority, the default number is `100`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
+
+```php
+$provider->addListener(AfterOrder::class, [$this, 'afterOrder'], 120);
+$provider->addSubscriber(new Controller(), 120);
 ```

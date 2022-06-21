@@ -98,48 +98,48 @@ For example
 ```php
 abstract AppDataMapper extends AbstractDataMapper
 {
-    public function beforeCreate(EntityInterface $entity): bool
+    protected function beforeCreate(EntityInterface $entity): bool
     {
         return true;
     }
 
-    public function afterCreate(EntityInterface $entity): void
+    protected function afterCreate(EntityInterface $entity): void
     {
     }
 
-    public function beforeUpdate(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    public function afterUpdate(EntityInterface $entity): void
-    {
-    }
-
-    public function beforeSave(EntityInterface $entity): bool
+    protected function beforeUpdate(EntityInterface $entity): bool
     {
         return true;
     }
 
-    public function afterSave(EntityInterface $entity): void
+    protected function afterUpdate(EntityInterface $entity): void
     {
     }
 
-    public function beforeDelete(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    public function afterDelete(EntityInterface $entity): void
-    {
-    }
-
-    public function beforeFind(QueryObject $query): bool
+    protected function beforeSave(EntityInterface $entity): bool
     {
         return true;
     }
 
-    public function afterFind(Collection $collection, QueryObject $query): void
+    protected function afterSave(EntityInterface $entity): void
+    {
+    }
+
+    protected function beforeDelete(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    protected function afterDelete(EntityInterface $entity): void
+    {
+    }
+
+    protected function beforeFind(QueryObject $query): bool
+    {
+        return true;
+    }
+
+    protected function afterFind(Collection $collection, QueryObject $query): void
     {
     }
 }

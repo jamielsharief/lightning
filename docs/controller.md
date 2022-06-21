@@ -93,22 +93,22 @@ abstract class AbstractEventsController extends AbstractController
         $this->eventDispatcher->dispatch(new InitializeEvent($this));
     }
 
-    public function beforeRender(): ?ResponseInterface
+    protected function beforeRender(): ?ResponseInterface
     {
         return $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))->getResponse(); // Response object or null
     }
 
-    public function afterRender(ResponseInterface $response): ResponseInterface
+    protected function afterRender(ResponseInterface $response): ResponseInterface
     {
         return $this->eventDispatcher->dispatch(new AfterRenderEvent($this, $this->request, $response))->getResponse();
     }
 
-    public function beforeRedirect(string $url): ?ResponseInterface
+    protected function beforeRedirect(string $url): ?ResponseInterface
     {
         return $this->eventDispatcher->dispatch(new BeforeRedirectEvent($this, $url, $this->request))->getResponse(); // Response object or null
     }
 
-    public function afterRedirect(ResponseInterface $response): ResponseInterface
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
     {
         return $this->eventDispatcher->dispatch(new AfterRedirectEvent($this, $this->request, $response))->getResponse();
     }

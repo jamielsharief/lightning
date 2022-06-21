@@ -74,7 +74,7 @@ abstract class AbstractDataMapper
     /**
      * Before create callback
      */
-    public function beforeCreate(EntityInterface $entity): bool
+    protected function beforeCreate(EntityInterface $entity): bool
     {
         return true;
     }
@@ -82,14 +82,14 @@ abstract class AbstractDataMapper
     /**
      * After create callback
      */
-    public function afterCreate(EntityInterface $entity): void
+    protected function afterCreate(EntityInterface $entity): void
     {
     }
 
     /**
      * Before update callback
      */
-    public function beforeUpdate(EntityInterface $entity): bool
+    protected function beforeUpdate(EntityInterface $entity): bool
     {
         return true;
     }
@@ -97,14 +97,14 @@ abstract class AbstractDataMapper
     /**
      * after update callback
      */
-    public function afterUpdate(EntityInterface $entity): void
+    protected function afterUpdate(EntityInterface $entity): void
     {
     }
 
     /**
      * Before save callback
      */
-    public function beforeSave(EntityInterface $entity): bool
+    protected function beforeSave(EntityInterface $entity): bool
     {
         return true;
     }
@@ -112,14 +112,14 @@ abstract class AbstractDataMapper
     /**
      * After save callback
      */
-    public function afterSave(EntityInterface $entity): void
+    protected function afterSave(EntityInterface $entity): void
     {
     }
 
     /**
      * Before delete callback
      */
-    public function beforeDelete(EntityInterface $entity): bool
+    protected function beforeDelete(EntityInterface $entity): bool
     {
         return true;
     }
@@ -127,14 +127,14 @@ abstract class AbstractDataMapper
     /**
      * after delete callback
      */
-    public function afterDelete(EntityInterface $entity): void
+    protected function afterDelete(EntityInterface $entity): void
     {
     }
 
     /**
      * before find callback
      */
-    public function beforeFind(QueryObject $query): bool
+    protected function beforeFind(QueryObject $query): bool
     {
         return true;
     }
@@ -142,7 +142,7 @@ abstract class AbstractDataMapper
     /**
      * After find callback
      */
-    public function afterFind(Collection $collection, QueryObject $query): void
+    protected function afterFind(Collection $collection, QueryObject $query): void
     {
     }
 

@@ -43,33 +43,33 @@ class ApiController extends AbstractController
         return new Response();
     }
 
-    public function initialize(): void
+    protected function initialize(): void
     {
         $this->wasCalled('initialize');
     }
 
-    public function beforeRender(): ?ResponseInterface
+    protected function beforeRender(): ?ResponseInterface
     {
         $this->wasCalled('beforeRender');
 
         return null;
     }
 
-    public function afterRender(ResponseInterface $response): ResponseInterface
+    protected function afterRender(ResponseInterface $response): ResponseInterface
     {
         $this->wasCalled('afterRender');
 
         return $response;
     }
 
-    public function beforeRedirect(string $url): ?ResponseInterface
+    protected function beforeRedirect(string $url): ?ResponseInterface
     {
         $this->wasCalled('beforeRedirect');
 
         return null;
     }
 
-    public function afterRedirect(ResponseInterface $response): ResponseInterface
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
     {
         $this->wasCalled('afterRedirect');
 

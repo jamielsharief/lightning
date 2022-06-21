@@ -50,14 +50,14 @@ abstract class AbstractController
     /**
      * Hook is called when the Controller object is created
      */
-    public function initialize(): void
+    protected function initialize(): void
     {
     }
 
     /**
      * Before render hook
      */
-    public function beforeRender(): ?ResponseInterface
+    protected function beforeRender(): ?ResponseInterface
     {
         return null;
     }
@@ -65,7 +65,7 @@ abstract class AbstractController
     /**
      * After render hook
      */
-    public function afterRender(ResponseInterface $response): ResponseInterface
+    protected function afterRender(ResponseInterface $response): ResponseInterface
     {
         return $response;
     }
@@ -73,7 +73,7 @@ abstract class AbstractController
     /**
      * Before Redirect hook
      */
-    public function beforeRedirect(string $url): ?ResponseInterface
+    protected function beforeRedirect(string $url): ?ResponseInterface
     {
         return null;
     }
@@ -81,7 +81,7 @@ abstract class AbstractController
     /**
      * After Direct hook
      */
-    public function afterRedirect(ResponseInterface $response): ResponseInterface
+    protected function afterRedirect(ResponseInterface $response): ResponseInterface
     {
         return $response;
     }

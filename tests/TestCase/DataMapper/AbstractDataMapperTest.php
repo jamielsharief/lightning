@@ -172,7 +172,7 @@ class Article extends AbstractDataMapper
     /**
      * Before create hook
      */
-    public function beforeCreate(EntityInterface $entity): bool
+    protected function beforeCreate(EntityInterface $entity): bool
     {
         parent::beforeCreate($entity);
 
@@ -184,7 +184,7 @@ class Article extends AbstractDataMapper
     /**
      * After create hook
      */
-    public function afterCreate(EntityInterface $entity): void
+    protected function afterCreate(EntityInterface $entity): void
     {
         parent::afterCreate($entity);
 
@@ -194,7 +194,7 @@ class Article extends AbstractDataMapper
     /**
      * Before update hook
      */
-    public function beforeUpdate(EntityInterface $entity): bool
+    protected function beforeUpdate(EntityInterface $entity): bool
     {
         parent::beforeUpdate($entity);
 
@@ -206,7 +206,7 @@ class Article extends AbstractDataMapper
     /**
      * after update hook
      */
-    public function afterUpdate(EntityInterface $entity): void
+    protected function afterUpdate(EntityInterface $entity): void
     {
         parent::afterUpdate($entity);
 
@@ -216,7 +216,7 @@ class Article extends AbstractDataMapper
     /**
      * Before save hook
      */
-    public function beforeSave(EntityInterface $entity): bool
+    protected function beforeSave(EntityInterface $entity): bool
     {
         parent::beforeSave($entity);
 
@@ -228,7 +228,7 @@ class Article extends AbstractDataMapper
     /**
      * After save hook
      */
-    public function afterSave(EntityInterface $entity): void
+    protected function afterSave(EntityInterface $entity): void
     {
         parent::afterSave($entity);
         $this->wasCalled('afterSave');
@@ -237,7 +237,7 @@ class Article extends AbstractDataMapper
     /**
      * Before delete hook
      */
-    public function beforeDelete(EntityInterface $entity): bool
+    protected function beforeDelete(EntityInterface $entity): bool
     {
         parent::beforeDelete($entity);
 
@@ -249,7 +249,7 @@ class Article extends AbstractDataMapper
     /**
      * after delete hook
      */
-    public function afterDelete(EntityInterface $entity): void
+    protected function afterDelete(EntityInterface $entity): void
     {
         parent::afterDelete($entity); // code cover friendly
         $this->wasCalled('afterDelete');
@@ -258,7 +258,7 @@ class Article extends AbstractDataMapper
     /**
      * before find hook
      */
-    public function beforeFind(QueryObject $query): bool
+    protected function beforeFind(QueryObject $query): bool
     {
         parent::beforeFind($query);// code cover friendly
         $this->wasCalled('beforeFind');
@@ -269,7 +269,7 @@ class Article extends AbstractDataMapper
     /**
      * After find hook
      */
-    public function afterFind(Collection $collection, QueryObject $query): void
+    protected function afterFind(Collection $collection, QueryObject $query): void
     {
         parent::afterFind($collection, $query); // code coverage friendly
         $this->wasCalled('afterFind');

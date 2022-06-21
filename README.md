@@ -55,5 +55,4 @@ $ vendor/bin/phpunit
 
 To think about
 - interfaces, use getEventName or eventName(), getSubscribedEvents() or subscribedEvents();
-- hooks should be public not protected, e.g. initialize
 - methods should be public even if they were not suppose to be called from the outside, e.g. Controller::render, only functions it calls can then be hidden.

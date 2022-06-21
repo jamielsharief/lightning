@@ -13,79 +13,63 @@
 
 namespace Lightning\Event;
 
-use Lightning\Event\Exception\EventException;
+use RuntimeException;
+use InvalidArgumentException;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 /**
  * Event - A generic Event
+ *
+ * @internal Event Type not Event name is the correct naming strategy
  */
-class Event implements GenericEventInterface, StoppableEventInterface
+class Event implements EventInterface, StoppableEventInterface
 {
     /**
-     * Event name e.g. Order.placed
-     *
-     * @var string
+     * Event type e.g. Order.placed
      */
-    protected string $name;
+    protected string $type;
 
     /**
      * Status
-     *
-     * @var boolean
      */
     private bool $stopped = false;
 
     /**
      * Event can be cancelled
-     *
-     * @var boolean
      */
     private bool $cancelable = true;
 
     /**
      * Event subject (source where this event was created)
-     *
-     * @var object|null
      */
     protected ?object $source;
 
     /**
      * Event data
-     *
-     * @var array
      */
     protected array $data = [];
 
     /**
      * Constructor
-     *
-     * @param string $name Type of event e.g Order.placed
-     * @param object $source The object that triggered the event
-     * @param array $data   Extra data passed to the event
-     * @param boolean $cancelable If the event is cancelable
      */
-    public function __construct(string $name, ?object $source = null, array $data = [], bool $cancelable = true)
+    public function __construct(string $type, ?object $source = null, array $data = [], bool $cancelable = true)
     {
-        $this->name = $name;
+        $this->type = $type;
         $this->source = $source;
         $this->data = $data;
         $this->cancelable = $cancelable;
     }
 
     /**
-     * Gets the event name, e.g. Order.placed
-     *
-     * @return string
+     * Gets the event type, e.g. Order.placed
      */
-    public function getName(): string
+    public function type(): string
     {
-        return $this->name;
+        return $this->type;
     }
 
     /**
      * Gets the source (subject) that triggered this Event
-     *
-     * @return object|null
      */
     public function getSource(): ?object
     {
@@ -94,13 +78,11 @@ class Event implements GenericEventInterface, StoppableEventInterface
 
     /**
      * Stops further propagation of the current Event
-     *
-     * @return static
      */
     public function stop(): static
     {
         if ($this->cancelable === false) {
-            throw new EventException('This event cannot be stopped');
+            throw new RuntimeException('This event cannot be stopped');
         }
         $this->stopped = true;
 
@@ -109,8 +91,6 @@ class Event implements GenericEventInterface, StoppableEventInterface
 
     /**
      * Checks if the Event has been stopped
-     *
-     * @return boolean
      */
     public function isPropagationStopped(): bool
     {
@@ -119,8 +99,6 @@ class Event implements GenericEventInterface, StoppableEventInterface
 
     /**
      * Checks if the event can be cancelled
-     *
-     * @return boolean
      */
     public function isCancelable(): bool
     {
@@ -129,9 +107,6 @@ class Event implements GenericEventInterface, StoppableEventInterface
 
     /**
      * Sets data for this Event
-     *
-     * @param array $data
-     * @return static
      */
     public function setData(array $data): static
     {
@@ -142,8 +117,6 @@ class Event implements GenericEventInterface, StoppableEventInterface
 
     /**
      * Get the Event data
-     *
-     * @return array
      */
     public function getData(): array
     {
@@ -151,13 +124,32 @@ class Event implements GenericEventInterface, StoppableEventInterface
     }
 
     /**
-     * Returns a new instance with this data
-     *
-     * @param array $data
-     * @return static
+     * Sets a value in the event object
      */
-    public function withData(array $data): static
+    public function set(string $name, mixed $value): static
     {
-        return (clone $this)->setData($data);
+        $this->data[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Gets a value from the Event
+     */
+    public function get(string $name): mixed
+    {
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('`%s` not found'));
+    }
+
+    /**
+     * Checks if there is a value in the Event
+     */
+    public function has(string $name): bool
+    {
+        return array_key_exists($name, $this->data);
     }
 }

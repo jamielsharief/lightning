@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Event\EventDispatcher;
+use Lightning\Event\EventManager;
 use Lightning\Test\Entity\TagEntity;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
@@ -216,7 +216,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
         $this->dataSource = new DatabaseDataSource($this->pdo, new QueryBuilder());
-        $this->eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $this->eventDispatcher = new EventManager(new ListenerProvider());
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([

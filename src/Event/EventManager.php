@@ -18,9 +18,9 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
- * PSR-14 Event Dispatcher
+ * PSR-14 Event Dispatcher and listener provider
  */
-class EventDispatcher implements EventDispatcherInterface, ListenerProviderInterface
+class EventManager implements EventDispatcherInterface, ListenerProviderInterface
 {
     public const DEFAULT_PRIORITY = 100;
 
@@ -57,7 +57,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     /**
      * Adds a subscriber
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): static
+    public function addSubscriber(SubscriberInterface $subscriber): static
     {
         foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
             $params = (array) $params;
@@ -70,7 +70,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     /**
      * Removes a subscriber
      */
-    public function removeSubscriber(EventSubscriberInterface $subscriber): static
+    public function removeSubscriber(SubscriberInterface $subscriber): static
     {
         foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
             $params = (array) $params;
@@ -85,7 +85,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
      */
     public function getListenersForEvent(object $event): iterable
     {
-        $eventType = $event instanceof Event ? $event->getName() : $event::class;
+        $eventType = $event instanceof Event ? $event->type() : $event::class;
 
         if (empty($this->listeners[$eventType])) {
             return [];

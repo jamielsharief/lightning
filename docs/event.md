@@ -1,77 +1,81 @@
-# PSR-14 Event Dispatcher 
+# PSR-14 Events
 
-A lightweight [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/) implementation.
+Use the` EventManager` to easily inject logic into an application, for more information on the standard see [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/).
+
 
 ## Usage
-
-Create the `EventDispatcher` object with the desired listener provider, we provide the `ListenerProvider` and the `PrioritizedListenerProvider` providers.
-
-```php
-$listenerProvider  = new ListenerProvider();
-$eventDispatcher = new EventDispatcher($listenerProvider);
-```
-
-Dispatch an Event
-
-```php
-$event = new CreditCardPaymentAccepted();
-$eventDispatcher->dispatch($event);
-```
-
-
-## Listener Provider
 
 To add any `callable` use the `addListener` method.
 
 ```php
-$provider  = new ListenerProvider();
-$provider->addListener(AfterOrder::class, [$this, 'afterOrder']);
+$eventManager = new EventManager();
+$eventManager->addListener(AfterOrder::class, [$this, 'afterOrder']);
+$eventManager->dispatch(new AfterOrder);
 ```
 
-```php
-$provider->addListener(AfterOrder::class, function(AfterOrder $order){
-    // do something
-});
-```
-
-You can remove a listener like so
+If you want to listen to multiple events then implement `EventSubscriberInterface` on the object that
+you want to do the listening
 
 ```php
-$provider->removeListener(AfterOrder::class, [$this, 'afterOrder']);
-```
-
-You can create a Subscriber class which listens to multiple events by adding the  `SubscriberInterface`.
-
-```php
-class Controller implements EventSubscriberInterface
+class OrderListener implements SubscriberInterface
 {
-    public function subscribedEvents(): array
+    public function subscribedEvents() : array
     {
         return [
-            SomethingHappened::class => 'foo',
-            SomethingElseHappened::class => 'bar'
+            NewOrder::class => 'newOrder',
+            AfterOrder::class => ['afterOrder', 5]
         ];
+    }
+
+    public function newOrder(NewOrder $event)
+    {
+        // do something
     }
 }
 ```
 
-then  call the `addSubscriber` method
+Then you would subscribe using the `addSubscriber` and then dispatch.
 
 ```php
-$provider->addSubscriber(new Controller());
+$eventManager = new EventManager();
+$eventManager->addSubscriber(new OrderListener);
+$eventManager->dispatch(new AfterOrder);
 ```
 
-To remove
+## Priority
+
+You can also pass a third argument, the priority, the default number is `100`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
 
 ```php
-$provider->removeSubscriber(new Controller());
+$eventManager->addListener(AfterOrder::class, function(AfterOrder $order){
+    echo "Hello";
+}, 50);
 ```
 
-## PrioritizedListenerProvider
+## Generic Events
 
-The `PrioritizedListenerProvider` methods `addListener` and `addSubscriber` have an optional third argument, the priority, the default number is `100`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.
+There is also a generic `Event` class.
 
 ```php
-$provider->addListener(AfterOrder::class, [$this, 'afterOrder'], 120);
-$provider->addSubscriber(new Controller(), 120);
+$eventManager = new EventManager();
+$eventManager->addListener('Order.afterPayment', [$this, 'afterPayment']);
+
+# To dispatch normally
+$event = new Event('Order.afterPayment', $this, ['order' => $order]);
+$eventManager->dispatch($event);
+```
+
+Subscribers also work nicely with the `Event` class
+
+```php
+class OrderListener implements SubscriberInterface
+{
+    public function subscribedEvents() : array
+    {
+        return [
+            'Order.new' = 'newOrder',
+            'Order.after' => ['afterOrder', 40 ]
+        ];
+    }
+}
 ```

@@ -8,7 +8,7 @@ use Lightning\Autowire\Autowire;
 use Lightning\Logger\FileLogger;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Event\EventDispatcher;
+use Lightning\Event\EventManager;
 use Lightning\Translator\Translator;
 use Lightning\Event\ListenerProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -33,7 +33,7 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
  return [
 
      EventManagerInterface::class => function (ContainerInterface $container) {
-         return new EventDispatcher(new ListenerProvider());
+         return new EventManager(new ListenerProvider());
      },
 
      Router::class => function (ContainerInterface $container) {

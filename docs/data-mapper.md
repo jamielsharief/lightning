@@ -73,21 +73,74 @@ $mapper->updateAll($query, ['status'=> 'approved']);
 
 ## Collection
 
-The `Utility\Collection` object is used to store the results from find operations and this is passed to the `Event` objects.
+The `Utility\Collection` object is used to store the results from find operations and this is passed to the callback methods.
 
-## PSR-14 Events
+## Callbacks
 
-You can also use PSR-14 Events, the following events are triggered:
+> The design of this deliberately does not include a specific event implementation e.g. PSR-14 event or Hooks. These methods are provided as the first point of call for getting the desired behavior.
+
+The following callbacks methods are called allowing you modify the behavior of the `DataMapper`, you can create different versions of the `DataMapper` using these methods to carry out different actions such as triggering `PSR-14 events` etc or using hooks or quite simply just placing the logic in the methods.
 
 - `initialize` - This is triggered when the data mapper is constructed
-- `BeforeSave`  - triggered before beforeCreate or beforeUpdate
-- `BeforeCreate` - triggered on save if the operation is a create
-- `BeforeUpdate` - triggered on save if the operation is an update
-- `BeforeDelete`
-- `AfterCreate` - triggered on save if the operation was a create
-- `AterUpdate` - triggered on save if the operation was an update
-- `AfterSave` - triggered after afterCreate or afterUpdate
-- `AfterDelete`
-- `BeforeFind`
-- `BeforeFind` - triggered on find, findCount and findList
-- `AfterFind` - triggered on find and findList
+- `beforeSave`  - triggered before beforeCreate or beforeUpdate
+- `beforeCreate` - triggered on save if the operation is a create
+- `beforeUpdate` - triggered on save if the operation is an update
+- `beforeDelete`
+- `afterCreate` - triggered on save if the operation was a create
+- `aterUpdate` - triggered on save if the operation was an update
+- `afterSave` - triggered after afterCreate or afterUpdate
+- `afterDelete`
+- `beforeFind` - triggered on find, findCount and findList
+- `afterFind` - triggered on find and findList
+
+For example 
+
+```php
+abstract AppDataMapper extends AbstractDataMapper
+{
+    public function beforeCreate(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    public function afterCreate(EntityInterface $entity): void
+    {
+    }
+
+    public function beforeUpdate(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    public function afterUpdate(EntityInterface $entity): void
+    {
+    }
+
+    public function beforeSave(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    public function afterSave(EntityInterface $entity): void
+    {
+    }
+
+    public function beforeDelete(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    public function afterDelete(EntityInterface $entity): void
+    {
+    }
+
+    public function beforeFind(QueryObject $query): bool
+    {
+        return true;
+    }
+
+    public function afterFind(Collection $collection, QueryObject $query): void
+    {
+    }
+}
+```

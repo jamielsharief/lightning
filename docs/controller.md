@@ -66,9 +66,11 @@ return $this->renderFile('/var/www/downloads/2021.txt',['download' => 'false']);
 return $this->renderFile('/var/www/downloads/2021.pdf',['name' =>'important.pdf']); // To give the file a different name
 ```
 
-## Life Cycle Callbacks
+## Callbacks
 
-The `Controller` comes with the following hooks to allow you modify the behavior of the `Controller`
+> The design of this deliberately does not include a specific event implementation e.g. PSR-14 event or Hooks. These methods are provided as the first point of call for getting the desired behavior.
+
+The following callbacks methods are called allowing you modify the behavior of the `Controller`, you can create different versions of the `Controller` using these methods to carry out different actions such as triggering `PSR-14 events` etc or using hooks or quite simply just placing the logic in the methods.
 
 - `initialize`
 - `beforeRender`
@@ -79,7 +81,7 @@ The `Controller` comes with the following hooks to allow you modify the behavior
 Here is how you could implement `PSR-14` Events using the controller callbacks.
 
 ```php
-abstract class AbstractPsrEventsController extends AbstractController
+abstract class AbstractEventsController extends AbstractController
 {
     protected EventDispatcherInterface $eventDispatcher;
 
@@ -93,7 +95,7 @@ abstract class AbstractPsrEventsController extends AbstractController
 
     public function beforeRender(): ?ResponseInterface
     {
-        return $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))->getResponse(); // response or null
+        return $this->eventDispatcher->dispatch(new BeforeRenderEvent($this, $this->request))->getResponse(); // Response object or null
     }
 
     public function afterRender(ResponseInterface $response): ResponseInterface
@@ -103,7 +105,7 @@ abstract class AbstractPsrEventsController extends AbstractController
 
     public function beforeRedirect(string $url): ?ResponseInterface
     {
-        return $this->eventDispatcher->dispatch(new BeforeRedirectEvent($this, $url, $this->request))->getResponse(); // response or null
+        return $this->eventDispatcher->dispatch(new BeforeRedirectEvent($this, $url, $this->request))->getResponse(); // Response object or null
     }
 
     public function afterRedirect(ResponseInterface $response): ResponseInterface

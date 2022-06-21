@@ -72,77 +72,77 @@ abstract class AbstractDataMapper
     }
 
     /**
-     * Before create hook
+     * Before create callback
      */
-    protected function beforeCreate(EntityInterface $entity): bool
+    public function beforeCreate(EntityInterface $entity): bool
     {
         return true;
     }
 
     /**
-     * After create hook
+     * After create callback
      */
-    protected function afterCreate(EntityInterface $entity): void
+    public function afterCreate(EntityInterface $entity): void
     {
     }
 
     /**
-     * Before update hook
+     * Before update callback
      */
-    protected function beforeUpdate(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * after update hook
-     */
-    protected function afterUpdate(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * Before save hook
-     */
-    protected function beforeSave(EntityInterface $entity): bool
+    public function beforeUpdate(EntityInterface $entity): bool
     {
         return true;
     }
 
     /**
-     * After save hook
+     * after update callback
      */
-    protected function afterSave(EntityInterface $entity): void
+    public function afterUpdate(EntityInterface $entity): void
     {
     }
 
     /**
-     * Before delete hook
+     * Before save callback
      */
-    protected function beforeDelete(EntityInterface $entity): bool
-    {
-        return true;
-    }
-
-    /**
-     * after delete hook
-     */
-    protected function afterDelete(EntityInterface $entity): void
-    {
-    }
-
-    /**
-     * before find hook
-     */
-    protected function beforeFind(QueryObject $query): bool
+    public function beforeSave(EntityInterface $entity): bool
     {
         return true;
     }
 
     /**
-     * After find hook
+     * After save callback
      */
-    protected function afterFind(Collection $collection, QueryObject $query): void
+    public function afterSave(EntityInterface $entity): void
+    {
+    }
+
+    /**
+     * Before delete callback
+     */
+    public function beforeDelete(EntityInterface $entity): bool
+    {
+        return true;
+    }
+
+    /**
+     * after delete callback
+     */
+    public function afterDelete(EntityInterface $entity): void
+    {
+    }
+
+    /**
+     * before find callback
+     */
+    public function beforeFind(QueryObject $query): bool
+    {
+        return true;
+    }
+
+    /**
+     * After find callback
+     */
+    public function afterFind(Collection $collection, QueryObject $query): void
     {
     }
 

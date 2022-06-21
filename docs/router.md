@@ -142,12 +142,12 @@ class ArticlesController implements ControllerInterface
     public function beforeFilter(ServerRequestInterface $request): ?ResponseInterface
     {
         $this->request = $request;
-        return $this->eventDispatcher->dispatch(new BeforeFilterEvent($request))->getResponse();
+        return $this->eventDispatcher->dispatch(new BeforeFilterEvent($request))->getResponse(); // Response object or null
     }
 
     public function afterFilter(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-       return $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse();
+       return $this->eventDispatcher->dispatch(new AfterFilterEvent($request, $response))->getResponse(); // Response object
     }
 }
 ```

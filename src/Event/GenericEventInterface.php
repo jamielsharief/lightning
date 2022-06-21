@@ -13,17 +13,7 @@
 
 namespace Lightning\Event;
 
-interface SubscriberInterface
+interface GenericEventInterface
 {
-    /**
-     * Return an array of eventTypes and methods
-     *
-     * [
-     *  'Order.complete' => 'sendEmail'
-     *  'Order.newCustomer' => ['sendSMS',100]
-     * ]
-     *
-     * @return array
-     */
-    public function subscribedEvents(): array;
+    public function getName(): string;
 }

@@ -2,14 +2,17 @@
 
 namespace Lightning\Test\Event;
 
+use Lightning\Event\Event;
 use PHPUnit\Framework\TestCase;
 use Lightning\Event\EventDispatcher;
-use Lightning\Event\ListenerProvider;
-use Lightning\Event\SubscriberInterface;
-use Lightning\Event\EventWithNameInterface;
+use Lightning\Event\EventSubscriberInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 
-class StoppableEvent implements StoppableEventInterface
+class TestEvent
+{
+}
+
+class TestStoppableEvent implements StoppableEventInterface
 {
     public bool $isStopped = false;
 
@@ -23,236 +26,200 @@ class StoppableEvent implements StoppableEventInterface
     }
 }
 
-final class EventDispatcherTest extends TestCase
+class Controller implements EventSubscriberInterface
 {
-    public function testGetListerProvider(): void
+    protected array $events = [];
+
+    public function getSubscribedEvents(): array
     {
-        $provider = new ListenerProvider();
-        $dispatcher = new EventDispatcher($provider);
-        $this->assertEquals($provider, $dispatcher->getListenerProvider());
+        return [
+            TestEvent::class => 'catchEvent',
+            TestStoppableEvent::class => ['catchEvent', 2],
+        ];
     }
 
-    public function testSetListenerProvider(): void
+    public array $methodsCalled = [];
+
+    /**
+     * Event Listener for testing
+     *
+     * @param object  $event
+     * @return void
+     */
+    public function catchEvent(object $event): void
     {
-        $provider = new ListenerProvider();
-        $dispatcher = new EventDispatcher($provider);
+        $this->events[] = $event;
+    }
 
-        $provider2 = clone $provider;
-        $provider2->addListener('foo', function () {
-        });
+    public function getEvents(): array
+    {
+        return $this->events;
+    }
+}
 
-        $this->assertEquals($provider2, $dispatcher->setListenerProvider($provider2)->getListenerProvider());
+final class EventDispatcherTest extends TestCase
+{
+    public array $events = [];
+
+    public function setUp(): void
+    {
+        $this->events = [];
+    }
+
+    public function testAddListener(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $callable = [$this,'catchEvent'];
+
+        $this->assertInstanceOf(
+            EventDispatcher::class,
+            $dispatcher->addListener(TestEvent::class, $callable)
+        );
+        $this->assertSame([$callable], $dispatcher->getListenersForEvent(new TestEvent()));
+    }
+
+    public function testAddSubscriber(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $subscriber = new Controller();
+
+        $this->assertInstanceOf(
+            EventDispatcher::class,
+            $dispatcher->addSubscriber($subscriber)
+        );
+
+        $callable = [$subscriber,'catchEvent'];
+        $this->assertSame([$callable], $dispatcher->getListenersForEvent(new TestEvent()));
+
+        $this->assertSame([
+            [$subscriber,'catchEvent'],
+        ], $dispatcher->getListenersForEvent(new TestEvent()));
+    }
+
+    /**
+     * @depends testAddListener
+     */
+    public function testGetListenersForEvent(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $this->assertEquals([], $dispatcher->getListenersForEvent($this));
+
+        $event = new TestEvent();
+        $callable = [$this,'catchEvent'];
+
+        $dispatcher->addListener(TestEvent::class, $callable);
+        $this->assertSame([$callable], $dispatcher->getListenersForEvent($event));
+    }
+
+    /**
+     * @depends testAddListener
+     */
+    public function testGetListenersForEventPriority(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $event = new TestEvent();
+        $subscriber = new Controller();
+
+        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->addListener(TestEvent::class, [$this,'catchEvent'], 1);
+
+        $listeners = $dispatcher->getListenersForEvent($event);
+
+        $this->assertEquals([$this,'catchEvent'], $listeners[0]);
+        $this->assertEquals([$subscriber,'catchEvent'], $listeners[1]);
+    }
+
+    /**
+     * @depends testAddListener
+     */
+    public function testGetListenersForEventPrioritySubscriber(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $event = new TestStoppableEvent();
+        $subscriber = new Controller();
+
+        $dispatcher->addListener(TestStoppableEvent::class, [$this,'catchEvent']);
+        $dispatcher->addSubscriber($subscriber);
+
+        $listeners = $dispatcher->getListenersForEvent($event);
+
+        $this->assertEquals([$subscriber,'catchEvent'], $listeners[0]);
+        $this->assertEquals([$this,'catchEvent'], $listeners[1]);
+    }
+
+    public function testRemoveListener(): void
+    {
+        $dispatcher = new EventDispatcher();
+
+        $callable = [$this,'catchEvent'];
+        $dispatcher->addListener(TestEvent::class, $callable);
+        $this->assertCount(1, $dispatcher->getListenersForEvent(new TestEvent()));
+
+        $this->assertInstanceOf(EventDispatcher::class, $dispatcher->removeListener(TestEvent::class, $callable));
+        $this->assertCount(0, $dispatcher->getListenersForEvent(new TestEvent()));
+    }
+
+    public function testRemoveSubscriber(): void
+    {
+        $dispatcher = new EventDispatcher();
+
+        $subscriber = new Controller();
+        $dispatcher->addSubscriber($subscriber);
+
+        $this->assertCount(1, $dispatcher->getListenersForEvent(new TestEvent()));
+        $this->assertInstanceOf(EventDispatcher::class, $dispatcher->removeSubscriber($subscriber));
+        $this->assertCount(0, $dispatcher->getListenersForEvent(new TestEvent()));
     }
 
     public function testDispatch(): void
     {
-        $event = new StoppableEvent();
-        $dispatcher = new EventDispatcher(new ListenerProvider());
-        $dispatcher->getListenerProvider()->addListener(StoppableEvent::class, function (StoppableEvent $event) {
-            $this->assertTrue(true);
-        });
-
+        $dispatcher = new EventDispatcher();
+        $event = new TestEvent();
         $this->assertEquals($event, $dispatcher->dispatch($event));
     }
 
-    public function testDispatchStopEvent(): void
+    public function testDispatchNoEvents(): void
     {
-        $event = new StoppableEvent();
-        $provider = new ListenerProvider();
-        $dispatcher = new EventDispatcher($provider);
-        $provider->addListener(StoppableEvent::class, function (StoppableEvent $event) {
-            $this->assertTrue(true);
-            $event->stop();
-        });
+        $dispatcher = new EventDispatcher();
+        $dispatcher->dispatch(new TestEvent());
+        $this->assertCount(0, $this->events);
+    }
 
-        $provider->addListener(StoppableEvent::class, function (StoppableEvent $event) {
-            $this->assertTrue(false); // fail
-        });
+    public function testDispatchSingleEvent(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(TestEvent::class, [$this,'catchEvent']);
 
-        $this->assertEquals($event, $dispatcher->dispatch($event));
+        $dispatcher->dispatch(new TestEvent());
+
+        $this->assertCount(1, $this->events);
+    }
+
+    public function testDispatchStoppableEvent(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(TestStoppableEvent::class, [$this,'stopEvent']);
+        $dispatcher->addListener(TestStoppableEvent::class, [$this,'catchEvent']);
+
+        $dispatcher->dispatch(new TestStoppableEvent());
+
+        $this->assertCount(1, $this->events);
+    }
+
+    /**
+    * Event Listener for testing
+    *
+    * @param object  $event
+    * @return void
+    */
+    public function catchEvent(object $event): void
+    {
+        $this->events[] = $event;
+    }
+
+    public function stopEvent(TestStoppableEvent $event): void
+    {
+        $event->stop();
+        $this->events[] = $event;
     }
 }
-
-// // class TestEvent
-// // {
-// // }
-
-// // class MultiEvent
-// // {
-// // }
-
-// class TestStoppableEvent implements StoppableEventInterface
-// {
-//     public bool $isStopped = false;
-
-//     public function stop(): void
-//     {
-//         $this->isStopped = true;
-//     }
-//     public function isPropagationStopped(): bool
-//     {
-//         return $this->isStopped;
-//     }
-// }
-
-// class Controller implements SubscriberInterface
-// {
-//     public function subscribedEvents(): array
-//     {
-//         return [
-//             SomethingHappened::class => 'foo',
-//             SomethingElseHappened::class => ['bar',5]
-//         ];
-//     }
-
-//     public function foo(object $event): void
-//     {
-//         $event->data .= 'foo';
-//     }
-
-//     public function bar(object $event): void
-//     {
-//         $event->data .= 'bar';
-//     }
-// }
-
-// abstract class AbstractEvent
-// {
-//     public string $data = '';
-// }
-
-// class SomethingHappened extends AbstractEvent
-// {
-// }
-
-// class SomethingElseHappened extends AbstractEvent
-// {
-// }
-
-// class AnotherThingHappened extends AbstractEvent
-// {
-// }
-
-// class BeforeTransaction implements EventWithNameInterface
-// {
-//     public function eventName(): string
-//     {
-//         return 'database.beforeTransaction';
-//     }
-// }
-
-// final class EventDispatcherTest extends TestCase
-// {
-//     public function testAddListener(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $eventDispatcher->addListener(SomethingHappened::class, function (object $event) {
-//             $this->assertInstanceOf(SomethingHappened::class, $event);
-//         })->dispatch(new SomethingHappened());
-//     }
-
-//     public function testGetListeners(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $handler = function (object $event) {
-//             $this->assertInstanceOf(SomethingHappened::class, $event);
-//         };
-
-//         $eventDispatcher->addListener(SomethingHappened::class, $handler)->dispatch(new SomethingHappened());
-//         $this->assertEquals([$handler], $eventDispatcher->getListenersForEvent(new SomethingHappened()));
-//     }
-
-//     public function testGetListenersNone(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();;
-//         $this->assertEmpty($eventDispatcher->getListenersForEvent(new SomethingElseHappened()));
-//     }
-
-//     public function testGetListenersByName(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $handler = function (object $event) {
-//         };
-
-//         $eventDispatcher->addListener('database.beforeTransaction', $handler)->dispatch(new BeforeTransaction());
-//         $this->assertEquals([$handler], $eventDispatcher->getListenersForEvent(new BeforeTransaction()));
-//     }
-
-//     public function testRemoveListeners(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $handler = function (object $event) {
-//             $this->assertInstanceOf(SomethingHappened::class, $event);
-//         };
-
-//         $eventDispatcher->addListener(SomethingHappened::class, $handler);
-//         $this->assertNotEmpty($eventDispatcher->getListenersForEvent(new SomethingHappened()));
-
-//         $eventDispatcher->removeListener(SomethingHappened::class, $handler);
-//         $this->assertEmpty($eventDispatcher->getListenersForEvent(new SomethingHappened()));
-//     }
-
-//     public function testAddSubscriber(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $controller = new Controller();
-
-//         $eventDispatcher->addSubscriber($controller);
-//         $this->assertEquals([[$controller,'foo']], $eventDispatcher->getListenersForEvent(new SomethingHappened()));
-//     }
-
-//     public function testRemoveSubscriber(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $controller = new Controller();
-//         $eventDispatcher->addSubscriber($controller);
-//         $this->assertEquals([[$controller,'foo']], $eventDispatcher->getListenersForEvent(new SomethingHappened()));
-
-//         $this->assertEmpty($eventDispatcher->removeSubscriber($controller)->getListenersForEvent(new SomethingHappened()));
-//     }
-
-//     public function testDispatch(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $event = new SomethingHappened();
-
-//         $this->assertEquals($event, $eventDispatcher->dispatch($event));
-
-//         $eventDispatcher = new EventDispatcher();
-//         $eventDispatcher->addListener(SomethingHappened::class, function (object $event) {
-//             $this->assertInstanceOf(SomethingHappened::class, $event);
-//         });
-//         $this->assertEquals($event, $eventDispatcher->dispatch($event));
-//     }
-
-//     public function testDispatchPriority(): void
-//     {
-//         $eventDispatcher = new EventDispatcher();
-
-//         $event = new SomethingHappened();
-//         $handler1 = function (object $event) {
-//             $event->data .= 'a';
-//         };
-//         $handler2 = function (object $event) {
-//             $event->data .= 'b';
-//         };
-//         $handler3 = function (object $event) {
-//             $event->data .= 'c';
-//         };
-
-//         $eventDispatcher->addListener(SomethingHappened::class, $handler1, 100)
-//             ->addListener(SomethingHappened::class, $handler2, 25)
-//             ->addListener(SomethingHappened::class, $handler3, 30);
-
-//         $event = $eventDispatcher->dispatch(new SomethingHappened());
-
-//         $this->assertEquals('bca', $event->data);
-//     }
-// }

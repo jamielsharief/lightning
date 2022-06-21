@@ -2,16 +2,16 @@
 
 namespace Lightning\Test\Dotenv;
 
-use RuntimeException;
 use Lightning\Event\Event;
 use PHPUnit\Framework\TestCase;
+use Lightning\Event\Exception\EventException;
 
 final class EventTest extends TestCase
 {
     public function testGetType(): void
     {
         $event = new Event('Test.type', $this);
-        $this->assertEquals('Test.type', $event->getType());
+        $this->assertEquals('Test.type', $event->getName());
     }
 
     public function testGetSource(): void
@@ -46,7 +46,7 @@ final class EventTest extends TestCase
         $event = new Event('Test.cancellable', $this, [], false);
         $this->assertFalse($event->isPropagationStopped());
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(EventException::class);
         $this->expectExceptionMessage('This event cannot be stopped');
         $event->stop();
     }

@@ -18,20 +18,93 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
- * PSR-14 Dispatcher
+ * PSR-14 Event Dispatcher
  */
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher implements EventDispatcherInterface, ListenerProviderInterface
 {
-    public function __construct(protected ListenerProviderInterface $provider)
+    public const DEFAULT_PRIORITY = 100;
+
+    private array $listeners = [];
+    private array $sorted = [];
+
+    /**
+     * Adds a Listener
+     */
+    public function addListener(string $eventType, callable $callable, int $priority = self::DEFAULT_PRIORITY): static
     {
+        $this->listeners[$eventType][$priority][] = $callable;
+        unset($this->sorted[$eventType]);
+
+        return $this;
     }
 
     /**
-     * Dispatches an Event
+     * Removes a listener
+     */
+    public function removeListener(string $eventType, callable $callable): static
+    {
+        foreach ($this->listeners[$eventType] ?? [] as $priority => $queue) {
+            foreach ($queue as $index => $handler) {
+                if ($handler == $callable) {
+                    unset($this->listeners[$eventType][$priority][$index]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds a subscriber
+     */
+    public function addSubscriber(EventSubscriberInterface $subscriber): static
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
+            $params = (array) $params;
+            $this->addListener($eventType, [$subscriber, $params[0]], $params[1] ?? self::DEFAULT_PRIORITY);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a subscriber
+     */
+    public function removeSubscriber(EventSubscriberInterface $subscriber): static
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventType => $params) {
+            $params = (array) $params;
+            $this->removeListener($eventType, [$subscriber, $params[0]]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Part of ListenerProviderInterface
+     */
+    public function getListenersForEvent(object $event): iterable
+    {
+        $eventType = $event instanceof Event ? $event->getName() : $event::class;
+
+        if (empty($this->listeners[$eventType])) {
+            return [];
+        }
+
+        if (! isset($this->sorted[$eventType])) {
+            ksort($this->listeners[$eventType]);
+            $this->sorted[$eventType] = true;
+        }
+
+        return array_merge(...$this->listeners[$eventType]);
+    }
+
+    /**
+     * Dispatches an event
      */
     public function dispatch(object $event): object
     {
-        foreach ($this->provider->getListenersForEvent($event) as $listener) {
+        foreach ($this->getListenersForEvent($event) as $listener) {
             if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
                 return $event;
             }
@@ -40,23 +113,5 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         return $event;
-    }
-
-    /**
-     * Get the Listener Provider
-     */
-    public function getListenerProvider(): ListenerProviderInterface
-    {
-        return $this->provider;
-    }
-
-    /**
-     * Set the Listener Provider
-     */
-    public function setListenerProvider(ListenerProviderInterface $provider): static
-    {
-        $this->provider = $provider;
-
-        return $this;
     }
 }

@@ -31,7 +31,7 @@ $provider->addListener(AfterOrder::class, [$this, 'afterOrder']);
 ```php
 $provider->addListener(AfterOrder::class, function(AfterOrder $order){
     // do something
-}, 50);
+});
 ```
 
 You can remove a listener like so

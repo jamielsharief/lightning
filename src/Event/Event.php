@@ -142,7 +142,7 @@ class Event implements StoppableEventInterface
             return $this->data[$name];
         }
 
-        throw new InvalidArgumentException(sprintf('`%s` not found'));
+        throw new InvalidArgumentException(sprintf('`%s` not found', $name));
     }
 
     /**

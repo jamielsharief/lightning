@@ -37,9 +37,12 @@ class OrderListener implements SubscriberInterface
 Then you would subscribe using the `addSubscriber` and then dispatch.
 
 ```php
-$eventManager = new EventManager();
-$eventManager->addSubscriber(new OrderListener);
-$eventManager->dispatch(new AfterOrder);
+class ArticlesController() {
+    public function initialize() 
+    {
+        $this->eventManager->addSubscriber($this);
+    }
+}
 ```
 
 ## Priority

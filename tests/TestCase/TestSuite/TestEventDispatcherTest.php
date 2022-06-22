@@ -3,7 +3,7 @@
 namespace Lightning\Test\TestSuite;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\Event\EventManager;
+use Lightning\Event\EventDispatcher;
 use Lightning\Event\ListenerProvider;
 use Lightning\TestSuite\TestEventDispatcher;
 
@@ -15,7 +15,7 @@ final class TestEventDispatcherTest extends TestCase
 {
     public function testGetDispatchedEventsCount(): void
     {
-        $eventDispatcher = new TestEventDispatcher(new EventManager(new ListenerProvider()));
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher(new ListenerProvider()));
 
         $this->assertCount(0, $eventDispatcher);
         $eventDispatcher->dispatch(new TestEvent());
@@ -28,7 +28,7 @@ final class TestEventDispatcherTest extends TestCase
 
     public function testGetDispatchedEvents(): void
     {
-        $eventDispatcher = new TestEventDispatcher(new EventManager(new ListenerProvider()));
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher(new ListenerProvider()));
         $event = new TestEvent();
 
         $this->assertEquals([], $eventDispatcher->getDispatchedEvents());
@@ -43,7 +43,7 @@ final class TestEventDispatcherTest extends TestCase
 
     public function testGetDispatchedEvent(): void
     {
-        $eventDispatcher = new TestEventDispatcher(new EventManager(new ListenerProvider()));
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher(new ListenerProvider()));
         $event = new TestEvent();
 
         $this->assertNull($eventDispatcher->getDispatchedEvent(TestEvent::class));
@@ -58,7 +58,7 @@ final class TestEventDispatcherTest extends TestCase
 
     public function testHasDispatchedEvent(): void
     {
-        $eventDispatcher = new TestEventDispatcher(new EventManager(new ListenerProvider()));
+        $eventDispatcher = new TestEventDispatcher(new EventDispatcher(new ListenerProvider()));
         $event = new TestEvent();
 
         $this->assertFalse($eventDispatcher->hasDispatchedEvent(TestEvent::class));

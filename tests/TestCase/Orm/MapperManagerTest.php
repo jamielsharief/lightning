@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Lightning\Orm\MapperManager;
 use App\Controllers\EntityInterface;
 use Lightning\Entity\AbstractEntity;
-use Lightning\Event\EventManager;
+use Lightning\Event\EventDispatcher;
 use Lightning\Event\ListenerProvider;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Orm\AbstractObjectRelationalMapper;
@@ -116,7 +116,7 @@ final class MapperManagerTest extends TestCase
     public function testGet(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventManager(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerProvider());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
@@ -126,7 +126,7 @@ final class MapperManagerTest extends TestCase
     public function testAdd(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventManager(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerProvider());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);
@@ -138,7 +138,7 @@ final class MapperManagerTest extends TestCase
     public function testConfigure(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventManager(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerProvider());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
@@ -159,7 +159,7 @@ final class MapperManagerTest extends TestCase
     public function testGetExisting(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventManager(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerProvider());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);

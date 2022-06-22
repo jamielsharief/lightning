@@ -6,7 +6,7 @@ use PDO;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
-use Lightning\Event\EventManager;
+use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
 use Lightning\Event\ListenerProvider;
@@ -251,6 +251,6 @@ final class AbstractRepositoryTest extends TestCase
     {
         $datasource = new DatabaseDataSource($this->pdo, new QueryBuilder());
 
-        return new ArticleRepository(new ArticleMapper($datasource, new EventManager(new ListenerProvider())));
+        return new ArticleRepository(new ArticleMapper($datasource, new EventDispatcher(new ListenerProvider())));
     }
 }

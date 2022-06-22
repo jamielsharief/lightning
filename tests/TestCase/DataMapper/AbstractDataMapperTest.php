@@ -12,7 +12,7 @@ use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Entity\AbstractEntity;
-use Lightning\Event\EventManager;
+use Lightning\Event\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 
 use Lightning\Entity\EntityInterface;
@@ -296,7 +296,7 @@ final class AbstractDataMapperTest extends TestCase
             TagsFixture::class,
         ]);
 
-        $this->setEventDispatcher(new TestEventDispatcher(new EventManager(new ListenerProvider())));
+        $this->setEventDispatcher(new TestEventDispatcher(new EventDispatcher(new ListenerProvider())));
     }
 
     public function testGetDataSource(): void

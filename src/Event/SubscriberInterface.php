@@ -13,17 +13,9 @@
 
 namespace Lightning\Event;
 
+use Psr\EventDispatcher\ListenerProviderInterface;
+
 interface SubscriberInterface
 {
-    /**
-     * Return an array of eventTypes and methods
-     *
-     * [
-     *      'Order.complete' => 'sendEmail',
-     *      'Order.newCustomer' => ['sendSMS', 100]
-     * ]
-     *
-     * @return array
-     */
-    public function getSubscribedEvents(): array;
+    public function registerListeners(ListenerProviderInterface $listenerProvider): void;
 }

@@ -31,7 +31,7 @@ class CustomHandler extends implements HandlerInterface
         return true;
     }
 
-    public function isHandled(string $level) : bool 
+    public function isHandling(string $level) : bool 
     {
         return true;
     }

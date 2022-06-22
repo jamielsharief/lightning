@@ -48,7 +48,7 @@ trait LoggerAwareTrait
      */
     public function log(string $level, string $message, array $context = []): void
     {
-        if ($this->logger) {
+        if (isset($this->logger)) {
             $this->logger->log($level, $message, $context);
         }
     }

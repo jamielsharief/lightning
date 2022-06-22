@@ -5,48 +5,75 @@ namespace Lightning\Test\Logger;
 use Psr\Log\LogLevel;
 use Lightning\Logger\Logger;
 use PHPUnit\Framework\TestCase;
-use Lightning\TestSuite\TestLogger;
+use Psr\Log\InvalidArgumentException;
+use Lightning\Logger\Handler\FileHandler;
 
 final class LoggerTest extends TestCase
 {
-    public function logLevelProvider()
+    public function testAddHandler(): void
     {
-        return [
-            [LogLevel::DEBUG],
-            [LogLevel::INFO],
-            [LogLevel::NOTICE],
-            [LogLevel::WARNING],
-            [LogLevel::ERROR],
-            [LogLevel::CRITICAL],
-            [LogLevel::ALERT],
-            [LogLevel::EMERGENCY]
-        ];
+        $handler = new FileHandler(sys_get_temp_dir() . '/' . uniqid());
+        $logger = new Logger('app');
+
+        $this->assertCount(0, $logger->getHandlers());
+        $this->assertCount(1, $logger->addHandler($handler)->getHandlers());
     }
 
-    /**
-     * @dataProvider logLevelProvider
-     */
-    public function testLog(string $level)
+    public function testRemoveHandler(): void
     {
-        $testLogger = new TestLogger();
+        $handler = new FileHandler(sys_get_temp_dir() . '/' . uniqid());
+        $logger = new Logger('app');
 
-        $logger = new Logger([$testLogger]);
-
-        $logger->$level('testLog was run');
-        $this->assertTrue($testLogger->hasMessageThatContains('testLog was run', $level));
+        $this->assertCount(1, $logger->addHandler($handler)->getHandlers());
+        $this->assertCount(0, $logger->removeHandler($handler)->getHandlers());
     }
 
-    /**
-     * @depends testLog
-     */
-    public function testPushLog()
+    public function testGetHandlers(): void
     {
-        $testLogger = new TestLogger();
+        $handler = new FileHandler(sys_get_temp_dir() . '/' . uniqid());
+        $logger = new Logger('app');
+        $this->assertCount(0, $logger->getHandlers());
 
-        $logger = new Logger();
-        $this->assertInstanceOf(Logger::class, $logger->pushLogger($testLogger));
+        $logger->addHandler($handler);
+        $this->assertCount(1, $logger->getHandlers());
+    }
 
-        $logger->log(LogLevel::DEBUG, 'testLog was run');
-        $this->assertTrue($testLogger->hasMessageThatContains('testLog was run', LogLevel::DEBUG));
+    public function testInvalidLogLevel(): void
+    {
+        $handler = new FileHandler(sys_get_temp_dir() . '/' . uniqid());
+        $logger = new Logger('app');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid log level `foo`');
+
+        $logger->log('foo', 'test');
+    }
+
+    public function testLog(): void
+    {
+        $temp = sys_get_temp_dir() . '/' . uniqid();
+
+        $logger = new Logger('app');
+        $logger->addHandler(new FileHandler($temp));
+
+        $logger->log(LogLevel::WARNING, '`{class}` has been deprecated', ['class' => 'foo']);
+
+        $this->assertFileExists($temp);
+        $this->assertStringContainsString('app WARNING: `foo` has been deprecated', file_get_contents($temp));
+    }
+
+    public function testIsHandled(): void
+    {
+        $temp = sys_get_temp_dir() . '/' . uniqid();
+
+        $logger = new Logger('app');
+        $logger->addHandler(new FileHandler($temp, LogLevel::ERROR));
+
+        $logger->log(LogLevel::WARNING, '`{class}` has been deprecated', ['class' => 'foo']);
+        $logger->log(LogLevel::ERROR, 'No gold down there');
+
+        $this->assertFileExists($temp);
+        $this->assertStringNotContainsString('app WARNING: `foo` has been deprecated', file_get_contents($temp));
+        $this->assertStringContainsString('app ERROR: No gold down there', file_get_contents($temp));
     }
 }

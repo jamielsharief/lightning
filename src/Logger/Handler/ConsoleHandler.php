@@ -11,15 +11,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Logger;
+namespace Lightning\Logger\Handler;
 
 use Psr\Log\LogLevel;
+use DateTimeImmutable;
 use InvalidArgumentException;
+use Lightning\Logger\LogMessage;
+use Lightning\Logger\AbstractHandler;
 
-class ConsoleLogger extends AbstractLogger
+class ConsoleHandler extends AbstractHandler
 {
-    protected $stream;
-
     protected array $colorMap = [
         LogLevel::DEBUG => '37',
         LogLevel::INFO => '32',
@@ -32,43 +33,27 @@ class ConsoleLogger extends AbstractLogger
     ];
 
     /**
-     * @param resource $stream e.g STDOUT
+     * Constructor
+     * @internal Log level should be always last and with a default value
      */
-    public function __construct($stream = STDOUT)
+    public function __construct(protected $stream = STDOUT, string $level = LogLevel::DEBUG)
     {
+        parent::__construct($level);
+
         if (! is_resource($stream)) {
             throw new InvalidArgumentException('The stream is not a valid resource');
         }
-        $this->stream = $stream;
     }
 
     /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
-     * @return void
+     * Handle method
      */
-    public function log($level, $message, array $context = []): void
+    public function handle(string $level, LogMessage $message, DateTimeImmutable $dateTime, string $channel): bool
     {
-        $this->checkLevel($level);
+        $line = sprintf(
+            '[%s] %s %s: %s', $dateTime->format('Y-m-d G:i:s'), $channel, strtoupper($level), $message->toString()
+        );
 
-        if ($this->shouldLog($level)) {
-            $message = $this->format($level, $message, $context);
-            fwrite($this->stream, $this->colorize($level, $message) . PHP_EOL);
-        }
-    }
-
-    /**
-     * Adds the console color
-     *
-     * @param string $level
-     * @param string $message
-     * @return string
-     */
-    protected function colorize(string $level, string $message): string
-    {
-        return "\033[0;{$this->colorMap[$level]}m{$message}\033[0m";
+        return fwrite($this->stream, "\033[0;{$this->colorMap[$level]}m{$line}\033[0m" . PHP_EOL) !== false;
     }
 }

@@ -13,56 +13,86 @@
 
 namespace Lightning\Logger;
 
+use Psr\Log\LogLevel;
+use DateTimeImmutable;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\InvalidArgumentException;
 
-/**
- * A multi logger I guess
- */
 class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    protected array $loggers = [];
+    /**
+     * @var HandlerInterface[]
+     */
+    private array $handlers = [];
+
+    private array $logLevels = [
+        LogLevel::DEBUG,
+        LogLevel::INFO,
+        LogLevel::NOTICE,
+        LogLevel::WARNING,
+        LogLevel::ERROR,
+        LogLevel::CRITICAL,
+        LogLevel::ALERT,
+        LogLevel::EMERGENCY
+    ];
 
     /**
      * Constructor
-     *
-     * @param array $loggers
      */
-    public function __construct(array $loggers = [])
+    public function __construct(private string $name)
     {
-        $this->loggers = $loggers;
+    }
+
+    /**
+     * Adds a new handler to the logger
+     */
+    public function addHandler(HandlerInterface $handler): static
+    {
+        array_push($this->handlers, $handler);
+
+        return $this;
+    }
+
+    /**
+     * Adds a new handler to the logger
+     */
+    public function removeHandler(HandlerInterface $handler): static
+    {
+        foreach ($this->handlers as $index => $value) {
+            if ($handler == $value) {
+                unset($this->handlers[$index]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return HandlerInterface[];
+     */
+    public function getHandlers(): array
+    {
+        return $this->handlers;
     }
 
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, string|\Stringable $message, array $context = [])
     {
-        foreach ($this->loggers as $logger) {
-            $logger->log($level, $message, $context);
+        if (! in_array($level, $this->logLevels)) {
+            throw new InvalidArgumentException(sprintf('Invalid log level `%s`', $level));
         }
-    }
 
-    /**
-     * Pushes a logger onto the logging stack
-     *
-     * @param AbstractLogger $logger
-     * @return static
-     */
-    public function pushLogger(LoggerInterface $logger): static
-    {
-        $this->loggers[] = $logger;
-
-        return $this;
+        foreach ($this->handlers as $handler) {
+            if ($handler->isHandling($level)) {
+                $handler->handle($level, new LogMessage($message, $context), new DateTimeImmutable(), $this->name);
+            }
+        }
     }
 }

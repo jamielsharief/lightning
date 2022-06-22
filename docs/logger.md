@@ -1,29 +1,39 @@
 # PSR-3 Logger
 
-Simple PSR loggers
+A lightweight PSR-3 Logger component.
 
-# Usage
-
-## File Logger
+## Usage
 
 ```php
-$logger = new FileLogger(__DIR__ . '/logs/application.log');
-$logger->debug('This is a test);
+$logger = new Logger('application');
+$logger->addHandler(new FileHandler('/var/www/logs/application.log'));
+$logger->log(LogLevel::ERROR,'An error has occured');
 ```
 
-## Console Logger
+## Handling
+
+When creating `handler` you can set the minimum log level to be used, if the handler is called but the log level is less, then it will
+not log anything.
+
 ```php
-$logger = new ConsoleLogger(STDOUT);
-$logger->debug('This is a test');
+$handler = new FileHandler('/var/www/logs/application.log', LogLevel::WARNING);
 ```
 
+## Custom Handlers
 
-## Logger
-
-Stack loggers
+Using the ` HandlerInterface` you can create your own log handlers.
 
 ```php
-$logger = new Logger();
-$logger->pushLogger($fileLogger1);
-$logger->pushLogger($fileLogger2);
+class CustomHandler extends implements HandlerInterface
+{
+    public function handle(string $level, LogMessage $message, DateTimeImmutable $dateTime, string $channel): bool
+    {
+        return true;
+    }
+
+    public function isHandled(string $level) : bool 
+    {
+        return true;
+    }
+}
 ```

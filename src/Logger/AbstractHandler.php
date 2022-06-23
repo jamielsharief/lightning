@@ -73,6 +73,6 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function isHandling(string $level): bool
     {
-        return  array_search($level, $this->logLevels) >= $this->minLevel;
+        return array_search($level, $this->logLevels) >= $this->minLevel;
     }
 }

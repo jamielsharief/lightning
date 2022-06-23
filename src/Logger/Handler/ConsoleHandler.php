@@ -48,7 +48,7 @@ class ConsoleHandler extends AbstractHandler
     /**
      * Handle method
      */
-    public function handle(string $level, LogMessage $message, DateTimeImmutable $dateTime, string $channel): bool
+    public function handle(LogMessage $message, string $level, string $channel, DateTimeImmutable $dateTime): bool
     {
         $line = sprintf(
             '[%s] %s %s: %s', $dateTime->format('Y-m-d G:i:s'), $channel, strtoupper($level), $message->toString()

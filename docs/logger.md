@@ -7,7 +7,9 @@ A lightweight PSR-3 Logger component.
 ```php
 $logger = new Logger('application');
 $logger->addHandler(new FileHandler('/var/www/logs/application.log'));
-$logger->log(LogLevel::ERROR,'An error has occured');
+
+// then use the PSR-3 Logging methods
+$logger->log(LogLevel::ERROR, 'An error has occured');
 ```
 
 ## Handling
@@ -21,17 +23,12 @@ $handler = new FileHandler('/var/www/logs/application.log', LogLevel::WARNING);
 
 ## Custom Handlers
 
-Using the ` HandlerInterface` you can create your own log handlers.
+Using the `HandlerInterface` you can create your own log handlers.
 
 ```php
-class CustomHandler extends implements HandlerInterface
+class CustomHandler extends ExtendsAbstractHandler
 {
-    public function handle(string $level, LogMessage $message, DateTimeImmutable $dateTime, string $channel): bool
-    {
-        return true;
-    }
-
-    public function isHandling(string $level) : bool 
+    public function handle(LogMessage $message, string $level, string $channel, DateTimeImmutable $dateTime): bool
     {
         return true;
     }

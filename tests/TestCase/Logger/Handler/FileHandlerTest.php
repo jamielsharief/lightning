@@ -16,8 +16,9 @@ final class FileHandlerTest extends TestCase
         $handler = new FileHandler($path);
 
         $handler->handle(
-            LogLevel::ERROR,
             new LogMessage('method `{method}` run', ['method' => 'testLog']),
+            LogLevel::ERROR,
+            'Application',
             new DateTimeImmutable('2022-01-01 14:00:00'), 'Application'
         ) ;
 

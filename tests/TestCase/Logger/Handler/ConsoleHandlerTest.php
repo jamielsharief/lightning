@@ -39,7 +39,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;37m[2022-01-01 14:00:00] Application DEBUG: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -52,7 +52,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;32m[2022-01-01 14:00:00] Application INFO: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -65,7 +65,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;36m[2022-01-01 14:00:00] Application NOTICE: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -78,7 +78,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;33m[2022-01-01 14:00:00] Application WARNING: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -91,7 +91,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;31m[2022-01-01 14:00:00] Application ERROR: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -104,7 +104,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;91m[2022-01-01 14:00:00] Application CRITICAL: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -117,7 +117,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;41;37m[2022-01-01 14:00:00] Application ALERT: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"
@@ -130,7 +130,7 @@ final class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler($this->stream);
 
         $message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut {foo} et dolore magna aliqua';
-        $handler->handle($level, new LogMessage($message, ['foo' => 'labore']), new DateTimeImmutable('2022-01-01 14:00:00'), 'Application') ;
+        $handler->handle(new LogMessage($message, ['foo' => 'labore']), $level, 'Application', new DateTimeImmutable('2022-01-01 14:00:00')) ;
 
         $this->assertStreamContains(
             "[0;4;41;37m[2022-01-01 14:00:00] Application EMERGENCY: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\033[0m"

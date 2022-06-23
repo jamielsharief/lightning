@@ -13,6 +13,7 @@
 
 namespace Lightning\Logger;
 
+use Stringable;
 use Psr\Log\LogLevel;
 use DateTimeImmutable;
 use Psr\Log\LoggerTrait;
@@ -83,15 +84,17 @@ class Logger implements LoggerInterface
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, string|\Stringable $message, array $context = [])
+    public function log($level, string|Stringable $message, array $context = [])
     {
         if (! in_array($level, $this->logLevels)) {
             throw new InvalidArgumentException(sprintf('Invalid log level `%s`', $level));
         }
 
+        $datetime = new DateTimeImmutable();
+
         foreach ($this->handlers as $handler) {
             if ($handler->isHandling($level)) {
-                $handler->handle($level, new LogMessage($message, $context), new DateTimeImmutable(), $this->name);
+                $handler->handle(new LogMessage((string) $message, $context), $level, $this->name, $datetime);
             }
         }
     }

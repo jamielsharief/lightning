@@ -23,7 +23,7 @@ $handler = new FileHandler('/var/www/logs/application.log', LogLevel::WARNING);
 
 ## Custom Handlers
 
-Using the `HandlerInterface` you can create your own log handlers.
+Create your own custom handler with ease.
 
 ```php
 class CustomHandler extends AbstractHandler

@@ -26,7 +26,7 @@ $handler = new FileHandler('/var/www/logs/application.log', LogLevel::WARNING);
 Using the `HandlerInterface` you can create your own log handlers.
 
 ```php
-class CustomHandler extends ExtendsAbstractHandler
+class CustomHandler extends AbstractHandler
 {
     public function handle(LogMessage $message, string $level, string $channel, DateTimeImmutable $dateTime): bool
     {

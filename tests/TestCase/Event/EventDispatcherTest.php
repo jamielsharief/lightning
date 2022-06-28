@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\TestCase\EventDispatcher;
+namespace Lightning\Test\TestCase\Event;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\EventDispatcher\EventDispatcher;
-use Lightning\EventDispatcher\ListenerRegistry;
+use Lightning\Event\EventDispatcher;
+use Lightning\Event\ListenerRegistry;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 class StoppableEvent implements StoppableEventInterface

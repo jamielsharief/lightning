@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\TestCase\EventDispatcher;
+namespace Lightning\Test\TestCase\Event;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\EventDispatcher\ListenerRegistry;
+use Lightning\Event\ListenerRegistry;
 
 abstract class AbstractEvent
 {

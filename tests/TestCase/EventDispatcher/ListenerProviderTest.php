@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\Event;
+namespace Lightning\Test\TestCase\EventDispatcher;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\Event\ListenerProvider;
+use Lightning\EventDispatcher\ListenerProvider;
 
 abstract class AbstractEvent
 {
@@ -40,27 +40,6 @@ class ListenerProviderTest extends TestCase
         $this->assertEquals(
             [$handler],
             (new ListenerProvider())->addListener(SomethingHappened::class, $handler)->getListenersForEvent(new SomethingHappened())
-        );
-    }
-
-    public function testGetListenersForEventPriority(): void
-    {
-        $handler1 = function (SomethingHappened $event) {
-            $this->assertTrue(true);
-        };
-
-        $handler2 = function (SomethingHappened $event) {
-            $this->assertTrue(true);
-        };
-
-        $provider = new ListenerProvider();
-
-        $provider->addListener(SomethingHappened::class, $handler1, 150)
-            ->addListener(SomethingHappened::class, $handler2, 50);
-
-        $this->assertEquals(
-            [$handler2,$handler1],
-            $provider->getListenersForEvent(new SomethingHappened())
         );
     }
 

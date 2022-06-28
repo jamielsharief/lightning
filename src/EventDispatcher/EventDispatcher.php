@@ -11,7 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Event;
+namespace Lightning\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -22,8 +22,19 @@ use Psr\EventDispatcher\ListenerProviderInterface;
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    public function __construct(protected ListenerProviderInterface $listenProvider)
+    /**
+     * Constructor
+     */
+    public function __construct(protected ListenerProviderInterface $listenerProvider)
     {
+    }
+
+    /**
+     * Get the Listener Provide (read only so no setting)
+     */
+    public function getListenerProvider(): ListenerProviderInterface
+    {
+        return $this->listenerProvider;
     }
 
     /**
@@ -31,7 +42,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch(object $event): object
     {
-        foreach ($this->listenProvider->getListenersForEvent($event) as $listener) {
+        foreach ($this->listenerProvider->getListenersForEvent($event) as $listener) {
             if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
                 return $event;
             }
@@ -40,23 +51,5 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         return $event;
-    }
-
-    /**
-     * Get the Listener Provide (read only so no setting)
-     */
-    public function getListenerProvider(): ListenerProviderInterface
-    {
-        return $this->listenProvider;
-    }
-
-    /**
-     * Subscribes to an object by automatically registering listeners
-     */
-    public function subscribeTo(SubscriberInterface $subscriber): static
-    {
-        $subscriber->registerListeners($this->listenProvider);
-
-        return $this;
     }
 }

@@ -4,8 +4,8 @@ namespace Lightning\Test\TestSuite;
 
 use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
-use Lightning\Event\EventDispatcher;
-use Lightning\Event\ListenerProvider;
+use Lightning\EventDispatcher\EventDispatcher;
+use Lightning\EventDispatcher\ListenerProvider;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 

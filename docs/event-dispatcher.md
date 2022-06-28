@@ -41,26 +41,6 @@ You can remove a listener like so
 $provider->removeListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
 
-You can create a Subscriber class which listens to multiple events by adding the  `SubscriberInterface`.
-
-```php
-class Controller implements SubscriberInterface
-{
-    public function registerListeners(ListenerProviderInterface $listenerProvider): void
-    {
-        $listenerProvider->addListener(SomethingHappened::class, function (SomethingHappened $event) {
-            // do something
-        });
-    }
-}
-```
-
-Then the call the `subscribeTo` method  `EventDispatcher` when the object is constructed.
-
-```php
-$dispatcher->subscribeTo(new ArticlesController());
-```
-
 ### PrioritizedListenerProvider
 
 The `PrioritizedListenerProvider` method `addListener` has  an optional third argument, the priority, the default number is `100`. Events are sorted from lowest values to highest values and prority is given to events with the lowest number.

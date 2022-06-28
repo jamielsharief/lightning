@@ -11,7 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\Event;
+namespace Lightning\EventDispatcher;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 

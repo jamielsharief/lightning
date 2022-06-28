@@ -1,13 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\Event;
+namespace Lightning\Test\TestCase\EventDispatcher;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\Event\EventDispatcher;
-use Lightning\Event\ListenerProvider;
-use Lightning\Event\SubscriberInterface;
+use Lightning\EventDispatcher\EventDispatcher;
+use Lightning\EventDispatcher\ListenerProvider;
 use Psr\EventDispatcher\StoppableEventInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
 
 class StoppableEvent implements StoppableEventInterface
 {
@@ -23,17 +21,7 @@ class StoppableEvent implements StoppableEventInterface
     }
 }
 
-class SubscriberController implements SubscriberInterface
-{
-    public function registerListeners(ListenerProviderInterface $listenerProvider): void
-    {
-        $listenerProvider->addListener(StoppableEvent::class, function (SomethingHappened $event) {
-            // do something
-        });
-    }
-}
-
-final class EventManagerTest extends TestCase
+final class EventDispatcherTest extends TestCase
 {
     public function testGetListerProvider(): void
     {
@@ -69,16 +57,5 @@ final class EventManagerTest extends TestCase
         });
 
         $this->assertEquals($event, $dispatcher->dispatch($event));
-    }
-
-    public function testSubscribeTo(): void
-    {
-        $event = new StoppableEvent();
-        $provider = new ListenerProvider();
-        $dispatcher = new EventDispatcher($provider);
-
-        $this->assertInstanceOf(EventDispatcher::class, $dispatcher->subscribeTo(new SubscriberController()));
-
-        $this->assertCount(1, $provider->getListenersForEvent($event));
     }
 }

@@ -12,11 +12,11 @@ use Lightning\Utility\Collection;
 use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\Entity\AbstractEntity;
-use Lightning\Event\EventDispatcher;
+use Lightning\EventDispatcher\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 
 use Lightning\Entity\EntityInterface;
-use Lightning\Event\ListenerProvider;
+use Lightning\EventDispatcher\ListenerProvider;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;

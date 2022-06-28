@@ -12,7 +12,7 @@ use Lightning\EventDispatcher\EventDispatcher;
 use Lightning\Test\Entity\TagEntity;
 use Lightning\DataMapper\QueryObject;
 use Lightning\Entity\EntityInterface;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Entity\PostEntity;
 use Lightning\Test\Entity\UserEntity;
@@ -216,7 +216,7 @@ final class AbstractObjectRelationalMapperTest extends TestCase
         $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
         $this->dataSource = new DatabaseDataSource($this->pdo, new QueryBuilder());
-        $this->eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $this->eventDispatcher = new EventDispatcher(new ListenerRegistry());
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([

@@ -16,7 +16,7 @@ use Lightning\EventDispatcher\EventDispatcher;
 use Lightning\DataMapper\QueryObject;
 
 use Lightning\Entity\EntityInterface;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
@@ -296,7 +296,7 @@ final class AbstractDataMapperTest extends TestCase
             TagsFixture::class,
         ]);
 
-        $this->setEventDispatcher(new TestEventDispatcher(new EventDispatcher(new ListenerProvider())));
+        $this->setEventDispatcher(new TestEventDispatcher(new EventDispatcher(new ListenerRegistry())));
     }
 
     public function testGetDataSource(): void

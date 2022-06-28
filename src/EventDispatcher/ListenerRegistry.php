@@ -13,19 +13,17 @@
 
 namespace Lightning\EventDispatcher;
 
-use Psr\EventDispatcher\ListenerProviderInterface;
-
 /**
- * PSR-14 Listener Provider
+ * ListenerRegistry
  */
-class ListenerProvider implements ListenerProviderInterface
+class ListenerRegistry implements ListenerRegistryInterface
 {
     protected array $listeners = [];
 
     /**
-     * Attaches an event handler
+     * Registers a Listener for an event type
      */
-    public function addListener(string $eventType, callable $callable): static
+    public function registerListener(string $eventType, callable $callable): static
     {
         $this->listeners[$eventType][] = $callable;
 
@@ -35,7 +33,7 @@ class ListenerProvider implements ListenerProviderInterface
     /**
      * Deteaches an even handler
      */
-    public function removeListener(string $eventType, callable $callable): static
+    public function unregisterListener(string $eventType, callable $callable): static
     {
         foreach ($this->listeners[$eventType] ?? [] as $index => $handler) {
             if ($handler == $callable) {

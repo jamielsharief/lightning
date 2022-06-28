@@ -10,7 +10,7 @@ use function Lightning\Dotenv\env;
 use Lightning\Database\PdoFactory;
 use Lightning\EventDispatcher\EventDispatcher;
 use Lightning\Translator\Translator;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Lightning\Http\Session\PhpSession;
@@ -33,7 +33,7 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
  return [
 
      EventDispatcherInterface::class => function (ContainerInterface $container) {
-         return new EventDispatcher(new ListenerProvider());
+         return new EventDispatcher(new ListenerRegistry());
      },
 
      Router::class => function (ContainerInterface $container) {

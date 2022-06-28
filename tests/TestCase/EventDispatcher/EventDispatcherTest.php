@@ -4,7 +4,7 @@ namespace Lightning\Test\TestCase\EventDispatcher;
 
 use PHPUnit\Framework\TestCase;
 use Lightning\EventDispatcher\EventDispatcher;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 class StoppableEvent implements StoppableEventInterface
@@ -25,17 +25,17 @@ final class EventDispatcherTest extends TestCase
 {
     public function testGetListerProvider(): void
     {
-        $provider = new ListenerProvider();
+        $provider = new ListenerRegistry();
         $dispatcher = new EventDispatcher($provider);
-        $this->assertEquals($provider, $dispatcher->getListenerProvider());
+        $this->assertEquals($provider, $dispatcher->getListenerRegistry());
     }
 
     public function testDispatch(): void
     {
         $event = new StoppableEvent();
-        $provider = new ListenerProvider();
+        $provider = new ListenerRegistry();
         $dispatcher = new EventDispatcher($provider);
-        $provider->addListener(StoppableEvent::class, function (StoppableEvent $event) {
+        $provider->registerListener(StoppableEvent::class, function (StoppableEvent $event) {
             $this->assertTrue(true);
         });
 
@@ -45,14 +45,14 @@ final class EventDispatcherTest extends TestCase
     public function testDispatchStopEvent(): void
     {
         $event = new StoppableEvent();
-        $provider = new ListenerProvider();
+        $provider = new ListenerRegistry();
         $dispatcher = new EventDispatcher($provider);
-        $provider->addListener(StoppableEvent::class, function (StoppableEvent $event) {
+        $provider->registerListener(StoppableEvent::class, function (StoppableEvent $event) {
             $this->assertTrue(true);
             $event->stop();
         });
 
-        $provider->addListener(StoppableEvent::class, function (StoppableEvent $event) {
+        $provider->registerListener(StoppableEvent::class, function (StoppableEvent $event) {
             $this->assertTrue(false); // fail
         });
 

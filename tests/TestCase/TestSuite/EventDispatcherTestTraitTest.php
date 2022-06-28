@@ -5,7 +5,7 @@ namespace Lightning\Test\TestSuite;
 use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Lightning\EventDispatcher\EventDispatcher;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Lightning\TestSuite\TestEventDispatcher;
 use Lightning\TestSuite\EventDispatcherTestTrait;
 
@@ -23,7 +23,7 @@ final class EventDispatcherTestTraitTest extends TestCase
 
     public function createEventDispatcher(): TestEventDispatcher
     {
-        return new TestEventDispatcher(new EventDispatcher(new ListenerProvider()));
+        return new TestEventDispatcher(new EventDispatcher(new ListenerRegistry()));
     }
 
     public function testSet(): void

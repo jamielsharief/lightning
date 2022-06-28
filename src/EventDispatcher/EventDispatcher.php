@@ -15,26 +15,35 @@ namespace Lightning\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
- * PSR-14 Dispatcher
+ * PSR-14 Event Dispatcher
  */
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
      * Constructor
      */
-    public function __construct(protected ListenerProviderInterface $listenerProvider)
+    public function __construct(protected ListenerRegistryInterface $listenerRegistry)
     {
     }
 
     /**
-     * Get the Listener Provide (read only so no setting)
+     * Get the Listener Registry
      */
-    public function getListenerProvider(): ListenerProviderInterface
+    public function getListenerRegistry(): ListenerRegistryInterface
     {
-        return $this->listenerProvider;
+        return $this->listenerRegistry;
+    }
+
+    /**
+     * Sets the ListenerRegistry
+     */
+    public function setListenerRegistry(ListenerRegistryInterface $listenerRegistry): static
+    {
+        $this->listenerRegistry = $listenerRegistry;
+
+        return $this;
     }
 
     /**
@@ -42,7 +51,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch(object $event): object
     {
-        foreach ($this->listenerProvider->getListenersForEvent($event) as $listener) {
+        foreach ($this->listenerRegistry->getListenersForEvent($event) as $listener) {
             if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
                 return $event;
             }

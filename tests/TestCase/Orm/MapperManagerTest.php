@@ -7,7 +7,7 @@ use Lightning\Orm\MapperManager;
 use App\Controllers\EntityInterface;
 use Lightning\Entity\AbstractEntity;
 use Lightning\EventDispatcher\EventDispatcher;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 use Lightning\DataMapper\DataSourceInterface;
 use Lightning\Orm\AbstractObjectRelationalMapper;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -116,7 +116,7 @@ final class MapperManagerTest extends TestCase
     public function testGet(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
@@ -126,7 +126,7 @@ final class MapperManagerTest extends TestCase
     public function testAdd(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);
@@ -138,7 +138,7 @@ final class MapperManagerTest extends TestCase
     public function testConfigure(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $this->assertInstanceOf(
@@ -159,7 +159,7 @@ final class MapperManagerTest extends TestCase
     public function testGetExisting(): void
     {
         $dataSource = new MemoryDataSource();
-        $eventDispatcher = new EventDispatcher(new ListenerProvider());
+        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
         $manager = new MapperManager($dataSource, $eventDispatcher);
 
         $mapper = new DummyArticle($dataSource, $eventDispatcher, $manager);

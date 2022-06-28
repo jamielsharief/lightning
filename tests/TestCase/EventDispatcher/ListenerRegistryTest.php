@@ -3,7 +3,7 @@
 namespace Lightning\Test\TestCase\EventDispatcher;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\EventDispatcher\ListenerProvider;
+use Lightning\EventDispatcher\ListenerRegistry;
 
 abstract class AbstractEvent
 {
@@ -18,7 +18,7 @@ class SomethingElseHappened extends AbstractEvent
 {
 }
 
-class ListenerProviderTest extends TestCase
+class ListenerRegistryTest extends TestCase
 {
     public function testAddListener(): void
     {
@@ -26,8 +26,8 @@ class ListenerProviderTest extends TestCase
             $this->assertTrue(true);
         };
 
-        $provider = new ListenerProvider();
-        $this->assertInstanceOf(ListenerProvider::class, $provider->addListener(SomethingHappened::class, $handler));
+        $provider = new ListenerRegistry();
+        $this->assertInstanceOf(ListenerRegistry::class, $provider->registerListener(SomethingHappened::class, $handler));
         $this->assertCount(1, $provider->getListenersForEvent(new SomethingHappened()));
     }
 
@@ -39,7 +39,7 @@ class ListenerProviderTest extends TestCase
 
         $this->assertEquals(
             [$handler],
-            (new ListenerProvider())->addListener(SomethingHappened::class, $handler)->getListenersForEvent(new SomethingHappened())
+            (new ListenerRegistry())->registerListener(SomethingHappened::class, $handler)->getListenersForEvent(new SomethingHappened())
         );
     }
 
@@ -51,9 +51,9 @@ class ListenerProviderTest extends TestCase
         $handler = function (SomethingHappened $event) {
             $this->assertTrue(true);
         };
-        $provider = (new ListenerProvider())->addListener(SomethingHappened::class, $handler);
+        $provider = (new ListenerRegistry())->registerListener(SomethingHappened::class, $handler);
 
-        $this->assertInstanceOf(ListenerProvider::class, $provider->removeListener(SomethingHappened::class, $handler));
+        $this->assertInstanceOf(ListenerRegistry::class, $provider->unregisterListener(SomethingHappened::class, $handler));
         $this->assertCount(0, $provider->getListenersForEvent(new SomethingHappened()));
     }
 }

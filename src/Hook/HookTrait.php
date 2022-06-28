@@ -50,9 +50,20 @@ trait HookTrait
      */
     public function unregisterHook(string $name, string $method): static
     {
-        unset($this->registeredHooks[$name]);
+        foreach ($this->registeredHooks[$name] ?? [] as $index => $objectMethod) {
+            if ($method === $objectMethod) {
+                unset($this->registeredHooks[$name][$index]);
+            }
+        }
 
         return $this;
+    }
+
+    public function hasRegisteredHook(string $name, string $method): bool
+    {
+        $registeredHooks = $this->registeredHooks[$name] ?? [];
+
+        return in_array($method, $registeredHooks);
     }
 
     /**

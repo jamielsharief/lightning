@@ -1,6 +1,6 @@
 # Event
 
-A lightweight [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/) implementation with extended `ListenerRegistryInterface` called `ListenerRegistry`.
+A lightweight [PSR-14: Event Dispatcher](https://www.php-fig.org/psr/psr-14/) implementation with extended `ListenerProviderInterface` called the `ListenerRegistry`.
 
 ## Usage
 
@@ -38,7 +38,6 @@ You can remove a listener like so
 ```php
 $provider->unregisterListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
-
 
 ## Events
 

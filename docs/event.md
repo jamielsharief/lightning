@@ -69,7 +69,7 @@ $event->stopPropagation(); // AbstractStoppableEvent only
 
 ## Listeners
 
-I wanted a seperate Listener class but did not want to use the magic method directly but wanted proper typehinting and a kind of contract, whilst making sure the listener could work with other dispatchers.
+A special `Listner` class is available that would be compatible with other `EventDispatchers` and at the same time allow 
 
 ```php
 class MyListener extends AbstractListener

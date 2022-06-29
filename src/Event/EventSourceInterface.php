@@ -13,6 +13,11 @@
 
 namespace Lightning\Event;
 
+/**
+ * EventSourceInterface
+ *
+ * @todo could there be a better name?
+ */
 interface EventSourceInterface
 {
     /**

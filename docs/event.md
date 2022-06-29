@@ -23,12 +23,12 @@ $eventDispatcher->dispatch($event);
 To add any `callable` use the `registerListener` method.
 
 ```php
-$provider  = new ListenerRegistry();
-$provider->registerListener(AfterOrder::class, [$this, 'afterOrder']);
+$registry  = new ListenerRegistry();
+$registry->registerListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
 
 ```php
-$provider->registerListener(AfterOrder::class, function(AfterOrder $order){
+$registry->registerListener(AfterOrder::class, function(AfterOrder $order){
     // do something
 });
 ```
@@ -36,7 +36,7 @@ $provider->registerListener(AfterOrder::class, function(AfterOrder $order){
 You can remove a listener like so
 
 ```php
-$provider->unregisterListener(AfterOrder::class, [$this, 'afterOrder']);
+$registry->unregisterListener(AfterOrder::class, [$this, 'afterOrder']);
 ```
 
 ## Events
@@ -81,4 +81,6 @@ class MyListener extends AbstractListener
 }
 ```
 
+# Event Exception
 
+An `EventException` class is marker exception to throw within your Events, they have no special purpose other than identification.

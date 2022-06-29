@@ -51,4 +51,30 @@ class ListenerRegistry implements ListenerRegistryInterface
     {
         return $this->listeners[$event::class] ?? [];
     }
+
+    /**
+     * Subscribes a subscriber class
+     * @internal intentionally not part of the ListenerRegistryInterface
+     */
+    public function subscribeTo(SubscriberInterface $subscriber): static
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventType => $method) {
+            $this->registerListener($eventType, [$subscriber,$method]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Unsubscribes subscriber
+     * @internal intentionally not part of the ListenerRegistryInterface
+     */
+    public function unsubscribeTo(SubscriberInterface $subscriber): static
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventType => $method) {
+            $this->unregisterListener($eventType, [$subscriber,$method]);
+        }
+
+        return $this;
+    }
 }

@@ -18,8 +18,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 /**
  * ListenerRegistryInterface
  *
- * @internal deal with the problem that the PSR does include a standard way
- * to register listeners.
+ * @internal deal with the problem that the PSR does include a standard way to register listeners.
  */
 interface ListenerRegistryInterface extends ListenerProviderInterface
 {

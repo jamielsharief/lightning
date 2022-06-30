@@ -44,37 +44,4 @@ final class EventDispatcherAwareTraitTest extends TestCase
 
         $this->assertEquals($clonedDispatcher, $controller->setEventDispatcher($clonedDispatcher)->getEventDispatcher());
     }
-
-    public function testDispatch(): void
-    {
-        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
-        $controller = new SongsController($eventDispatcher);
-        $this->assertInstanceOf(BeforeYouGoGo::class, $controller->dispatchEvent(new BeforeYouGoGo()));
-    }
-
-    public function testOn(): void
-    {
-        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
-        $controller = new SongsController($eventDispatcher);
-        $event = $controller->registerEventListener(BeforeYouGoGo::class, function (BeforeYouGoGo $event) {
-            $this->assertTrue(true);
-        })->dispatchEvent(new BeforeYouGoGo());
-
-        $this->assertInstanceOf(BeforeYouGoGo::class, $event);
-    }
-
-    public function testOff(): void
-    {
-        $eventDispatcher = new EventDispatcher(new ListenerRegistry());
-        $controller = new SongsController($eventDispatcher);
-
-        $callable = function (BeforeYouGoGo $event) {
-            $this->assertTrue(false);
-        };
-        $event = $controller->registerEventListener(BeforeYouGoGo::class, $callable)
-            ->unregisterEventListener(BeforeYouGoGo::class, $callable)
-            ->dispatchEvent(new BeforeYouGoGo());
-
-        $this->assertInstanceOf(BeforeYouGoGo::class, $event);
-    }
 }

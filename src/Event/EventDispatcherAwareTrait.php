@@ -13,6 +13,11 @@
 
 namespace Lightning\Event;
 
+/**
+ * EventDispatcherAwareTrait
+ *
+ * This covers our implemenation
+ */
 trait EventDispatcherAwareTrait
 {
     protected EventDispatcher $eventDispatcher;
@@ -33,33 +38,5 @@ trait EventDispatcherAwareTrait
         $this->eventDispatcher = $eventDispatcher;
 
         return $this;
-    }
-
-    /**
-     * Adds an Event Listener
-     */
-    public function registerEventListener(string $eventType, callable $callable): static
-    {
-        $this->eventDispatcher->getListenerRegistry()->registerListener($eventType, $callable);
-
-        return $this;
-    }
-
-    /**
-     * Removes an Event Listener
-     */
-    public function unregisterEventListener(string $eventType, callable $callable): static
-    {
-        $this->eventDispatcher->getListenerRegistry()->unregisterListener($eventType, $callable);
-
-        return $this;
-    }
-
-    /**
-     * Dispatches an Event
-     */
-    public function dispatchEvent(object $event): object
-    {
-        return $this->eventDispatcher->dispatch($event);
     }
 }

@@ -13,12 +13,10 @@
 
 namespace Lightning\Controller;
 
-use RuntimeException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Lightning\TemplateRenderer\TemplateRenderer;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Abstract Controller
@@ -31,7 +29,6 @@ abstract class AbstractController
     protected TemplateRenderer $templateRenderer;
     protected ?ServerRequestInterface $request;
     protected ?ResponseInterface $response;
-    protected EventDispatcherInterface $eventDispatcher;
 
     protected ?string $layout = null;
 
@@ -211,7 +208,7 @@ abstract class AbstractController
     /**
      * Gets the Request object
      */
-    public function getRequest(): ServerRequestInterface
+    public function getRequest(): ?ServerRequestInterface
     {
         return $this->request;
     }
@@ -255,21 +252,5 @@ abstract class AbstractController
         $this->response = $response;
 
         return $this;
-    }
-
-    /**
-     *
-     */
-    public function addEventListener(string $eventType, callable $callable): static
-    {
-        throw new RuntimeException('Not implemented');
-    }
-
-    /**
-     *
-     */
-    public function dispatchEvent(object $event): ?object
-    {
-        return isset($this->eventDispatcher) ? $this->eventDispatcher->dispatch($event) : null;
     }
 }

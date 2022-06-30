@@ -15,7 +15,7 @@ namespace Lightning\MessageQueue;
 
 use PDO;
 
-class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueInterface
+class DatabaseMessageQueue implements MessageQueueInterface
 {
     private PDO $pdo;
     private string $table;
@@ -45,7 +45,7 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
      */
     protected function serialize(object $object): string
     {
-        $string = parent::serialize($object);
+        $string = serialize($object);
 
         return $this->driver === 'pgsql' ? base64_encode($string) : $string;
     }
@@ -60,18 +60,13 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
     {
         $string = $this->driver === 'pgsql' ? base64_decode($string) : $string;
 
-        return parent::unserialize($string);
+        return unserialize($string);
     }
 
     /**
      * Sends a message to the message queue
-     *
-     * @param string $queue
-     * @param object $message
-     * @param integer $delay
-     * @return boolean
      */
-    public function send(string $queue, object $message, int $delay = 0): bool
+    public function send(string $queue, Message $message, int $delay = 0): bool
     {
         $statement = $this->pdo->prepare("INSERT INTO {$this->table} (body,queue,scheduled) VALUES (:body,:queue,:scheduled)");
 
@@ -84,11 +79,9 @@ class DatabaseMessageQueue extends AbstractMessageQueue implements MessageQueueI
 
     /**
      * Receives the next message from the queue, if any
-     *
-     * @param string $queue
-     * @return object|null
+
      */
-    public function receive(string $queue): ?object
+    public function receive(string $queue): ?Message
     {
         $result = null;
 

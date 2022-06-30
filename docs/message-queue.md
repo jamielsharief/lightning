@@ -95,3 +95,56 @@ CREATE TABLE queue (
   created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+
+## Message Producer
+
+Using the `MessageProducer`, you can swap out the queues being used an hook into the lifecycle `beforeSend` and `afterSend`.
+
+```php
+$messageQueue = new MemoryMessageQueue();
+$producer = new MessageProducer($messageQueue, 'default');
+$producer->send(new Message('foo'),5);
+$producer->sentTo('bar',new Message('foo'), 0);
+```
+
+## Message Consumer
+
+Using the `MessageConsumer`, you can swap out the queues being used an hook into the lifecycle `afterReceive`.
+
+```php
+$messageQueue = new MemoryMessageQueue();
+$producer = new MessageConsumer($messageQueue, 'default');
+$producer->receive();
+$producer->receiveFrom('mailers');
+```
+
+
+## QueueWorker
+
+The `QueueWorkerCommand` command  uses `WorkerInterface` to consume workers from a queue.
+
+Create a file `bin/queue-worker` and run `chmod +x` on it.
+
+```php
+#!/usr/bin/env php
+<?php
+
+use Lightning\Console\ConsoleIo;
+use Lightning\Console\ConsoleApplication;
+use Lightning\MessageQueue\MessageConsumer;
+use Lightning\Console\ConsoleArgumentParser;
+use Lightning\MessageQueue\MemoryMessageQueue;
+use Lightning\MessageQueue\Command\QueueWorkerCommand;
+
+include dirname(__DIR__) . '/config/bootstrap_cli.php';
+
+$io = new ConsoleIo();
+$parser = new ConsoleArgumentParser();
+$application = new ConsoleApplication($io);
+
+$consumer = new MessageConsumer(new MemoryMessageQueue(), 'default');
+
+$command = new QueueWorkerCommand($parser, $io, $consumer);
+exit($command->run($argv));
+```

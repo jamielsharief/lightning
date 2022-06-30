@@ -20,7 +20,7 @@ use Redis;
  *
  * @internal I have tested concurency using a bash script and seems good.
  */
-class RedisMessageQueue extends AbstractMessageQueue implements MessageQueueInterface
+class RedisMessageQueue implements MessageQueueInterface
 {
     private Redis $redis;
 
@@ -36,15 +36,11 @@ class RedisMessageQueue extends AbstractMessageQueue implements MessageQueueInte
 
     /**
      * Sends a message to the message queue
-     *
-     * @param string $queue
-     * @param object $message
-     * @param integer $delay
-     * @return boolean
+
      */
-    public function send(string $queue, object $message, int $delay = 0): bool
+    public function send(string $queue, Message $message, int $delay = 0): bool
     {
-        $payload = $this->serialize($message);
+        $payload = serialize($message);
 
         if ($delay === 0) {
             return $this->redis->rpush('queued:' . $queue, $payload) !== false;
@@ -55,17 +51,14 @@ class RedisMessageQueue extends AbstractMessageQueue implements MessageQueueInte
 
     /**
      * Receives the next message from the queue, if any
-     *
-     * @param string $queue
-     * @return object|null
      */
-    public function receive(string $queue): ?object
+    public function receive(string $queue): ?Message
     {
         $this->migrateScheduledMessages($queue);
 
         $message = $this->redis->lpop('queued:' . $queue);
 
-        return $message ? $this->unserialize($message) : null;
+        return $message ? unserialize($message) : null;
     }
 
     /**

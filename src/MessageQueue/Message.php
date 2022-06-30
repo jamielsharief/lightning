@@ -21,8 +21,6 @@ class Message
 
     /**
      * Constructor
-     *
-     * @param string $body
      */
     public function __construct(string $body)
     {
@@ -33,8 +31,6 @@ class Message
 
     /**
      * Gets the message ID
-     *
-     * @return string
      */
     public function getId(): ?string
     {
@@ -43,8 +39,6 @@ class Message
 
     /**
      * Gets the message body
-     *
-     * @return string
      */
     public function getBody(): string
     {
@@ -53,8 +47,6 @@ class Message
 
     /**
      * Gets the created timestamp for when this message was created
-     *
-     * @return integer
      */
     public function getTimestamp(): int
     {

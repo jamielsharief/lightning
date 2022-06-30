@@ -13,19 +13,14 @@
 
 namespace Lightning\MessageQueue;
 
-class MemoryMessageQueue extends AbstractMessageQueue implements MessageQueueInterface
+class MemoryMessageQueue implements MessageQueueInterface
 {
     protected array $messages = [];
 
     /**
      * Sends a message to the message queue
-     *
-     * @param string $queue
-     * @param object $message
-     * @param integer $delay
-     * @return boolean
      */
-    public function send(string $queue, object $message, int $delay = 0): bool
+    public function send(string $queue, Message $message, int $delay = 0): bool
     {
         if (! isset($this->messages[$queue])) {
             $this->messages[$queue] = [];
@@ -38,11 +33,8 @@ class MemoryMessageQueue extends AbstractMessageQueue implements MessageQueueInt
 
     /**
      * Receives the next message from the queue, if any
-     *
-     * @param string $queue
-     * @return object|null
      */
-    public function receive(string $queue): ?object
+    public function receive(string $queue): ?Message
     {
         return isset($this->messages[$queue]) ? array_shift($this->messages[$queue]) : null;
     }

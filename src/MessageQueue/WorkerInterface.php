@@ -13,15 +13,10 @@
 
 namespace Lightning\MessageQueue;
 
-interface MessageQueueInterface
+/**
+ * A worker only fails if an exception is thrown, if not it assumes all is good
+ */
+interface WorkerInterface
 {
-    /**
-     * Sends a message to the message queue
-     */
-    public function send(string $queue, Message $message, int $delay = 0): bool;
-
-    /**
-     * Receives the next message from the queue, if any
-     */
-    public function receive(string $queue): ?Message;
+    public function run(): void;
 }

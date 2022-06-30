@@ -41,6 +41,7 @@ $ vendor/bin/phpunit
 
 - Factory method should be `create` or `createObject`
 - Minimum requirement of PHP 8 will be only set once its in Ubuntu server main repo, this gives ample time to ensure thats its available.
+- This is suppose to be building blocks, e.g PSR-Events inside a controller should be implemented in a seperate controller overiding the exsting controller
 
 ## Conventions
 

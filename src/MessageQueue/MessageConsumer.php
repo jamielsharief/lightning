@@ -15,6 +15,9 @@ namespace Lightning\MessageQueue;
 
 class MessageConsumer
 {
+    private $handler = null;
+    protected bool $receiving = true;
+
     /**
      * Constructor
      */
@@ -41,30 +44,81 @@ class MessageConsumer
     }
 
     /**
-     * Receives the next mesage from the Message queue if one is available
+     * Gets the source for the messages
      */
-    public function receive(): ?Message
+    public function getSource(): string
     {
-        return $this->receiveFrom($this->source);
+        return $this->source;
     }
 
     /**
-     * Receives the next mesage from the Message queue if one is available
+     * Sets the source for the messages
      */
-    public function receiveFrom(string $queue): ?Message
+    public function setSource(string $source): static
     {
-        $message = $this->messageQueue->receive($queue);
-        if ($message) {
-            $this->afterReceive($message, $queue);
+        $this->source = $source;
+
+        return $this;
+    }
+
+    /**
+     * Sets the message handler
+     */
+    public function setMessageListener(callable $handler): static
+    {
+        $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Stops the receive process if this has been called
+     */
+    public function stop(): static
+    {
+        $this->receiving = false;
+
+        return $this;
+    }
+
+    /**
+     * Receives messages whilst open
+     *
+     * TODO: sleep should prevent CPU blocking, test in real world situations if this is helping
+     */
+    public function receive(int $timeout = 0): void
+    {
+        $stopAt = time() + $timeout;
+
+        while ($this->receiving && ($timeout === 0 || ($timeout && time() < $stopAt))) {
+            if (! $this->receiveNoWait()) {
+                sleep(1);
+            }
         }
 
-        return $message;
+        $this->receiving = true;
     }
 
     /**
-     * AfterReceive Callback
+     * Receives the next message if available but does not wait
      */
-    protected function afterReceive(Message $message, string $queue): void
+    public function receiveNoWait(): ?object
     {
+        $message = $this->messageQueue->receive($this->source);
+        if (! $message || ! $object = @unserialize($message)) {
+            return null;
+        };
+
+        if ($object instanceof Message) {
+            $object = $object->getObject();
+        }
+
+        if ($handler = $this->handler) {
+            $handler($object);
+        }
+
+        return $object;
+
+        return null;
     }
 }

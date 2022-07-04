@@ -5,13 +5,20 @@ namespace Lightning\Test\TestCase\MessageQueue;
 use PHPUnit\Framework\TestCase;
 use Lightning\MessageQueue\Message;
 
+
+class SendEmailNotification
+{
+
+}
+
 final class MessageTest extends TestCase
 {
     public function testGetBody(): void
     {
+        $message = new SendEmailNotification();
         $this->assertEquals(
-            'foo',
-            (new Message('foo'))->getBody()
+            $message,
+            (new Message($message))->getObject()
         );
     }
 
@@ -19,7 +26,7 @@ final class MessageTest extends TestCase
     {
         $this->assertMatchesRegularExpression(
             '/^[0-9a-f]{32}/',
-            (new Message('foo'))->getId()
+            (new Message(new SendEmailNotification()))->getId()
         );
     }
 
@@ -27,15 +34,9 @@ final class MessageTest extends TestCase
     {
         $this->assertEquals(
             time(),
-            (new Message('foo'))->getTimestamp()
+            (new Message(new SendEmailNotification()))->getTimestamp()
         );
     }
 
-    public function testSerialization(): void
-    {
-        $message = new Message('foo');
-
-        $serialized = serialize($message);
-        $this->assertEquals(unserialize($serialized), $message);
-    }
+ 
 }

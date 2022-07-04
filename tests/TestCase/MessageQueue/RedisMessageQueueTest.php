@@ -5,9 +5,20 @@ namespace Lightning\Test\TestCase\MessageQueue;
 use Redis;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
-use Lightning\MessageQueue\Message;
 
 use Lightning\MessageQueue\RedisMessageQueue;
+
+class RedisMessage
+{
+    public function __construct(protected string $body)
+    {
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+}
 
 final class RedisMessageQueueTest extends TestCase
 {
@@ -24,7 +35,7 @@ final class RedisMessageQueueTest extends TestCase
     public function testSend()
     {
         $this->assertTrue(
-            $this->createMessageQueue()->send('default', new Message('foo'))
+            $this->createMessageQueue()->send('default', 'foo')
         );
     }
 
@@ -32,17 +43,17 @@ final class RedisMessageQueueTest extends TestCase
     {
         $queue = $this->createMessageQueue();
 
-        $this->assertEquals('foo', $queue->receive('default')->getBody());
+        $this->assertEquals('foo', $queue->receive('default'));
         $this->assertNull($queue->receive('default'));
     }
 
     public function testReceiveDelayed()
     {
         $queue = $this->createMessageQueue();
-        $queue->send('scheduled', new Message('foo'), 1);
+        $queue->send('scheduled', 'foo', 1);
         $this->assertNull($queue->receive('scheduled'));
         sleep(1);
-        $this->assertInstanceOf(Message::class, $queue->receive('scheduled'));
+        $this->assertEquals('foo', $queue->receive('scheduled'));
         $this->assertNull($queue->receive('scheduled'));
     }
 }

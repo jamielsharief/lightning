@@ -16,13 +16,13 @@ namespace Lightning\MessageQueue;
 class Message
 {
     private string $id;
-    private string $body;
+    private object $body;
     private int $timestamp;
 
     /**
      * Constructor
      */
-    public function __construct(string $body)
+    public function __construct(object $body)
     {
         $this->id = bin2hex(random_bytes(16));
         $this->timestamp = time();
@@ -40,7 +40,7 @@ class Message
     /**
      * Gets the message body
      */
-    public function getBody(): string
+    public function getObject(): object
     {
         return $this->body;
     }

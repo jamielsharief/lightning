@@ -18,7 +18,7 @@ class MessageProducer
     /**
      * Constructor
      */
-    public function __construct(protected MessageQueueInterface $messageQueue, protected string $destination)
+    public function __construct(protected MessageQueueInterface $messageQueue)
     {
     }
 
@@ -41,39 +41,12 @@ class MessageProducer
     }
 
     /**
-     * Sends a message to the message queue
-     */
-    public function send(Message $message, int $delay = 0): bool
-    {
-        return $this->sendTo($this->destination, $message, $delay);
-    }
-
-    /**
      * Returns a new instance with a specific destination
      */
-    public function sendTo(string $destination, Message $message, int $delay = 0): bool
+    public function send(string $destination, object $message, int $delay = 0): bool
     {
-        $this->beforeSend($message);
-
-        $result = $this->messageQueue->send($destination, $message, $delay);
-        if ($result) {
-            $this->afterSend($message);
-        }
-
-        return $result ;
-    }
-
-    /**
-     * BeforeSend Callback
-     */
-    protected function beforeSend(Message $message): void
-    {
-    }
-
-    /**
-     * AfterSend Callback
-     */
-    protected function afterSend(Message $message): void
-    {
+        return $this->messageQueue->send(
+            $destination, serialize(new Message($message)), $delay
+        );
     }
 }

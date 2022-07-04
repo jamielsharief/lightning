@@ -3,38 +3,36 @@
 namespace Lightning\Test\TestCase\MessageQueue;
 
 use PHPUnit\Framework\TestCase;
-use Lightning\MessageQueue\Message;
 use Lightning\MessageQueue\MessageConsumer;
+use Lightning\MessageQueue\MessageProducer;
 use Lightning\MessageQueue\MemoryMessageQueue;
 
-class ConsumerTestMessageQueue extends MemoryMessageQueue
+class ConsumerMessage
 {
-    /**
-     * Sends a message to the message queue
-     */
-    public function send(string $queue, Message $message, int $delay = 0): bool
+    private bool $handled = false;
+
+    public function __construct(protected string $body)
     {
-        return false;
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
+    public function handle(): void
+    {
+        $this->handled = true;
+    }
+
+    public function wasHandled(): bool
+    {
+        return $this->handled;
     }
 }
 
-class TestMessageConsumer extends MessageConsumer
+class ConsumerTestMessageQueue extends MemoryMessageQueue
 {
-    protected array $callled = [];
-
-    /**
-     * BeforeSend Callback
-     */
-    protected function AfterReceive(Message $message, string $queue): void
-    {
-        parent::afterReceive($message, $queue);
-        $this->callled[] = 'afterReceive';
-    }
-
-    public function wasCalled(string $method): bool
-    {
-        return in_array($method, $this->callled);
-    }
 }
 
 final class MessageConsumerTest extends TestCase
@@ -56,21 +54,81 @@ final class MessageConsumerTest extends TestCase
         $this->assertEquals($messageQueue2, $consumer->setMessageQueue($messageQueue2)->getMessageQueue());
     }
 
-    public function testReceiveNextMessage(): void
+    public function testReceiveNotWaitNoMessage(): void
     {
         $messageQueue = new MemoryMessageQueue();
-        $consumer = new TestMessageConsumer($messageQueue, 'default');
-        $this->assertNull($consumer->receive());
-        $this->assertFalse($consumer->wasCalled('afterReceive'));
+        $consumer = new MessageConsumer($messageQueue, 'default');
+        $this->assertNull($consumer->receiveNoWait());
     }
 
-    public function testReceiveNextMessageWithResult(): void
+    public function testReceiveNoWait(): void
     {
         $messageQueue = new MemoryMessageQueue();
-        $messageQueue->send('default', new Message('foo'));
 
-        $consumer = new TestMessageConsumer($messageQueue, 'default');
-        $this->assertInstanceOf(Message::class, $consumer->receive());
-        $this->assertTrue($consumer->wasCalled('afterReceive'));
+        (new MessageProducer($messageQueue))->send('default', new ConsumerMessage('foo'));
+
+        $consumer = new MessageConsumer($messageQueue, 'default');
+
+        $this->assertInstanceOf(ConsumerMessage::class, $consumer->receiveNoWait());
+    }
+
+    public function testReceiveNoWaitHandler(): void
+    {
+        $messageQueue = new MemoryMessageQueue();
+
+        (new MessageProducer($messageQueue))->send('default', new ConsumerMessage('foo'));
+
+        $consumer = new MessageConsumer($messageQueue, 'default');
+        $consumer->setMessageListener([$this,'messageHandler']);
+
+        $message = $consumer->receiveNoWait();
+
+        $this->assertTrue($message->wasHandled());
+    }
+
+    public function testStop(): void
+    {
+        $consumer = new MessageConsumer(new MemoryMessageQueue(), 'default');
+
+        $this->assertInstanceOf(MessageConsumer::class, $consumer->stop());
+    }
+
+    public function testReceive(): void
+    {
+        $messageQueue = new MemoryMessageQueue();
+
+        (new MessageProducer($messageQueue))->send('default', new ConsumerMessage('foo'));
+
+        $consumer = new MessageConsumer($messageQueue, 'default');
+
+        $start = time();
+        $consumer->setMessageListener(function (object $message) use ($consumer, $start) {
+            if (time() + 2 > $start) {
+                $this->assertTrue(true);
+                $consumer->stop();
+            }
+        });
+
+        $consumer->receive();
+    }
+
+    public function testReceiveTimeout(): void
+    {
+        $messageQueue = new MemoryMessageQueue();
+
+        (new MessageProducer($messageQueue))->send('default', new ConsumerMessage('foo'));
+
+        $consumer = new MessageConsumer($messageQueue, 'default');
+
+        $start = time();
+
+        $consumer->receive(2);
+
+        $this->assertEquals($start + 2, time());
+    }
+
+    public function messageHandler(ConsumerMessage $message)
+    {
+        $message->handle();
     }
 }

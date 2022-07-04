@@ -7,42 +7,24 @@ use Lightning\MessageQueue\Message;
 use Lightning\MessageQueue\MessageProducer;
 use Lightning\MessageQueue\MemoryMessageQueue;
 
-class ProducerTestMessageQueue extends MemoryMessageQueue
+class ProducerMessage
 {
-    /**
-     * Sends a message to the message queue
-     */
-    public function send(string $queue, Message $message, int $delay = 0): bool
+    public function __construct(protected string $body)
     {
-        return false;
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
     }
 }
 
-class TestMessageProducer extends MessageProducer
+class ProducerTestMessageQueue extends MemoryMessageQueue
 {
-    protected array $callled = [];
 
-    /**
-     * BeforeSend Callback
-     */
-    protected function beforeSend(Message $message): void
+    public function send(string $queue, string $message, int $delay = 0): bool
     {
-        parent::beforeSend($message);
-        $this->callled[] = 'beforeSend';
-    }
-
-    /**
-     * AfterSend Callback
-     */
-    protected function afterSend(Message $message): void
-    {
-        parent::afterSend($message);
-        $this->callled[] = 'afterSend';
-    }
-
-    public function wasCalled(string $method): bool
-    {
-        return in_array($method, $this->callled);
+        return false;
     }
 }
 
@@ -51,7 +33,7 @@ final class MessageProducerTest extends TestCase
     public function testGetMessageQueue(): void
     {
         $messageQueue = new MemoryMessageQueue();
-        $producer = new MessageProducer($messageQueue, 'default');
+        $producer = new MessageProducer($messageQueue);
 
         $this->assertEquals($messageQueue, $producer->getMessageQueue());
     }
@@ -60,7 +42,7 @@ final class MessageProducerTest extends TestCase
     {
         $messageQueue = new MemoryMessageQueue();
         $messageQueue2 = new ProducerTestMessageQueue();
-        $producer = new MessageProducer($messageQueue, 'default');
+        $producer = new MessageProducer($messageQueue);
 
         $this->assertEquals($messageQueue2, $producer->setMessageQueue($messageQueue2)->getMessageQueue());
     }
@@ -68,23 +50,18 @@ final class MessageProducerTest extends TestCase
     public function testSend(): void
     {
         $messageQueue = new MemoryMessageQueue();
+        $messageProducer = new MessageProducer($messageQueue);
 
-        $messageProducer = new TestMessageProducer($messageQueue, 'default');
+        $this->assertTrue($messageProducer->send('default', new ProducerMessage('foo')));
+        $this->assertNotEmpty($messageQueue->receive('default'));
 
-        $this->assertTrue($messageProducer->send(new Message('foo')));
-
-        $this->assertTrue($messageProducer->wasCalled('beforeSend'));
-        $this->assertTrue($messageProducer->wasCalled('afterSend'));
     }
 
     public function testSendFail(): void
     {
         $messageQueue = new ProducerTestMessageQueue();
+        $messageProducer = new MessageProducer($messageQueue);
 
-        $messageProducer = new TestMessageProducer($messageQueue, 'default');
-
-        $this->assertFalse($messageProducer->send(new Message('foo')));
-        $this->assertTrue($messageProducer->wasCalled('beforeSend'));
-        $this->assertFalse($messageProducer->wasCalled('afterSend'));
+        $this->assertFalse($messageProducer->send('default',new ProducerMessage('foo')));
     }
 }

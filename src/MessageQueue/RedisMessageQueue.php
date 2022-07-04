@@ -13,6 +13,8 @@
 
 namespace Lightning\MessageQueue;
 
+use Lightning\MessageQueue\MessageQueueInterface;
+
 use Redis;
 
 /**
@@ -26,8 +28,6 @@ class RedisMessageQueue implements MessageQueueInterface
 
     /**
      * Constructor
-     *
-     * @param Redis $redis
      */
     public function __construct(Redis $redis)
     {
@@ -36,36 +36,32 @@ class RedisMessageQueue implements MessageQueueInterface
 
     /**
      * Sends a message to the message queue
-
+     * @internal message must be unique
      */
-    public function send(string $queue, Message $message, int $delay = 0): bool
+    public function send(string $queue, string $message, int $delay = 0): bool
     {
-        $payload = serialize($message);
 
         if ($delay === 0) {
-            return $this->redis->rpush('queued:' . $queue, $payload) !== false;
+            return $this->redis->rpush('queued:' . $queue, $message) !== false;
         }
 
-        return $this->redis->zadd('scheduled:' . $queue, time() + $delay, $payload) !== false;
+        return $this->redis->zadd('scheduled:' . $queue, time() + $delay, $message) !== false;
     }
 
     /**
      * Receives the next message from the queue, if any
      */
-    public function receive(string $queue): ?Message
+    public function receive(string $queue): ?string
     {
         $this->migrateScheduledMessages($queue);
 
         $message = $this->redis->lpop('queued:' . $queue);
 
-        return $message ? unserialize($message) : null;
+        return $message ?: null;
     }
 
     /**
      * Look for scheduled messages that are due and send those
-     *
-     * @param string $queue
-     * @return void
      */
     private function migrateScheduledMessages(string $queue): void
     {

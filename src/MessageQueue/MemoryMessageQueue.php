@@ -20,13 +20,13 @@ class MemoryMessageQueue implements MessageQueueInterface
     /**
      * Sends a message to the message queue
      */
-    public function send(string $queue, Message $message, int $delay = 0): bool
+    public function send(string $queue, string $message, int $delay = 0): bool
     {
         if (! isset($this->messages[$queue])) {
             $this->messages[$queue] = [];
         }
 
-        $this->messages[$queue][] = $message;
+        $this->messages[$queue][] = [$message,time() + $delay];
 
         return true;
     }
@@ -34,8 +34,17 @@ class MemoryMessageQueue implements MessageQueueInterface
     /**
      * Receives the next message from the queue, if any
      */
-    public function receive(string $queue): ?Message
+    public function receive(string $queue): ?string
     {
-        return isset($this->messages[$queue]) ? array_shift($this->messages[$queue]) : null;
+        foreach ($this->messages[$queue] ?? [] as $index => $data) {
+            list($message, $when) = $data;
+            if ($when <= time()) {
+                unset($this->messages[$queue][$index]);
+
+                return $message;
+            }
+        }
+
+        return null;
     }
 }

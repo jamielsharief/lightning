@@ -13,6 +13,7 @@
 
 namespace Lightning\MessageQueue;
 
+use Lightning\MessageQueue\MessageQueueInterface;
 use PDO;
 
 class DatabaseMessageQueue implements MessageQueueInterface
@@ -23,9 +24,10 @@ class DatabaseMessageQueue implements MessageQueueInterface
 
     /**
      * Constructor
-     *
-     * @param PDO $pdo
-     * @param string $table
+     * 
+     * @internal some objects such as those with private properties will have null byte characters, e.g.  \x00 this causes
+     * for data to be truncated in pgsql, whilst BYTEA would be appropriate its seems messey. There seem to be no problems
+     * in Redis, MySQL or Sqlite or even PHP since these are strings. So data for postgres will need to be encoded.
      */
     public function __construct(PDO $pdo, string $table)
     {
@@ -34,44 +36,17 @@ class DatabaseMessageQueue implements MessageQueueInterface
         $this->driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
-    /**
-     * @internal some objects such as those with private properties will have null byte characters, e.g.  \x00 this causes
-     * for data to be truncated in pgsql, whilst BYTEA would be appropriate its seems messey. There seem to be no problems
-     * in Redis, MySQL or Sqlite or even PHP since these are strings. So data for postgres will be encoded as I do not want
-     * the overhead introduced on all engines just to play nice with postgres.
-     *
-     * @param object $object
-     * @return string
-     */
-    protected function serialize(object $object): string
-    {
-        $string = serialize($object);
-
-        return $this->driver === 'pgsql' ? base64_encode($string) : $string;
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param string $string
-     * @return object
-     */
-    protected function unserialize(string $string): object
-    {
-        $string = $this->driver === 'pgsql' ? base64_decode($string) : $string;
-
-        return unserialize($string);
-    }
+  
 
     /**
      * Sends a message to the message queue
      */
-    public function send(string $queue, Message $message, int $delay = 0): bool
+    public function send(string $queue, string $message, int $delay = 0): bool
     {
         $statement = $this->pdo->prepare("INSERT INTO {$this->table} (body,queue,scheduled) VALUES (:body,:queue,:scheduled)");
 
         return $statement->execute([
-            'body' => $this->serialize($message),
+            'body' => $message,
             'queue' => $queue,
             'scheduled' => date('Y-m-d H:i:s', time() + $delay)
         ]);
@@ -79,9 +54,8 @@ class DatabaseMessageQueue implements MessageQueueInterface
 
     /**
      * Receives the next message from the queue, if any
-
      */
-    public function receive(string $queue): ?Message
+    public function receive(string $queue): ?string
     {
         $result = null;
 
@@ -95,7 +69,7 @@ class DatabaseMessageQueue implements MessageQueueInterface
             $id = $row['id'];
 
             if ($this->execute("DELETE FROM {$this->table} WHERE {$this->table}.id = :id", ['id' => $id])) {
-                $result = $this->unserialize($row['body']);
+                $result = $row['body'];
             }
         }
 
@@ -106,10 +80,6 @@ class DatabaseMessageQueue implements MessageQueueInterface
 
     /**
      * Executes a query
-     *
-     * @param string $sql
-     * @param array $params
-     * @return boolean
      */
     private function execute(string $sql, array $params = []): bool
     {
@@ -120,10 +90,6 @@ class DatabaseMessageQueue implements MessageQueueInterface
 
     /**
      * Executes a query and fetches a single row
-     *
-     * @param string $sql
-     * @param array $params
-     * @return array|null
      */
     private function query(string $sql, array $params = []): ?array
     {

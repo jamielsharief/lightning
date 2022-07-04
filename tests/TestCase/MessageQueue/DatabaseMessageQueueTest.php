@@ -5,11 +5,23 @@ namespace Lightning\Test\TestCase\MessageQueue;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
-use Lightning\MessageQueue\Message;
+
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\MessageQueueFixture;
 
 use Lightning\MessageQueue\DatabaseMessageQueue;
+
+class DatabaseMessage
+{
+    public function __construct(protected string $body)
+    {
+    }
+
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+}
 
 final class DatabaseMessageQueueTest extends TestCase
 {
@@ -32,7 +44,7 @@ final class DatabaseMessageQueueTest extends TestCase
     public function testSend()
     {
         $this->assertTrue(
-            $this->createMessageQueue()->send('default', new Message('foo'))
+            $this->createMessageQueue()->send('default','foo')
         );
     }
 
@@ -42,9 +54,9 @@ final class DatabaseMessageQueueTest extends TestCase
     public function testReceive()
     {
         $queue = $this->createMessageQueue();
-        $queue->send('default', new Message('foo'));
+        $queue->send('default','foo');
 
-        $this->assertInstanceOf(Message::class, $queue->receive('default'));
+        $this->assertEquals('foo', $queue->receive('default'));
         $this->assertNull($queue->receive('default'));
     }
 
@@ -54,10 +66,10 @@ final class DatabaseMessageQueueTest extends TestCase
     public function testReceiveDelayed()
     {
         $queue = $this->createMessageQueue();
-        $queue->send('delayed', new Message('foo'), 1);
+        $queue->send('delayed','foo', 1);
         $this->assertNull($queue->receive('delayed'));
         sleep(1);
-        $this->assertInstanceOf(Message::class, $queue->receive('delayed'));
+        $this->assertEquals('foo', $queue->receive('default'));
         $this->assertNull($queue->receive('delayed'));
     }
 }

@@ -18,10 +18,10 @@ interface MessageQueueInterface
     /**
      * Sends a message to the message queue
      */
-    public function send(string $queue, Message $message, int $delay = 0): bool;
+    public function send(string $queue, string $message, int $delay = 0): bool;
 
     /**
      * Receives the next message from the queue, if any
      */
-    public function receive(string $queue): ?Message;
+    public function receive(string $queue): ?string;
 }

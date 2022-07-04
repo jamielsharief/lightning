@@ -30,22 +30,12 @@ class RegisterUserService extends AbstractServiceObject
 }
 ```
 
-To run the service
+To run the `ServiceObject` you can pass an array of parameters that will be passed as a [Params](params.md) object during execution, this is to ensure that state is not set during the constructor for DI purposes.
 
 ```php
 $result = (new RegisterUserService ($model, $logger))
-    ->withParams(['name' => 'fred', 'email' => 'fred@example.com'])
+    ->withParameters(['name' => 'fred', 'email' => 'fred@example.com'])
     ->run();
-```
-
-## Params Object
-
-The `Params` object is passed to the execute method when the `ServiceObject` is `run`. If `get` is called and the parameter was not supplied it will throw `UnkownParameterException`, therefore, for optional parameters check with `has` first.
-
-```php
-$params = new Params(['name' => 'fred', 'email' => 'fred@example.com']);
-$name = $params->get('name');
-$bool = $params->has('surname');
 ```
 
 ## Result Object

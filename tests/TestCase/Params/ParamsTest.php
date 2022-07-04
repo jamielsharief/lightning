@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Lightning\Test\ServiceObject;
+namespace Lightning\Test\Params;
 
+use Lightning\Params\Params;
 use PHPUnit\Framework\TestCase;
-use Lightning\ServiceObject\Params;
-use Lightning\ServiceObject\Exception\UnknownParameterException;
+use Lightning\Params\Exception\UnknownParameterException;
 
 final class ParamsTest extends TestCase
 {
@@ -49,7 +49,7 @@ final class ParamsTest extends TestCase
         $params->get('foo');
     }
 
-    public function testGetState(): void
+    public function testGetArray(): void
     {
         $this->assertEquals(
             ['foo' => 'bar'],

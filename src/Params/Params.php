@@ -11,9 +11,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\ServiceObject;
+namespace Lightning\Params;
 
-use Lightning\ServiceObject\Exception\UnknownParameterException;
+use Lightning\Params\Exception\UnknownParameterException;
 
 class Params
 {

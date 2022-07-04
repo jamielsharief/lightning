@@ -2,8 +2,8 @@
 
 namespace Lightning\Test\ServiceObject;
 
+use Lightning\Params\Params;
 use PHPUnit\Framework\TestCase;
-use Lightning\ServiceObject\Params;
 use Lightning\ServiceObject\Result;
 use Lightning\ServiceObject\AbstractServiceObject;
 
@@ -36,28 +36,28 @@ final class AbstractServiceObjectTest extends TestCase
         $this->assertTrue($result->get('initialized'));
     }
 
-    public function testDispatchWithParams()
+    public function testDispatchWithParameters()
     {
         $service = new ServiceObject();
 
-        $this->assertEquals('bar', $service->withParams(['foo' => 'bar'])
+        $this->assertEquals('bar', $service->withParameters(['foo' => 'bar'])
             ->run()
             ->get('params')
             ->get('foo'));
     }
 
-    public function testGetParams(): void
+    public function testGetParameters(): void
     {
         $service = new ServiceObject();
-        $this->assertEquals([], $service->getParams());
-        $this->assertEquals(['foo' => 'bar'], $service->withParams(['foo' => 'bar'])->getParams());
+        $this->assertEquals([], $service->getParameters());
+        $this->assertEquals(['foo' => 'bar'], $service->withParameters(['foo' => 'bar'])->getParameters());
     }
 
-    public function testDispatchWithParamsArray()
+    public function testDispatchWithParametersArray()
     {
         $service = new ServiceObject();
 
-        $this->assertEquals('bar', $service->withParams(['foo' => 'bar'])
+        $this->assertEquals('bar', $service->withParameters(['foo' => 'bar'])
             ->run()
             ->get('params')
             ->get('foo'));
@@ -65,8 +65,7 @@ final class AbstractServiceObjectTest extends TestCase
 
     public function testIsInvokable(): void
     {
-        $params = new Params(['foo' => 'bar']);
-        $service = (new ServiceObject())->withParams(['foo' => 'bar']);
+        $service = (new ServiceObject())->withParameters(['foo' => 'bar']);
 
         $this->assertIsCallable($service);
         $this->assertInstanceOf(Result::class, $service());

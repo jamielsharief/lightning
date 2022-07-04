@@ -11,7 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Lightning\ServiceObject\Exception;
+namespace Lightning\Params\Exception;
 
 use RuntimeException;
 

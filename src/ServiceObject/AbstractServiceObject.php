@@ -13,6 +13,8 @@
 
 namespace Lightning\ServiceObject;
 
+use Lightning\Params\Params;
+
 /**
  * Service Object
  *
@@ -29,7 +31,7 @@ namespace Lightning\ServiceObject;
  */
 abstract class AbstractServiceObject implements ServiceObjectInterface
 {
-    private array $params = [];
+    private ?Params $params;
 
     /**
      * A hook that is called before execute when the Service Object is run.
@@ -46,18 +48,18 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
     /**
      * Gets the params that will be passed when run
      */
-    public function getParams(): array
+    public function getParameters(): array
     {
-        return $this->params;
+        return isset($this->params) ? $this->params->toArray() : [];
     }
 
     /**
      * Returns a new instance with the parameters set
      */
-    public function withParams(array $params): static
+    public function withParameters(array $parameters): static
     {
         $service = clone $this;
-        $service->params = $params;
+        $service->params = new Params($parameters);
 
         return $service;
     }
@@ -69,7 +71,7 @@ abstract class AbstractServiceObject implements ServiceObjectInterface
     {
         $this->initialize();
 
-        return $this->execute(new Params($this->params));
+        return $this->execute($this->params ?? new Params());
     }
 
     /**

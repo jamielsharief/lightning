@@ -161,6 +161,14 @@ abstract class AbstractCommand implements CommandInterface
         // Parse arguments
         $arguments = $this->parser->parse($args);
 
+        if ($arguments->getOption('verbose')) {
+            $this->io->setOutputLevel(ConsoleIo::VERBOSE);
+        }
+
+        if ($arguments->getOption('quiet')) {
+            $this->io->setOutputLevel(ConsoleIo::QUIET);
+        }
+
         if ($arguments->getOption('help') === true) {
             $this->displayHelp();
 

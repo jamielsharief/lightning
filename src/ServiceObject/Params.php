@@ -31,19 +31,13 @@ class Params
     }
 
     /**
-     * Checks if a parameter exists
+     * Set a value of a param
      */
-    public function has(string $name): bool
+    public function set(string $name, mixed $value): static
     {
-        return array_key_exists($name, $this->data);
-    }
+        $this->data[$name] = $value;
 
-    /**
-     * Gets the params as an array
-     */
-    public function toArray(): array
-    {
-        return $this->data;
+        return $this;
     }
 
     /**
@@ -61,13 +55,11 @@ class Params
     }
 
     /**
-     * Set a value of a param
+     * Checks if a parameter exists
      */
-    public function set(string $name, mixed $value): static
+    public function has(string $name): bool
     {
-        $this->data[$name] = $value;
-
-        return $this;
+        return array_key_exists($name, $this->data);
     }
 
     /**
@@ -78,5 +70,13 @@ class Params
         unset($this->data[$name]);
 
         return $this;
+    }
+
+    /**
+     * Gets the params as an array
+     */
+    public function toArray(): array
+    {
+        return $this->data;
     }
 }

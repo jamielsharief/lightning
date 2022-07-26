@@ -52,7 +52,7 @@ use Lightning\Http\Auth\IdentityService\PdoIdentityService;
      PDO::class => function (ContainerInterface $container) {
          $pdoFactory = new PdoFactory();
 
-         return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+         return $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
      },
      TemplateRenderer::class => function (ContainerInterface $container) {
 

@@ -16,7 +16,7 @@ final class PdoFactoryTest extends TestCase
 
         $pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
         $this->assertInstanceOf(PDO::class, $pdo);
-        $this->assertTrue($pdo->getAttribute(PDO::ATTR_PERSISTENT));
+        $this->assertFalse($pdo->getAttribute(PDO::ATTR_PERSISTENT));
 
         // PHP throws error when trying to get this on SQLLite.  Driver does not support this function: driver does not support that attribute
         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite') {
@@ -25,5 +25,16 @@ final class PdoFactoryTest extends TestCase
 
         $this->assertEquals(PDO::ERRMODE_EXCEPTION, $pdo->getAttribute(PDO::ATTR_ERRMODE));
         $this->assertEquals(PDO::FETCH_ASSOC, $pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE));
+    }
+
+
+    public function testCreatePersistent()
+    {
+        $pdoFactory = new PdoFactory();
+
+        $pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $this->assertInstanceOf(PDO::class, $pdo);
+        $this->assertTrue($pdo->getAttribute(PDO::ATTR_PERSISTENT));
+
     }
 }

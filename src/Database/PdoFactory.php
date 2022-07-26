@@ -24,15 +24,16 @@ class PdoFactory
      * Factory method
      *
      * @param string $dsn e.g. mysql:host=127.0.0.1;port=3306;dbname=crm;charset=utf8mb4
-     * @param string $username
-     * @param string $password
-     * @return PDO
      */
-    public function create(string $dsn, string $username, string $password): PDO
+    public function create(string $dsn, string $username, string $password, bool $persistent = false): PDO
     {
         return new PDO($dsn, $username, $password, [
 
-            PDO::ATTR_PERSISTENT => true,
+            /**
+             * don't set to true unless you know what you are doing, this can have all kinds of effects
+             * that need to be understood properly.
+             */
+            PDO::ATTR_PERSISTENT => $persistent,
             /**
              * 1. This must be set to false for security reasons
              * 2. It also plays a part in cast in casting data types such as integer

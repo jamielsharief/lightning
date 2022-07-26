@@ -95,7 +95,7 @@ class Criteria
                     throw new InvalidArgumentException(sprintf('Invalid comparison value for `%s`, expected a scalar or null value', $field));
                 }
 
-                $value = sprintf('/^%s$/i', str_replace(['%','_'], ['.*','.'], (string) $value));
+                $value = sprintf('/^%s$/i', str_replace(['%','_'], ['.*','.'], preg_quote((string) $value)));
 
             break;
             default:

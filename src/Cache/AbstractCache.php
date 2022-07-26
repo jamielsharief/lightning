@@ -94,16 +94,13 @@ abstract class AbstractCache implements CacheInterface
 
     /**
      * Checks the cache key and adds the prefix
-     *
-     * @param mixed $key
-     * @return string
      */
-    protected function addPrefix($key): string
+    protected function addPrefix(string $key): string
     {
-        if (! is_string($key) || strlen($key) === 0 || ! preg_match('/^[a-z0-9_-]+$/i', $key)) {
+        $length = mb_strlen($key);
+        if (!($length > 0 && $length <= 64)  || ! preg_match('/^[A-Za-z0-9_\.]+$/i', $key)) {
             throw new InvalidArgumentException(sprintf('Invalid key `%s`', $key));
         }
-
         return $this->prefix . $key;
     }
 
@@ -111,7 +108,6 @@ abstract class AbstractCache implements CacheInterface
      * Gets the duration from TTL
      *
      * @param int|DateInterval|null $ttl
-     * @return integer
      */
     protected function getDuration($ttl): int
     {

@@ -14,7 +14,7 @@ final class PdoFactoryTest extends TestCase
     {
         $pdoFactory = new PdoFactory();
 
-        $pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+        $pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),false);
         $this->assertInstanceOf(PDO::class, $pdo);
         $this->assertFalse($pdo->getAttribute(PDO::ATTR_PERSISTENT));
 
@@ -26,7 +26,6 @@ final class PdoFactoryTest extends TestCase
         $this->assertEquals(PDO::ERRMODE_EXCEPTION, $pdo->getAttribute(PDO::ATTR_ERRMODE));
         $this->assertEquals(PDO::FETCH_ASSOC, $pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE));
     }
-
 
     public function testCreatePersistent()
     {

@@ -19,7 +19,7 @@ final class StatementTest extends TestCase
     public function setUp(): void
     {
         $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([

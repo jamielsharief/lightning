@@ -24,7 +24,7 @@ final class DatabaseDataSourceTest extends TestCase
     {
         // Create Connection
         $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([ArticlesFixture::class,AuthorsFixture::class]);

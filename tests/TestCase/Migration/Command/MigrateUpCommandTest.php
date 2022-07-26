@@ -29,7 +29,7 @@ final class MigrateUpCommandTest extends TestCase
     {
         // Create Connection
         $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
 
         $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 

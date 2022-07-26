@@ -43,7 +43,7 @@ final class AbstractRepositoryTest extends TestCase
     public function setUp(): void
     {
         $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
 
         $this->storage = new DatabaseDataSource($this->pdo, new QueryBuilder());
 

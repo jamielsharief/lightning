@@ -186,7 +186,7 @@ class Route
         if (is_array($handler) && is_string($handler[0])) {
             $handler = [$this->resolve($handler[0], $container), $handler[1]];
         } elseif (is_string($handler)) {
-            $handler = $this->resolve($handler);
+            $handler = $this->resolve($handler, $container);
         }
 
         if (is_callable($handler)) {

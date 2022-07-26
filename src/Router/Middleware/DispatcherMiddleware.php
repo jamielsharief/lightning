@@ -13,6 +13,7 @@
 
 namespace Lightning\Router\Middleware;
 
+use Closure;
 use Lightning\Autowire\Autowire;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -52,7 +53,13 @@ class DispatcherMiddleware implements MiddlewareInterface
         }
 
         if ($this->autowire) {
-            $response = is_array($callable) ? $this->autowire->method($callable[0], $callable[1], $params) : $this->autowire->function($callable, $params);
+            if ($callable instanceof Closure) {
+                $response = $this->autowire->function($callable, $params);
+            } elseif (is_callable($callable)) {
+                $response = $this->autowire->method($callable, '__invoke', $params);
+            } else {
+                $response = $this->autowire->method($callable[0], $callable[1], $params);
+            }
         } else {
             $response = $callable($request, $this->response);
         }

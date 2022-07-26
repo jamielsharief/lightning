@@ -25,19 +25,22 @@ use Lightning\Database\Exception\DatabaseException;
  */
 class Connection
 {
-    private PDO $pdo;
-    private ?LoggerInterface $logger;
+    protected PDO $pdo;
+    protected ?LoggerInterface $logger = null;
 
     /**
      * Constructor
-     *
-     * @param PDO $pdo
-     * @param LoggerInterface|null $logger
      */
-    public function __construct(PDO $pdo, ?LoggerInterface $logger = null)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+    }
+
+    public function setLogger(LoggerInterface $logger): static
+    {
         $this->logger = $logger;
+
+        return $this;
     }
 
     /**

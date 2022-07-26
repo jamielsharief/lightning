@@ -7,7 +7,6 @@ use Exception;
 use PDOException;
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
-use Lightning\Cache\MemoryCache;
 use Lightning\Database\Statement;
 use function Lightning\Dotenv\env;
 use Lightning\Database\Connection;
@@ -41,7 +40,9 @@ final class ConnectionTest extends TestCase
     {
         $pdo = $useExceptions ? $this->pdo : new PDO(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
-        return new Connection($pdo, $this->getLogger());
+        $connection = new Connection($pdo);
+        $connection->setLogger($this->getLogger());
+        return $connection;
     }
 
     public function testGetPDO(): void

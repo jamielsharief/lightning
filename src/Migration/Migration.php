@@ -14,6 +14,7 @@
 namespace Lightning\Migration;
 
 use PDO;
+use RuntimeException;
 
 class Migration
 {
@@ -41,11 +42,20 @@ class Migration
     public function get(): array
     {
         $migrations = [];
+
         foreach (glob($this->path . '/*.sql') as $path) {
-            $migrations[] = $this->parseMigration($path);
+            $migration = $this->parseMigration($path);;
+
+            if (isset($migrations[$migration['version']])) {
+                throw new RuntimeException(sprintf('Migration version `%s` already exists', $migration['version']));
+            }
+
+            $migrations[$migration['version']] = $migration;
         }
 
-        return $migrations;
+        ksort($migrations);
+
+        return array_values($migrations);
     }
 
     /**

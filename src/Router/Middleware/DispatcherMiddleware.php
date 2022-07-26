@@ -47,7 +47,6 @@ class DispatcherMiddleware implements MiddlewareInterface
         $params = [ServerRequestInterface::class => $request,ResponseInterface::class => $this->response];
 
         $isController = is_array($callable) && $callable[0] instanceof ControllerInterface;
-
         if ($isController && $response = $callable[0]->beforeFilter($request)) {
             return $response;
         }
@@ -55,7 +54,7 @@ class DispatcherMiddleware implements MiddlewareInterface
         if ($this->autowire) {
             if ($callable instanceof Closure) {
                 $response = $this->autowire->function($callable, $params);
-            } elseif (is_callable($callable)) {
+            } elseif (is_object($callable)) {
                 $response = $this->autowire->method($callable, '__invoke', $params);
             } else {
                 $response = $this->autowire->method($callable[0], $callable[1], $params);

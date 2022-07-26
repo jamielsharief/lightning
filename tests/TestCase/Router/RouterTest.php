@@ -30,6 +30,15 @@ class DummyController
     }
 }
 
+class SingleActionController
+{
+
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        return new Response(200, [], 'ok');
+    }
+}
+
 class BaseTestMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -305,6 +314,16 @@ final class RouterTest extends TestCase
         $router->get('/articles', function (ServerRequestInterface $request, ResponseInterface $response, ApcuCache $class) {
             return new Response(200, [], 'ok');
         });
+
+        $response = $router->dispatch(new ServerRequest('GET', '/articles'));
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+    }
+
+
+    public function testAutowireActionController(): void
+    {
+        $router = new Router(null, new Autowire(), new Response());
+        $router->get('/articles', SingleActionController::class);
 
         $response = $router->dispatch(new ServerRequest('GET', '/articles'));
         $this->assertInstanceOf(ResponseInterface::class, $response);

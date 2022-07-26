@@ -25,15 +25,41 @@ use Lightning\Database\Exception\DatabaseException;
  */
 class Connection
 {
-    protected PDO $pdo;
+    protected ?PDO $pdo = null;
     protected ?LoggerInterface $logger = null;
 
     /**
      * Constructor
      */
-    public function __construct(PDO $pdo)
+    public function __construct(
+        protected PdoFactoryInterface $pdoFactory
+    )
     {
-        $this->pdo = $pdo;
+
+    }
+
+    /**
+     * Creates the DB connection
+     */
+    public function connect() : void
+    {
+        $this->pdo = $this->pdoFactory->create();
+    }
+
+    /**
+     * Disconnects from the DB
+     */
+    public function disconnect(): void
+    {
+        $this->pdo = null;
+    }
+
+    /**
+     * Checks if connected
+     */
+    public function isConnected(): bool 
+    {
+        return $this->pdo instanceof PDO;
     }
 
     public function setLogger(LoggerInterface $logger): static
@@ -45,18 +71,14 @@ class Connection
 
     /**
      * Gets the PDO object
-     *
-     * @return PDO
      */
-    public function getPdo(): PDO
+    public function getPdo(): ?PDO
     {
-        return $this->pdo;
+        return $this->pdo ?? null;
     }
 
     /**
      * Begins a Transaction
-     *
-     * @return boolean
      */
     public function beginTransaction(): bool
     {
@@ -73,8 +95,6 @@ class Connection
 
     /**
      * Commits a Transaction
-     *
-     * @return boolean
      */
     public function commit(): bool
     {
@@ -91,8 +111,6 @@ class Connection
 
     /**
      * Rollsback a Transaction
-     *
-     * @return boolean
      */
     public function rollback(): bool
     {
@@ -109,8 +127,6 @@ class Connection
 
     /**
      * Checks to see if currently in a transaction
-     *
-     * @return boolean
      */
     public function inTransaction(): bool
     {
@@ -119,11 +135,8 @@ class Connection
 
     /**
      * Prepares an SQL statement
-     *
-     * @param string|Stringable $query
-     * @return Statement
      */
-    public function prepare($query): Statement
+    public function prepare(string|Stringable $query): Statement
     {
         $sql = $query instanceof Stringable ? (string) $query : $query;
 
@@ -140,12 +153,8 @@ class Connection
 
     /**
      * Executes a statement and returns a decorated PDO statement
-     *
-     * @param string|Stringable $query
-     * @param array $params
-     * @return Statement
      */
-    public function execute($query, array $params = []): Statement
+    public function execute(string|Stringable $query, array $params = []): Statement
     {
         $statement = $this->prepare($query);
         if ($params) {
@@ -163,9 +172,6 @@ class Connection
     /**
      * A helper method to execute transactional SQL queries with automatic rollback if the
      * callable throws an exception or returns false.
-     *
-     * @param callable $callable
-     * @return mixed
      */
     public function transaction(callable $callable): mixed
     {
@@ -192,8 +198,6 @@ class Connection
      * Gets the last insert ID
      *
      * @see https://www.php.net/manual/en/pdo.lastinsertid.php
-     * @param string|null $sequence
-     * @return string|null
      */
     public function getLastInsertId(?string $sequence = null): ?string
     {
@@ -204,10 +208,6 @@ class Connection
 
     /**
      * A simple interpolater for logging purposes
-     *
-     * @param string $sql
-     * @param array $params
-     * @return string
      */
     private function interpolateStatement(string $sql, array $params): string
     {
@@ -225,10 +225,6 @@ class Connection
      * Inserts a row into the table
      *
      * @example INSERT INTO tags (name,created_at,updated_at) VALUES (?,?,?)
-     *
-     * @param string $table
-     * @param array $data
-     * @return boolean
      */
     public function insert(string $table, array $data): bool
     {
@@ -244,11 +240,6 @@ class Connection
      * Updates a row or rows in the database
      *
      * @example UPDATE tags SET name = ?, created_at = ?, updated_at = ? WHERE id = ?
-     *
-     * @param string $table
-     * @param array $data
-     * @param array $identifiers
-     * @return integer
      */
     public function update(string $table, array $data, array $identifiers = []): int
     {
@@ -267,10 +258,6 @@ class Connection
      * Deletes a row or rows from the database
      *
      * @example DELETE FROM articles WHERE id = ?
-     *
-     * @param string $table
-     * @param array $identifiers
-     * @return integer
      */
     public function delete(string $table, array $identifiers = []): int
     {
@@ -284,9 +271,6 @@ class Connection
 
     /**
      * Convert an array of data into a placeholder set
-     *
-     * @param array $data
-     * @return array
      */
     private function toPlaceholders(array $data): array
     {
@@ -300,8 +284,6 @@ class Connection
 
     /**
      * Gets the Driver name for this connection
-     *
-     * @return string
      */
     public function getDriver(): string
     {

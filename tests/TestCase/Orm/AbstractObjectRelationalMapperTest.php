@@ -212,8 +212,8 @@ final class AbstractObjectRelationalMapperTest extends TestCase
 
     public function setUp(): void
     {
-        $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $pdoFactory = new PdoFactory(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $this->pdo = $pdoFactory->create();
 
         $this->dataSource = new DatabaseDataSource($this->pdo, new QueryBuilder());
         $this->eventDispatcher = new EventDispatcher(new ListenerRegistry());

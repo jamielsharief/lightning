@@ -23,8 +23,8 @@ final class DatabaseDataSourceTest extends TestCase
     protected function setUp(): void
     {
         // Create Connection
-        $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $pdoFactory = new PdoFactory(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $this->pdo = $pdoFactory->create();
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([ArticlesFixture::class,AuthorsFixture::class]);

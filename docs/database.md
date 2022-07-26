@@ -7,15 +7,27 @@ Database components come with `PdoFactory`, `Connection` and a `QueryBuilder`.
 Creates and configures PDO object to in a standard and secure way.
 
 ```php
-use Lightning\Database\PdoFactory
-$pdoFactory = new PdoFactory();
-$pdo = $pdoFactory->create('mysql:host=127.0.0.1;port=3306;dbname=lightning', 'root', 'secret');
+use Lightning\Database\PdoFactory;
+$pdoFactory = new PdoFactory('mysql:host=127.0.0.1;port=3306;dbname=lightning', 'root', 'secret');
+$pdo = $pdoFactory->create();
 ```
 
 The default fetch mode for the `PDO` object to an associative array, however if you want to change it to objects.
 
 ```php
 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_OBJ);
+```
+
+You maybe also want the `PdoFactory` to work differently
+
+```php
+class CustomPdoFactory implements PdoFactoryInterface
+{
+    public function create(): PDO
+    {
+        return new PDO(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+    }
+}
 ```
 
 ## Connection
@@ -25,8 +37,8 @@ Works with PDO and PSR-3 Logger.
 ### Usage
 
 ```php
-$pdo = new \PDO('mysql:host=mysql;port=3306;dbname=lightning','root', 'root'); // 
-$db = new Connection($pdo);
+$pdoFactory = new PdoFactory('mysql:host=mysql;port=3306;dbname=lightning', 'root', 'root'); // 
+$db = new Connection($pdoFactory);
 ```
 
 ```php

@@ -18,22 +18,33 @@ use PDO;
 /**
  * PdoFactory class
  */
-class PdoFactory
+class PdoFactory implements PdoFactoryInterface
 {
     /**
-     * Factory method
+     * Constructor
      *
      * @param string $dsn e.g. mysql:host=127.0.0.1;port=3306;dbname=crm;charset=utf8mb4
      */
-    public function create(string $dsn, string $username, string $password, bool $persistent = false): PDO
+    public function __construct(
+        private string $dsn,
+        private string $username, 
+        private string $password, 
+        private bool $persistent = false)
     {
-        return new PDO($dsn, $username, $password, [
+    }
+
+    /**
+     * Factory method
+     */
+    public function create(): PDO
+    {
+        return new PDO($this->dsn, $this->username, $this->password, [
 
             /**
              * don't set to true unless you know what you are doing, this can have all kinds of effects
              * that need to be understood properly.
              */
-            PDO::ATTR_PERSISTENT => $persistent,
+            PDO::ATTR_PERSISTENT => $this->persistent,
             /**
              * 1. This must be set to false for security reasons
              * 2. It also plays a part in cast in casting data types such as integer

@@ -7,7 +7,7 @@ use Lightning\Database\Row;
 use PHPUnit\Framework\TestCase;
 use function Lightning\Dotenv\env;
 use Lightning\Database\Connection;
-
+use Lightning\Database\PdoFactory;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\ArticlesFixture;
 
@@ -99,8 +99,9 @@ final class RowTest extends TestCase
 
     public function testWorksWithPDO(): void
     {
-        $connection = new Connection($this->pdo);
-
+        $connection = new Connection(new PdoFactory(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD')));
+        $connection->connect();
+        
         $result = $connection->execute('SELECT * FROM articles')->fetchObject(Row::class);
 
         $this->assertInstanceOf(Row::class, $result);

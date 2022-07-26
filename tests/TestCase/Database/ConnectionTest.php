@@ -11,21 +11,34 @@ use Lightning\Database\Statement;
 use function Lightning\Dotenv\env;
 use Lightning\Database\Connection;
 use Lightning\Database\PdoFactory;
+use Lightning\Database\PdoFactoryInterface;
 use Lightning\Fixture\FixtureManager;
 use Lightning\Test\Fixture\TagsFixture;
 use Lightning\QueryBuilder\QueryBuilder;
 use Lightning\TestSuite\LoggerTestTrait;
 use Lightning\Test\Fixture\ArticlesFixture;
 
+
+class NoExceptionConfigPdoFactory implements PdoFactoryInterface
+{
+    public function create(): PDO
+    {
+        return new PDO(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
+    }
+
+}
+
 final class ConnectionTest extends TestCase
 {
     use LoggerTestTrait;
 
+    private PdoFactory $pdoFactory;
     private PDO $pdo;
+
     public function setUp(): void
     {
-        $pdoFactory = new PdoFactory();
-        $this->pdo = $pdoFactory->create(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $this->pdoFactory = new PdoFactory(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'),true);
+        $this->pdo = $this->pdoFactory->create();
 
         $this->fixtureManager = new FixtureManager($this->pdo);
         $this->fixtureManager->load([
@@ -38,16 +51,35 @@ final class ConnectionTest extends TestCase
 
     private function createConnection(bool $useExceptions = true): Connection
     {
-        $pdo = $useExceptions ? $this->pdo : new PDO(env('DB_URL'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
-        $connection = new Connection($pdo);
+        $connection = new Connection($useExceptions ? $this->pdoFactory : new NoExceptionConfigPdoFactory());
         $connection->setLogger($this->getLogger());
+        $connection->connect();
+
+
         return $connection;
     }
 
     public function testGetPDO(): void
     {
-        $this->assertInstanceOf(PDO::class, $this->createConnection()->getPdo());
+        $connection = new Connection($this->pdoFactory);
+        $this->assertNull($connection->getPdo());
+        $connection->connect();
+        $this->assertInstanceOf(PDO::class,$connection->getPdo());
+    }
+
+
+    public function testIsConnected(): void 
+    {
+        $connection = new Connection($this->pdoFactory);
+        $this->assertFalse($connection->isConnected());
+
+        
+        $connection->connect();
+        $this->assertTrue($connection->isConnected());
+
+        $connection->disconnect();
+        $this->assertFalse($connection->isConnected());
     }
 
     public function testGetDriver(): void

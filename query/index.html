@@ -1,0 +1,1118 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.8">
+    
+    
+      
+        <title>Query - Lightning</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.1d29e8d0.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#query" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Lightning" class="md-header__button md-logo" aria-label="Lightning" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lightning
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Query
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Lightning" class="md-nav__button md-logo" aria-label="Lightning" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Lightning
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../autoloader/" class="md-nav__link">
+        Autoloader
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../autowire/" class="md-nav__link">
+        Autowire
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/" class="md-nav__link">
+        Cache
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collection.md" class="md-nav__link">
+        Collection
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../console/" class="md-nav__link">
+        Console
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../container/" class="md-nav__link">
+        Container
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controller/" class="md-nav__link">
+        Controller
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../criteria/" class="md-nav__link">
+        Criteria
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datamapper.md" class="md-nav__link">
+        DataMapper
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dotenv/" class="md-nav__link">
+        Dotenv
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entity/" class="md-nav__link">
+        Entity
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event/" class="md-nav__link">
+        Event
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fixture/" class="md-nav__link">
+        Fixure
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../formatter/" class="md-nav__link">
+        Formatter
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_15" type="checkbox" id="__nav_15" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_15">
+          Http
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Http" data-md-level="1">
+        <label class="md-nav__title" for="__nav_15">
+          <span class="md-nav__icon md-icon"></span>
+          Http
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/cookie/" class="md-nav__link">
+        Cookie
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/emitter/" class="md-nav__link">
+        Emitter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/exception/" class="md-nav__link">
+        Exception
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/exception-handler/" class="md-nav__link">
+        ExceptionHandler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/session/" class="md-nav__link">
+        Session
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logger/" class="md-nav__link">
+        Logger
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../message-queue/" class="md-nav__link">
+        Message Queue
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Query
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Query
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    Select
+  </a>
+  
+    <nav class="md-nav" aria-label="Select">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conditions" class="md-nav__link">
+    Conditions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#join" class="md-nav__link">
+    Join
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group" class="md-nav__link">
+    Group
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#order" class="md-nav__link">
+    Order
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#having" class="md-nav__link">
+    Having
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit" class="md-nav__link">
+    Limit
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paging" class="md-nav__link">
+    Paging
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insert-statement" class="md-nav__link">
+    Insert Statement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-statement" class="md-nav__link">
+    Update Statement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-statement" class="md-nav__link">
+    Delete Statement
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../query-builder/" class="md-nav__link">
+        QueryBuilder
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repository/" class="md-nav__link">
+        Repository
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../router/" class="md-nav__link">
+        Router
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../service-object/" class="md-nav__link">
+        Service Object
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test-suite/" class="md-nav__link">
+        Test Suite
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translator/" class="md-nav__link">
+        Translator
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../view.md" class="md-nav__link">
+        View
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    Select
+  </a>
+  
+    <nav class="md-nav" aria-label="Select">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conditions" class="md-nav__link">
+    Conditions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#join" class="md-nav__link">
+    Join
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group" class="md-nav__link">
+    Group
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#order" class="md-nav__link">
+    Order
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#having" class="md-nav__link">
+    Having
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit" class="md-nav__link">
+    Limit
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paging" class="md-nav__link">
+    Paging
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insert-statement" class="md-nav__link">
+    Insert Statement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-statement" class="md-nav__link">
+    Update Statement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-statement" class="md-nav__link">
+    Delete Statement
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="query">Query</h1>
+<p>A Lightweight Query builder and statement executor.</p>
+<h2 id="usage">Usage</h2>
+<p>Create the <code>PDO</code> object, it is best to set the error mode to exception mode.</p>
+<pre><code class="language-php">$pdo = new PDO('mysql:host=mysql;port=3306;dbname=lightning','root', 'root', [
+    PDO::ATTR_EMULATE_PREPARES =&gt; false,
+    PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION
+]);
+
+$query new Query($pdo, new SqlBuilder());
+</code></pre>
+<p>To load the first record that matches the criteria</p>
+<pre><code class="language-php">$article = $query-&gt;select(['id','title','created_at','updated_at'])
+    -&gt;from('articles')
+    -&gt;where(['id' =&gt; 1234])
+    -&gt;first();
+</code></pre>
+<p>To load all the records</p>
+<pre><code class="language-php">$articles = $query-&gt;select(['id','title','created_at','updated_at'])
+    -&gt;from('articles')
+    -&gt;where(['status' =&gt; 'published'])
+    -&gt;or(['created_at &lt;' =&gt; '2021-10-21 09:00:00'])
+    -&gt;all();
+</code></pre>
+<h2 id="select">Select</h2>
+<p>To start a <code>SELECT</code> query, call the <code>select</code> method, this will reset the query</p>
+<pre><code class="language-php">$query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;where(['status' =&gt; 'published']);
+</code></pre>
+<h3 id="conditions">Conditions</h3>
+<p>The <code>where</code> method accepts an array of conditions.</p>
+<pre><code class="language-php">$query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;where([
+        'published' =&gt; 1, // Equals or if you pass a null value then it will be IS NULL
+        'author &lt;&gt;' =&gt; 1234] // Not equals or you can use != which is non ISO standard,
+        'deleted_at &lt;&gt;'  =&gt; null, // IS NOT NULL
+        'status' =&gt; ['new','pending'],  // IN
+        'category &lt;&gt;' =&gt; ['Development'],  // NOT IN
+        'created_at BETWEEN' =&gt; ['2021-01-01 12:00:00', '2021-06-01 12:00:00'], // BETWEEN OR NOT BETWEEN
+        'title LIKE' =&gt; '%foo', // LIKE or NOT LIKE
+        'id &gt;=' 2000, // arithmetic operators &lt;,&gt;,&lt;=,&gt;=  
+    ]);
+</code></pre>
+<p>The array conditions can also use nested conditions if they have the key <code>OR</code>, <code>AND</code>, this will join conditions by this type</p>
+<p>By default when you call <code>where</code> all conditions are joined by <code>AND</code> if you want to start a new group </p>
+<pre><code class="language-php">$query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;where(['status' =&gt; 'published']);
+    -&gt;or(['author' =&gt; 1234]);  // Find status published or author = 1234
+</code></pre>
+<h3 id="join">Join</h3>
+<p>When you join records, data from each joined table is put in their own <code>Row</code> object.</p>
+<pre><code class="language-php">$result = $query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;leftJoin('authors','author', ['articles.author_id = author.id'])
+    -&gt;first();
+
+echo $result-&gt;title; // article title
+echo $result-&gt;author-&gt;name; // the information from the table authors is in its own property
+</code></pre>
+<p>To do multiple joins on the same table, use the aliases</p>
+<pre><code class="language-php">$result = $query-&gt;select(['articles.id','title','author.id','author.name'])
+    -&gt;from('articles')
+    -&gt;leftJoin('authors','author', ['articles.author_id = author.id'])
+    -&gt;leftJoin('authors','owner', ['articles.owner_id = owner.id'])
+    -&gt;first();
+
+echo $result-&gt;author-&gt;name; 
+echo $result-&gt;owner-&gt;name; 
+</code></pre>
+<blockquote>
+<p>When using Postgres or Sqlite with table aliases you must supply the column names, you cannot use wildcard <code>*</code></p>
+</blockquote>
+<h3 id="group">Group</h3>
+<p>To create a <code>GROUP BY</code> query</p>
+<pre><code class="language-php">$query-&gt;select(['COUNT(*) AS count','category'])
+    -&gt;from('articles')
+    -&gt;groupBy('category');
+</code></pre>
+<h3 id="order">Order</h3>
+<pre><code class="language-php">$query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;orderBy('id DESC'); // or ['id' =&gt; 'DESC']
+</code></pre>
+<h3 id="having">Having</h3>
+<pre><code class="language-php">$query-&gt;select(['id', 'name','email'])
+    -&gt;from('articles')
+    -&gt;having('COUNT(id) &gt; 5');
+</code></pre>
+<h3 id="limit">Limit</h3>
+<p>To limit records</p>
+<pre><code class="language-php">$query-&gt;select(['id', 'name','email'])
+    -&gt;from('articles')
+    -&gt;limit(10);
+</code></pre>
+<p>To limit records starting from an offset</p>
+<pre><code class="language-php">$query-&gt;select(['id', 'name','email'])
+    -&gt;from('articles')
+    -&gt;limit(10, 20);
+</code></pre>
+<h3 id="paging">Paging</h3>
+<p>You can also use <code>page</code> which automatically calculates the limit, offset for you.</p>
+<pre><code class="language-php">$query-&gt;select(['*'])
+    -&gt;from('articles')
+    -&gt;page(5, 20)
+</code></pre>
+<h2 id="insert-statement">Insert Statement</h2>
+<p>To insert records</p>
+<pre><code class="language-php">$query-&gt;insertInto('posts')
+-&gt;values([
+    'title' =&gt; 'This is an article',
+    'body' =&gt; 'Some article body',
+    'created_at' =&gt; '2021-10-23 15:35:00',
+    'updated_at' =&gt; '2021-10-23 15:35:00',
+])
+-&gt;execute();
+</code></pre>
+<p>To get the last insert ID</p>
+<pre><code class="language-php">$id = $query-&gt;getLastInsertId();
+</code></pre>
+<h2 id="update-statement">Update Statement</h2>
+<p>To update data in the database, the execute method will return the number of rows affected.</p>
+<pre><code class="language-php">$rowsAffected = $query-&gt;update('posts')
+    -&gt;set([
+        'title' =&gt; 'foo'
+    ])
+    -&gt;where(['id' =&gt; 1000])
+    -&gt;execute();
+</code></pre>
+<h2 id="delete-statement">Delete Statement</h2>
+<p>To delete data in the database, the execute method will return the number of rows affected.</p>
+<pre><code class="language-php">$rowsAffected = $query-&gt;deleteFrom('posts')
+    -&gt;where(['id' =&gt; 1000]);
+    -&gt;execute();
+</code></pre>
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../migration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Migration" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Migration
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../query-builder/" class="md-footer__link md-footer__link--next" aria-label="Next: QueryBuilder" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              QueryBuilder
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.0238f547.min.js"></script>
+      
+    
+  </body>
+</html>

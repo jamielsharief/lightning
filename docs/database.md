@@ -32,13 +32,15 @@ class CustomPdoFactory implements PdoFactoryInterface
 
 ## Connection
 
-Works with PDO and PSR-3 Logger.
+Works with PDO and PSR-3 Logger, also allows you to connect and disconnect as needed.
 
 ### Usage
 
 ```php
 $pdoFactory = new PdoFactory('mysql:host=mysql;port=3306;dbname=lightning', 'root', 'root'); // 
 $db = new Connection($pdoFactory);
+$db->connect();
+$db->disconnect();
 ```
 
 ```php
